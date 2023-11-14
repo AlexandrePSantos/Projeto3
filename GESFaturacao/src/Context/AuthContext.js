@@ -43,7 +43,7 @@ export const AuthProvider = ({children}) => {
         await AsyncStorage.removeItem('@userInfo');
         await AsyncStorage.removeItem('@userToken');
         setIsLoading(false);
-        ToastAndroid.show("Obrigado pela preferência, " + nome, ToastAndroid.SHORT);
+        // ToastAndroid.show("Obrigado pela preferência, " + nome, ToastAndroid.SHORT);
     }
 
 

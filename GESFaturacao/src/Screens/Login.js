@@ -19,11 +19,12 @@ const Login = ({navigation}) => {
   return (
     <View style={styles.background}>
         {/* <Image source={require('./assets/gesf.png')}  style={styles.img}/> */}
-        <Image source={require('./assets/logo_old.jpg')}  style={styles.img}/>        
-        <Text style={styles.paddingBottom}>Bem-vindo ao GESFaturação</Text>
+        <Image source={require('./assets/logo_old.jpg')}  style={styles.containerLogo}/>        
+        
         <TextInput
           style={styles.input}
           value={username}
+          autoCapitalize='none'
           onChangeText={text => setUsername(text)}
           placeholder="Username"
         />
@@ -31,6 +32,7 @@ const Login = ({navigation}) => {
         <TextInput
           style={styles.input}
           value={password}
+          autoCapitalize='none'
           onChangeText={text => setPassword(text)}
           placeholder="Password"
           secureTextEntry

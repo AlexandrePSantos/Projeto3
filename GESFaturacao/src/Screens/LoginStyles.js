@@ -8,8 +8,9 @@ export default StyleSheet.create({
         backgroundColor: '#D8D5D4',
       },
       containerLogo: {
-        flex: 1,
         justifyContent: 'center',
+        marginBottom: 100,
+        borderRadius: 15,
       },
       container: {
         flex: 1,
@@ -22,10 +23,6 @@ export default StyleSheet.create({
         marginBottom: 15,
         borderRadius: 7,
       },
-      btnFgPass: {},
-      fgPass: {
-        marginBottom: 15,
-      },
       btnSignIn: {
         backgroundColor: '#BE6E31',
         borderRadius: 7,
@@ -33,5 +30,8 @@ export default StyleSheet.create({
       },
       signIn: {
         margin: 10,
+        fontSize: 20,
+        fontWeight: "bold",
+        color:'#ffffff',
       },
     });

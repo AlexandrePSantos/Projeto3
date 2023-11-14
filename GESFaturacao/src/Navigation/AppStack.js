@@ -25,7 +25,8 @@ const AppStack = () => {
 
     return (
       <Stack.Navigator>
-        <Stack.Screen name="GesFaturação" component={Home} options={{headerLeft: () => <Logo />}}/>
+        {/* <Stack.Screen name="GesFaturação" component={Home} options={{headerLeft: () => <Logo />}}/> */}
+        <Stack.Screen name="Dashboard" component={Home} options={{headerTitleAlign: 'center'}}/>
       </Stack.Navigator>
     );
 };
