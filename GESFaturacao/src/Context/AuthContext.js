@@ -46,9 +46,67 @@ export const AuthProvider = ({children}) => {
         // ToastAndroid.show("Obrigado pela preferência, " + nome, ToastAndroid.SHORT);
     }
 
+    const CriarFatura = async (clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC) =>{
+        var token = await this.getToken();
+        console.log(clienteC + ' Cliente');
+        console.log(serieC + ' Serie');
+        console.log(numeroC + ' num');
+        console.log(dataC + ' data');
+        console.log(validadeC + ' val');
+        console.log(referenciaC + ' ref');
+        console.log(vencimentoC + ' ven');
+        console.log(moedaC + ' moeda');
+        console.log(descontoC + ' des');
+        console.log(observacoesC + ' obs');
+        console.log(JSON.stringify(LinhasC) + ' linha');
+        console.log(finalizarDocumentoC + ' fim');
+
+        const stringifiedLinhas = JSON.stringify(LinhasC);
+        return axios({
+            url: `${BASE_URL}/invoices`,
+            method: 'POST',
+            timeout: 5000,
+            data: qs.stringify({
+                opcao: '2',
+                _token: token,
+                cliente: clienteC,
+                serie: serieC,
+                numero: numeroC,
+                moeda: 1,
+                data: dataC,
+                validade: validadeC,
+                referencia: referenciaC,
+                vencimento: vencimentoC,
+                desconto: descontoC,
+                observacoes: observacoesC,
+                finalizarDocumento: finalizarDocumentoC,
+                pagamento: 0,
+                Linhas: stringifiedLinhas,
+            }),
+            headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        });
+    }
+
+    const getArtigos = async () =>{
+        var token = await this.getToken();
+
+        return axios({
+            url: `${BASE_URL}/api/tabelas/artigos`,
+            method: 'GET',
+            params: {
+                opcao: '0',
+                pag: '0',
+                numRows: '25',
+                _token: token
+            },
+            headers: {
+                Accept: 'application/json',
+            },
+        });
+    }
 
     return(
-        <AuthContext.Provider value={{login, logout, isLoading, userToken}}>
+        <AuthContext.Provider value={{login, logout, CriarFatura, getArtigos, isLoading, userToken}}>
             {children}
         </AuthContext.Provider>
     );

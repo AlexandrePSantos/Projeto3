@@ -14,17 +14,16 @@ export default function Home({navigation}) {
   return (
     <View style={styles.outerContainer}>
       <View style={styles.container}>
-        {/* <TouchableOpacity
-          style={[styles.menuButton, styles.shadow]}>
-          onPress={() => navigation.navigate("GesFaturação - Orçamentos")}
+        <TouchableOpacity
+          style={[styles.menuButton, styles.shadow]}
+          onPress={() => navigation.navigate("Criar Fatura")}>
           <Text style={styles.menuText}>Criar fatura</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
 
         <TouchableOpacity style={[styles.menuButton, styles.shadow]} onPress={() => {logout()}}>
           <Text style={styles.menuText}>Logout</Text>
         </TouchableOpacity>
       </View>
-      {/* <Image source={require('./assets/logotipoMini.png')}/> */}
     </View>
   );
 };
