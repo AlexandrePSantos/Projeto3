@@ -1,9 +1,11 @@
 import React from "react";
 import { useState, useEffect, useContext } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View, FlatList, TextInput,ScrollView,ToastAndroid,LogBox  } from 'react-native';
+import { Button, StyleSheet, Text, Touchable, TouchableNativeFeedback, TouchableOpacity, View, FlatList, TextInput,ScrollView } from 'react-native';
 import { AuthContext } from "../../Context/AuthContext";
 import { Picker } from '@react-native-picker/picker';
+import { BASE_URL } from '../../config';
 import DatePicker from 'react-native-date-picker'
+import { useForm } from 'react-hook-form';
 import moment from 'moment/moment';
 
 
@@ -23,13 +25,14 @@ function Item({ item, onPress }) {
 }
 
 
-export default function CriarFatura({ navigation }) {
-  LogBox.ignoreLogs(['Warning: ...']); // Ignore log notification by message
-  LogBox.ignoreAllLogs();//Ignore all log notifications
-  const { getFaturas } = useContext(AuthContext);
+export default function CriarOrcamento({ navigation }) {
+
+  const { getOrcamentos } = useContext(AuthContext);
   const { getClientes } = useContext(AuthContext);
+  const { getclienteID } = useContext(AuthContext)
   const { getArtigos } = useContext(AuthContext);
-  const {CriarFatura} = useContext(AuthContext);
+  const {addOrcamentos} = useContext(AuthContext);
+  var coisa;
 
   /*const {register, handleSubmit, errors} = useForm({
     resolver: yupResolver(schema)
@@ -52,7 +55,7 @@ export default function CriarFatura({ navigation }) {
   const [iva, setIva] = useState(1);
   
 
-    //Dados para CriarFatura
+    //Dados para addOrçamento
 
     const [clienteC, setCliente] = useState();
     const [serieC, setSerie] = useState(3);
@@ -96,7 +99,7 @@ export default function CriarFatura({ navigation }) {
       setDadosClientes(res.data.aaData)
       
     });
-    getFaturas().then((res) => {
+    getOrcamentos().then((res) => {
       console.log(res.data);
 
     })
@@ -106,22 +109,18 @@ export default function CriarFatura({ navigation }) {
     setLinhas(LinhasC.filter((_, i) => i !== index));
   }
 
-  console.log("FJFJ",LinhasC);
+  console.log(LinhasC);
 
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
 
-  handleCreateFatura = () => {
+  handleCreateOrcamento = () => {
 
-    console.log(clienteC,"oi")
-    CriarFatura(clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC).then(response => {
+    console.log(clienteC + ' É aqui cepo');
+    addOrcamentos(clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC).then(response => {
         console.log(response + ' Resposta Criar Orçamento')
-        
-        navigation.navigate('GesFaturação');
-      ToastAndroid.show("Fatura Criada ", ToastAndroid.SHORT);
+        navigation.navigate("GesFaturação")
     });
-   
-    
 }
 
   return (
@@ -217,7 +216,6 @@ export default function CriarFatura({ navigation }) {
         <TextInput
           value={vencimentoC}
           onChangeText={(text) => setVencimento(text)}
-          defaultValue={0}
           placeholder="Vencimento"
           keyboardType="numeric"
         // ref={register({name: "quantidade"})} 
@@ -347,7 +345,7 @@ export default function CriarFatura({ navigation }) {
         )}
       />
       <View style={{marginTop: 30,marginBottom: 10 ,width: 350}}>
-      <Button  title="Criar Fatura" color="#d0933f" onPress={() => handleCreateFatura()} />
+      <Button  title="Criar Orçamento" color="#d0933f" onPress={() => handleCreateOrcamento()} />
       </View>
       </View>
     </ScrollView>
@@ -398,3 +396,4 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   }
 });
+

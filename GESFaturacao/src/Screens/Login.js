@@ -1,10 +1,8 @@
 import React, {useContext, useState} from 'react';
 import {
-  Button,
   TextInput,
   View,
   Text,
-  StyleSheet,
   TouchableOpacity, 
   Image
 } from 'react-native';
