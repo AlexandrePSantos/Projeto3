@@ -12,55 +12,10 @@ export default function CriarOrcamento({ navigation }) {
   const [dadosClientes, setDadosClientes] = useState([]);
   const [clienteC, setCliente] = useState();
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
-  var coisa;
-
-  /*const {register, handleSubmit, errors} = useForm({
-    resolver: yupResolver(schema)
-  });*/
- 
-  const [dadosArtigos, setDadosArtigos] = useState([]);
-  //const [cliente, setCliente] = useState();
-  //const [linhas, setLinhas] = useState([]);
-  const [datei, setDatei] = useState();
-  const [open, setOpen] = useState(false);
-
-  const [datev, setDatev] = useState();
-  const [openv, setOpenV] = useState(false);
-
-  const [artigo, setArtigo] = useState();
-  const [quantidade, setQuantidade] = useState();
-  const [preco, setPreco] = useState();
-  const [listKey, setListKey] = useState(0);
-  const [precoPVP, setPrecoPVP] = useState();
-  const [iva, setIva] = useState(1);
-  
 
     //Dados para addOrçamento
-
-
-    const [serieC, setSerie] = useState(3);
-    const [numeroC, setNumero] = useState(0);
-    const [dataC, setData] = useState("12/12/2022");
-    const [validadeC, setValidade] = useState("12/12/2022");
-    const [referenciaC, setReferencia] = useState("Ref. Documento");
-    const [vencimentoC, setVencimento] = useState(0);
-    const [moedaC, setMoeda] = useState(1);
-    const [descontoC, setDesconto] = useState(0);
-    const [observacoesC, setObservacoes] = useState("Observacoes");
-    //Linha de artigo
-    //const [artigoC, setArtigoL ] = useState("1");
-    const [descricaoC, setDescricaoL ] = useState("Artigo+Geral");
-    //const [qtdC, setQtdL ] = useState("1");
-    //const [precoC, setPrecoL ] = useState("33.333");
-    //const [impostoC, setImpostoL ] = useState("1");
-    //const [motivoC, setMotivoL ] = useState(null);
-    //const [descontoCL, setDescontoL ] = useState("0");
-    const [retencaoC, setRetencaoL ] = useState("0");
-    //const [centroC, setCentroL ] = useState("5");
-    //const [comentarioC, setComentarioL ] = useState("");
-    
     const [LinhasC, setLinhas] = useState([]);
-    const [finalizarDocumentoC, setFinalizarDocumento] = useState(0);
+
     useEffect(() => {
       getClientes().then((res) => {
         if (res.data) {
@@ -69,30 +24,10 @@ export default function CriarOrcamento({ navigation }) {
       });
     }, []);
 
-    
-
-
   const onSubmit = (data) => {
     setLinhas([...LinhasC, data]);
   }
 
-  //if (!dadosArtigos.length) {
-    //getArtigos().then((res) => {
-      //setDadosArtigos(res.data.aaData)
-      //console.log(res.data.aaData)
-    //});
-  //}
-  if (!dadosClientes.length) {
-    getClientes().then((res) => {
-      
-      setDadosClientes(res.data.aaData)
-      
-    });
-    //getOrcamentos().then((res) => {
-      //console.log(res.data);
-
-    //})
-  }
   
   const removeItem = (index) => {
     setLinhas(LinhasC.filter((_, i) => i !== index));
@@ -100,7 +35,7 @@ export default function CriarOrcamento({ navigation }) {
 
   console.log(LinhasC);
 
-  const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
+ 
 
   handleCreateOrcamento = () => {
     const serieC = '';
