@@ -80,14 +80,14 @@ export const AuthProvider = ({children}) => {
     // ------!-------
     //    Faturas
     // ------!-------
-    const CriarFatura = async (clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC) => {
+    const CriarFatura = async (clienteC, serieC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
         const stringifiedLinhas = JSON.stringify(LinhasC);
     
         let data = qs.stringify({
             'client': clienteC,
             'serie': serieC,
-            'number': numeroC,
+            'number': 0,
             'date': dataC,
             'expiration': validadeC,
             'reference': referenciaC,
