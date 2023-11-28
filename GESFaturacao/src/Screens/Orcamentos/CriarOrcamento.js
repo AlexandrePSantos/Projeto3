@@ -6,7 +6,6 @@ import { Picker } from '@react-native-picker/picker';
 
 
 export default function CriarOrcamento({ navigation }) {
-
   const { getClientes } = useContext(AuthContext);
   const { CriarOrcamento } = useContext(AuthContext);
 
