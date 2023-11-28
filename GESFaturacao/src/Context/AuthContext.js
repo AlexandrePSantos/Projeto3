@@ -133,8 +133,7 @@ export const AuthProvider = ({children}) => {
             maxBodyLength: Infinity,
             url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/clients',
             headers: { 
-              'Authorization': token, 
-              'Cookie': 'PHPSESSID=2126001ea125fd6cd0c8d1029eb1497a'
+              'Authorization': token
             },
             data : data
           };

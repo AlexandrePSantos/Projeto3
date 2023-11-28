@@ -57,15 +57,10 @@ export default function CriarFatura({ navigation }) {
       <View style={{marginTop: 10}}>
         <Text style={styles.titleSelect}>Client</Text>
         <View style={styles.borderMargin}>
-          <Picker  style={styles.pickerComponent} placeholder="Selecione um cliente" selectedValue={selectedIdCliente} 
-            onValueChange={itemValue => {
-            setSelectedIdCliente(itemValue);
-            setCliente(itemValue);
-          }}>
-          {dadosClientes.map(function (client, i) {
-            return <Picker.Item label={client.name} value={client.id.toString()} key={i} />;
-          })}
-          </Picker>
+        <Picker style={styles.pickerComponent} selectedValue={selectedIdCliente} onValueChange={itemValue => { setSelectedIdCliente(itemValue); setCliente(itemValue); }} >
+          <Picker.Item label="Selecione um cliente" value={null} />
+          {dadosClientes.map(function (client, i) { return <Picker.Item label={client.name} value={client.id.toString()} key={i} />; })}
+        </Picker>
         </View>
       </View>
       <View style={{marginTop: 30,marginBottom: 10 ,width: 350}}>
