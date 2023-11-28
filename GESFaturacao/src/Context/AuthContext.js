@@ -43,105 +43,56 @@ export const AuthProvider = ({children}) => {
         await AsyncStorage.removeItem('@userInfo');
         await AsyncStorage.removeItem('@userToken');
         setIsLoading(false);
-        // ToastAndroid.show("Obrigado pela preferência, " + nome, ToastAndroid.SHORT);
     }
 
     // ------!-------
     //    Faturas
     // ------!-------
-    const CriarFatura = async (clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC) =>{
+    const CriarFatura = async (clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
-        console.log(clienteC + ' Cliente');
-        console.log(serieC + ' Serie');
-        console.log(numeroC + ' num');
-        console.log(dataC + ' data');
-        console.log(validadeC + ' val');
-        console.log(referenciaC + ' ref');
-        console.log(vencimentoC + ' ven');
-        console.log(moedaC + ' moeda');
-        console.log(descontoC + ' des');
-        console.log(observacoesC + ' obs');
-        console.log(JSON.stringify(LinhasC) + ' linha');
-        console.log(finalizarDocumentoC + ' fim');
-
         const stringifiedLinhas = JSON.stringify(LinhasC);
-        return axios({
+    
+        let data = qs.stringify({
+            'client': clienteC,
+            'serie': serieC,
+            'number': numeroC,
+            'date': dataC,
+            'expiration': validadeC,
+            'reference': referenciaC,
+            'dueDate': vencimentoC,
+            'coin': moedaC,
+            'discount': descontoC,
+            'observations': observacoesC,
+            'finalize': finalizarDocumentoC,
+            'payment': 0,
+            'lines': stringifiedLinhas,
+            'doc_origin': '9' 
+        });
+    
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
             url: `${BASE_URL}/invoices`,
-            method: 'POST',
-            timeout: 5000,
-            data: qs.stringify({
-                opcao: '2',
-                _token: token,
-                cliente: clienteC,
-                serie: serieC,
-                numero: numeroC,
-                moeda: 1,
-                data: dataC,
-                validade: validadeC,
-                referencia: referenciaC,
-                vencimento: vencimentoC,
-                desconto: descontoC,
-                observacoes: observacoesC,
-                finalizarDocumento: finalizarDocumentoC,
-                pagamento: 0,
-                Linhas: stringifiedLinhas,
-            }),
-            headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        });
-    }
-
-    const getFaturas = async () =>{
-        var token = await this.getToken();
-        return axios({
-            url: `${BASE_URL}/api/vendas/faturas`,
-            method: 'GET',
-            timeout: 5000,
-            params: {
-                opcao: '0',
-                pag: '0',
-                numRows: '25',
-                _token: token
+            headers: { 
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'Authorization': token, 
+                'Cookie': 'PHPSESSID=2126001ea125fd6cd0c8d1029eb1497a'
             },
-            headers: {
-                Accept: 'application/json',
-            }
-        });
+            data : data
+        };
+    
+        return axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     }
 
     // ------!-------
     //    Artigos
     // ------!-------
-    const CriarArtigo = async (dadosArt) =>{
-        console.log(dadosArt);
-        var token = await this.getToken();
-        return axios({
-            url: `${BASE_URL}/api/tabelas/artigos`,
-            method: 'POST',
-            timeout: 5000,
-            data : {
-                opcao: '2',
-                _token: token,
-                codigo_artigo:dadosArt.Codigo,
-                nome_artigo: dadosArt.Nome,
-                categoria_artigo: dadosArt.Categoria,
-                tipo_artigo: dadosArt.Tipo,
-                stock_artigo: dadosArt.Stock,
-                unidade_artigo: dadosArt.Unidade,
-                precoPVP_artigo: dadosArt.PrecoPVP,
-                imposto_artigo: dadosArt.IVA , 
-                preco_artigo: dadosArt.Preco ,
-                codigobarras_artigo: dadosArt.CodigoBarras,
-                numeroserie_artigo: dadosArt.SerialNumber,
-                retencao_valor_artigo: dadosArt.RetencaoValor,
-                retencao_percenteagem_artigo: dadosArt.RetencaoPercentagem,
-                observacoes_artigo: dadosArt.DescricaoLonga
-        },
-        headers: {
-            Accept: 'application/json',
-        }
-        });
-    }
-
     const getArtigos = async () =>{
         var token = await this.getToken();
 
@@ -236,80 +187,46 @@ export const AuthProvider = ({children}) => {
     // ------!-------
     //   Clientes
     // ------!-------
-    const criarCliente = async (dadosCli) =>{
-        var token = await this.getToken();
-        console.log(token)
-        console.log(dadosCli)
-        axios.post(`${BASE_URL}/api/tabelas/clientes`, {
-        opcao: '2',
-                    _token: token,
-                    nome_cliente: dadosCli.Nome,
-                    nif_cliente: dadosCli.Nif,
-                    pais_cliente: dadosCli.Pais,
-                    endereco_cliente: dadosCli.Endereco,
-                    codigopostal_cliente: dadosCli.CodigoPostal,
-                    regiao_cliente: dadosCli.Regiao,
-                    cidade_cliente: dadosCli.Cidade,
-                    email_cliente: dadosCli.Email,
-                    website_cliente: dadosCli.Website,
-                    tlm_cliente: dadosCli.Telemovel,
-                    tlf_cliente: dadosCli.Telefone,
-                    fax_cliente: dadosCli.Fax,
-                    vencimento_cliente: dadosCli.Vencimento,
-                    desconto_cliente: dadosCli.Desconto,
-    
-        }, {headers: { Accept: 'application/json',}})
-    }
-
-    const getClientes = async ()=> {
-        
-        var token = await this.getToken();
-
-        return axios({
+    const getClientes = async () => {
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
             url: `${BASE_URL}/clients`,
-            method: 'GET',
-            params: {
-                opcao: '0',
-                _token: token,
-                pag: '0',
-                numRows: '25',
-                table_usage: '1'
-            },
             headers: {
-                Accept: 'application/json',
+                'Authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo5LCJ1c2VybmFtZSI6ImlwdmMiLCJjcmVhdGVkIjoiMjAyMy0xMS0yOCAxMzo0NDowNSJ9.nH46hp-ANZ6tp5RXuekGVslavXE0hZwsME-E7uueKBk',
+                'Cookie': 'PHPSESSID=2126001ea125fd6cd0c8d1029eb1497a'
             }
-        })
+        };
+    
+        try {
+            const response = await axios.request(config);
+            console.log(JSON.stringify(response.data));
+            return response.data; // return the data
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     const getclienteID = async (id) =>{
-        console.log("AQUI", id)
         var token = await this.getToken();
-        return axios({
-            url: `${BASE_URL}/clients`,
-            method: 'GET',
-            params: {
-                opcao: '1',
-                idCliente: id,
-                _token: token
-            },
-            headers: {
-                Accept: 'application/json',
-            },
-        });
-    }
-
-    const deletecliente = async (id) =>{
-        var token = await this.getToken();
-        return axios({
-            url: `${BASE_URL}/api/tabelas/clientes`,
-            method: 'DELETE',
-            timeout: 5000,
-            data: qs.stringify({
-                opcao: '4',
-                _token: token,
-                idCliente: id
-            }),
-            headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/clients?id=${id}`,
+            headers: { 
+                'Authorization': token, 
+                'Cookie': 'PHPSESSID=2126001ea125fd6cd0c8d1029eb1497a'
+            }
+        };
+        
+        return axios.request(config)
+        .then((response) => {
+            console.log(JSON.stringify(response.data));
+            return response.data;
+        })
+        .catch((error) => {
+            console.log(error);
         });
     }
 
@@ -319,9 +236,9 @@ export const AuthProvider = ({children}) => {
     return(
         <AuthContext.Provider value={{login, logout, 
             CriarOrcamentos, getOrcamentos,
-            CriarArtigo, getArtigos, 
-            CriarFatura, getFaturas,
-            criarCliente, getClientes, getclienteID, deletecliente,
+            getArtigos, 
+            CriarFatura,
+            getClientes, getclienteID,
             isLoading, userToken}}>
             {children}
         </AuthContext.Provider>
