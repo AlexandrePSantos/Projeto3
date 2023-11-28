@@ -14,9 +14,8 @@ export default function CriarFatura({ navigation }) {
   
   useEffect(() => {
     getClientes().then((res) => {
-      console.log(res.data)
-      if (res.data && res.data.aaData) {
-        setDadosClientes(res.data.aaData)
+      if (res.data) {
+        setDadosClientes(res.data)
       }
     });
   }, []);
@@ -58,13 +57,15 @@ export default function CriarFatura({ navigation }) {
       <View style={{marginTop: 10}}>
         <Text style={styles.titleSelect}>Client</Text>
         <View style={styles.borderMargin}>
-        <Picker  style={styles.pickerComponent} placeholder="Selecione um cliente" selectedValue={selectedIdCliente} onValueChange={itemValue => {
-          setSelectedIdCliente(itemValue); 
-          setCliente(itemValue[0]);}}>
-          {dadosClientes.map(function (object, i) {
-            return <Picker.Item label={object[2]} value={object[0]} key={i} />;
+          <Picker  style={styles.pickerComponent} placeholder="Selecione um cliente" selectedValue={selectedIdCliente} 
+            onValueChange={itemValue => {
+            setSelectedIdCliente(itemValue);
+            setCliente(itemValue);
+          }}>
+          {dadosClientes.map(function (client, i) {
+            return <Picker.Item label={client.name} value={client.id.toString()} key={i} />;
           })}
-        </Picker>
+          </Picker>
         </View>
       </View>
       <View style={{marginTop: 30,marginBottom: 10 ,width: 350}}>
