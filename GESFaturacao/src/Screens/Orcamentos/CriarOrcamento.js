@@ -2,27 +2,54 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View, FlatList, TextInput,ScrollView,ToastAndroid,LogBox  } from 'react-native';
 import { AuthContext } from "../../Context/AuthContext";
 import { Picker } from '@react-native-picker/picker';
+import DatePicker from 'react-native-date-picker';
+import moment from 'moment/moment';
 
 
 
 export default function CriarOrcamento({ navigation }) {
   const { getClientes } = useContext(AuthContext);
   const { CriarOrcamento } = useContext(AuthContext);
+  const { getSeries } = useContext(AuthContext);
 
   const [dadosClientes, setDadosClientes] = useState([]);
+  const [dadosSeries, setDadosSeries] = useState([]);
+  const [serieC, setSerie] = useState();
+  const [datei, setDatei] = useState();
+
   const [clienteC, setCliente] = useState();
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
+  const [selectedIdSerie, setSelectedIdSerie] = useState(null);
+  const [datev, setDatev] = useState();
+  const [openv, setOpenV] = useState(false);
 
     //Dados para addOrçamento
     const [LinhasC, setLinhas] = useState([]);
 
-    useEffect(() => {
-      getClientes().then((res) => {
-        if (res.data) {
-          setDadosClientes(res.data)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const clientesResponse = await getClientes();
+        const seriesResponse = await getSeries();
+
+        if (clientesResponse.data) {
+          setDadosClientes(clientesResponse.data);
+          console.log(clientesResponse.data);
         }
-      });
-    }, []);
+
+
+        
+        if (seriesResponse.data) {
+          setDadosSeries(seriesResponse.data);
+          console.log(seriesResponse.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const onSubmit = (data) => {
     setLinhas([...LinhasC, data]);
@@ -296,7 +323,6 @@ export default function CriarOrcamento({ navigation }) {
   return (
     <ScrollView>
     <View style={styles.container}>
-
       {/* Cliente */}
       <View style={{marginTop: 10}}>
         <Text style={styles.titleSelect}>Client</Text>
@@ -312,6 +338,32 @@ export default function CriarOrcamento({ navigation }) {
             </Picker>
           </View>
         </View>
+        {/* SERIE */}
+        <Text style={styles.titleSelect}>Series</Text>
+          <View style={styles.borderMargin}>
+            <Picker style={styles.pickerComponent} selectedValue={selectedIdSerie} onValueChange={itemValue => {setSelectedIdSerie(itemValue); setSerie(itemValue)}} >
+              <Picker.Item label="Selecione uma serie" value={null} />
+                {dadosSeries.map(function (serie, i) { return <Picker.Item label={serie.description} value={serie.id.toString()} key={i} />; })}
+            </Picker>
+          </View>
+          {/* date */}
+          <Text style={styles.titleSelect}>Data</Text>
+            <View style={styles.borderMargin}>
+              <TouchableOpacity  onPress={() => setOpenV(true)} style={styles.touchableO}>
+                <DatePicker modal mode="date" open={openv} date={new Date()}
+                  onConfirm={(datev) => { setOpenV(false); setDatev(datev); setValidade(moment(datev).format("DD/MM/YYYY")) }} onCancel={() => { setOpenV(false) }} />
+                <Text style={styles.textDate}> {todaiDate = moment(datei).format("DD/MM/YYYY") }</Text>
+              </TouchableOpacity>
+            </View>
+          {/* expiration */}
+          <Text style={styles.titleSelect}>Validade</Text>
+            <View style={styles.borderMargin}>
+              <TouchableOpacity  onPress={() => setOpenV(true)} style={styles.touchableO}>
+                <DatePicker modal mode="date" open={openv} date={new Date()}
+                  onConfirm={(datev) => { setOpenV(false); setDatev(datev); setValidade(moment(datev).format("DD/MM/YYYY")) }} onCancel={() => { setOpenV(false) }} />
+                <Text style={styles.textDate}> {todayVDate = moment(datev).format("DD/MM/YYYY") }</Text>
+              </TouchableOpacity>
+            </View>
         <View style={{marginTop: 30,marginBottom: 10 ,width: 350}}>
           <Button  title="Criar Orçamento" color="#d0933f" onPress={() => handleCreateOrcamento()} />
         </View>
