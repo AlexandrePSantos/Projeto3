@@ -140,7 +140,7 @@ export const AuthProvider = ({children}) => {
     
         return axios.request(config)
         .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         return response.data; // Add this line
         })
         .catch((error) => {
@@ -149,23 +149,50 @@ export const AuthProvider = ({children}) => {
     }
 
     // ------!-------
+    //    Series
+    // ------!-------
+    const getSeries = async () => {
+        var token = await this.getToken();
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/series',
+            headers: { 
+              'Authorization': token
+            }
+          };
+          
+          return axios.request(config)
+          .then((response) => {
+            // console.log(JSON.stringify(response.data));
+            return response.data; // Add this line
+          })
+          .catch((error) => {
+            console.log(error + ' Erro Series');
+          });
+    }
+
+    // ------!-------
     //    Artigos
     // ------!-------
     const getArtigos = async () =>{
         var token = await this.getToken();
-
-        return axios({
-            url: `${BASE_URL}/api/tabelas/artigos`,
-            method: 'GET',
-            params: {
-                opcao: '0',
-                pag: '0',
-                numRows: '25',
-                _token: token
-            },
-            headers: {
-                Accept: 'application/json',
-            },
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/products',
+            headers: { 
+                'Authorization': token
+            }
+        };
+          
+        return axios.request(config)
+        .then((response) => {
+        console.log(JSON.stringify(response.data));
+        return response.data; // Add this line
+        })
+        .catch((error) => {
+        console.log(error);
         });
     }
 
@@ -248,6 +275,7 @@ export const AuthProvider = ({children}) => {
     return(
         <AuthContext.Provider value={{login, logout, 
             CriarOrcamentos, getOrcamentos,
+            getSeries,
             getArtigos, 
             CriarFatura,
             getClientes, 
