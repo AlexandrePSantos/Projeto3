@@ -1,28 +1,56 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View, FlatList, TextInput,ScrollView,ToastAndroid,LogBox  } from 'react-native';
+import { Button, StyleSheet, Text, View, TouchableOpacity, ScrollView,ToastAndroid, } from 'react-native';
 import { AuthContext } from "../../Context/AuthContext";
 import { Picker } from '@react-native-picker/picker';
+import DatePicker from 'react-native-date-picker';
+import moment from 'moment/moment';
 
 export default function CriarFatura({ navigation }) {
-  const { getClientes } = useContext(AuthContext);
   const { CriarFatura } = useContext(AuthContext);
+  const { getClientes } = useContext(AuthContext);
+  const { getSeries } = useContext(AuthContext);
 
   const [dadosClientes, setDadosClientes] = useState([]);
+  const [dadosSeries, setDadosSeries] = useState([]);
+  const [datei, setDatei] = useState();
+  const [open, setOpen] = useState(false);
   const [clienteC, setCliente] = useState();
+  const [serieC, setSerie] = useState();
+  const [dataC, setData] = useState("01/12/2023");
+  
+  const [datev, setDatev] = useState();
+  const [openv, setOpenV] = useState(false);
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
+  const [selectedIdSerie, setSelectedIdSerie] = useState(null);
   
   
   useEffect(() => {
-    getClientes().then((res) => {
-      if (res.data) {
-        setDadosClientes(res.data)
+    const fetchData = async () => {
+      try {
+        const clientesResponse = await getClientes();
+        const seriesResponse = await getSeries();
+
+        if (clientesResponse.data) {
+          setDadosClientes(clientesResponse.data);
+          console.log(clientesResponse.data);
+        }
+
+        if (seriesResponse.data) {
+          setDadosSeries(seriesResponse.data);
+          console.log(seriesResponse.data);
+        }
+      } catch (error) {
+        console.error(error);
       }
-    });
+    };
+
+    fetchData();
   }, []);
 
   const handleCreateFatura = () => {
     // Define the variables here
-    const serieC = '';
+    const clienteC = clienteC;
+    const serieC = serieC;
     const numeroC = '';
     const dataC = '';
     const validadeC = '';
@@ -51,26 +79,64 @@ export default function CriarFatura({ navigation }) {
 
   return (
     <ScrollView>
-    <View style={styles.container}>
+      <View style={styles.container}>     
+        <View style={{marginTop: 10}}>
+          {/* Cliente */}
+          <Text style={styles.titleSelect}>Client</Text>
+          <View style={styles.borderMargin}>
+            <Picker style={styles.pickerComponent} selectedValue={selectedIdCliente} onValueChange={itemValue => { setSelectedIdCliente(itemValue); setCliente(itemValue); }} >
+              <Picker.Item label="Selecione um cliente" value={null} />
+              {dadosClientes.map(function (client, i) { return <Picker.Item label={client.name} value={client.id.toString()} key={i} />; })}
+            </Picker>
+          </View>
+          {/* Serie */}
+          <Text style={styles.titleSelect}>Series</Text>
+            <View style={styles.borderMargin}>
+              <Picker style={styles.pickerComponent} selectedValue={selectedIdSerie} onValueChange={itemValue => {setSelectedIdSerie(itemValue); setSerie(itemValue)}} >
+                <Picker.Item label="Selecione uma serie" value={null} />
+                {dadosSeries.map(function (serie, i) { return <Picker.Item label={serie.description} value={serie.id.toString()} key={i} />; })}
+              </Picker>
+            </View>
+          {/* date */}
+          <Text style={styles.titleSelect}>Data</Text>
+            <View style={styles.borderMargin}>
+              <TouchableOpacity  onPress={() => setOpen(true)} style={styles.touchableO}>
+                <DatePicker modal mode="date" open={openv} date={new Date()}
+                  onConfirm={(datev) => { setOpenV(false); setDatev(datev); setValidade(moment(datev).format("DD/MM/YYYY")) }} onCancel={() => { setOpenV(false) }} />
+                <Text style={styles.textDate}> {todaiDate = moment(datei).format("DD/MM/YYYY") }</Text>
+              </TouchableOpacity>
+            </View>
+          {/* expiration */}
+          <Text style={styles.titleSelect}>Validade</Text>
+            <View style={styles.borderMargin}>
+              <TouchableOpacity  onPress={() => setOpenV(true)} style={styles.touchableO}>
+                <DatePicker modal mode="date" open={openv} date={new Date()}
+                  onConfirm={(datev) => { setOpenV(false); setDatev(datev); setValidade(moment(datev).format("DD/MM/YYYY")) }} onCancel={() => { setOpenV(false) }} />
+                <Text style={styles.textDate}> {todayVDate = moment(datev).format("DD/MM/YYYY") }</Text>
+              </TouchableOpacity>
+            </View>
+          {/* reference */}
 
-      {/* Cliente */}
-      <View style={{marginTop: 10}}>
-        <Text style={styles.titleSelect}>Client</Text>
-        <View style={styles.borderMargin}>
-          <Picker  style={styles.pickerComponent} placeholder="Selecione um cliente" selectedValue={selectedIdCliente} 
-            onValueChange={itemValue => {
-            setSelectedIdCliente(itemValue);
-            setCliente(itemValue);
-          }}>
-          {dadosClientes.map(function (client, i) {
-            return <Picker.Item label={client.name} value={client.id.toString()} key={i} />;
-          })}
-          </Picker>
+          {/* dueDate */}
+
+          {/* Coin */}
+
+          {/* discount */}
+
+          {/* observations */}
+
+          {/* finalize */}
+
+          {/* payment */}
+
+          {/* lines/artigos */}
+
+          {/* doc_origin */}
+
         </View>
-      </View>
-      <View style={{marginTop: 30,marginBottom: 10 ,width: 350}}>
-      <Button  title="Criar Fatura" color="#d0933f" onPress={() => handleCreateFatura()} />
-      </View>
+        <View style={{marginTop: 30,marginBottom: 10 ,width: 350}}>
+          <Button  title="Criar Fatura" color="#d0933f" onPress={() => handleCreateFatura()} />
+        </View>
       </View>
     </ScrollView>
   );

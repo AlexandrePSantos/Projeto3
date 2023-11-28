@@ -80,14 +80,14 @@ export const AuthProvider = ({children}) => {
     // ------!-------
     //    Faturas
     // ------!-------
-    const CriarFatura = async (clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC) => {
+    const CriarFatura = async (clienteC, serieC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
         const stringifiedLinhas = JSON.stringify(LinhasC);
     
         let data = qs.stringify({
             'client': clienteC,
             'serie': serieC,
-            'number': numeroC,
+            'number': 0,
             'date': dataC,
             'expiration': validadeC,
             'reference': referenciaC,
@@ -133,15 +133,14 @@ export const AuthProvider = ({children}) => {
             maxBodyLength: Infinity,
             url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/clients',
             headers: { 
-              'Authorization': token, 
-              'Cookie': 'PHPSESSID=2126001ea125fd6cd0c8d1029eb1497a'
+              'Authorization': token
             },
             data : data
           };
     
         return axios.request(config)
         .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         return response.data; // Add this line
         })
         .catch((error) => {
@@ -150,23 +149,50 @@ export const AuthProvider = ({children}) => {
     }
 
     // ------!-------
+    //    Series
+    // ------!-------
+    const getSeries = async () => {
+        var token = await this.getToken();
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/series',
+            headers: { 
+              'Authorization': token
+            }
+          };
+          
+          return axios.request(config)
+          .then((response) => {
+            // console.log(JSON.stringify(response.data));
+            return response.data; // Add this line
+          })
+          .catch((error) => {
+            console.log(error + ' Erro Series');
+          });
+    }
+
+    // ------!-------
     //    Artigos
     // ------!-------
     const getArtigos = async () =>{
         var token = await this.getToken();
-
-        return axios({
-            url: `${BASE_URL}/api/tabelas/artigos`,
-            method: 'GET',
-            params: {
-                opcao: '0',
-                pag: '0',
-                numRows: '25',
-                _token: token
-            },
-            headers: {
-                Accept: 'application/json',
-            },
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/products',
+            headers: { 
+                'Authorization': token
+            }
+        };
+          
+        return axios.request(config)
+        .then((response) => {
+        console.log(JSON.stringify(response.data));
+        return response.data; // Add this line
+        })
+        .catch((error) => {
+        console.log(error);
         });
     }
 
@@ -242,6 +268,7 @@ export const AuthProvider = ({children}) => {
     return(
         <AuthContext.Provider value={{login, logout, 
             CriarOrcamentos, getOrcamentos,
+            getSeries,
             getArtigos, 
             CriarFatura,
             getClientes, 
