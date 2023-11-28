@@ -1,43 +1,24 @@
-import React from "react";
-import { useState, useEffect, useContext } from 'react';
-import { Button, StyleSheet, Text, Touchable, TouchableNativeFeedback, TouchableOpacity, View, FlatList, TextInput,ScrollView } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { Button, StyleSheet, Text, TouchableOpacity, View, FlatList, TextInput,ScrollView,ToastAndroid,LogBox  } from 'react-native';
 import { AuthContext } from "../../Context/AuthContext";
 import { Picker } from '@react-native-picker/picker';
-import { BASE_URL } from '../../config';
-import DatePicker from 'react-native-date-picker'
-import { useForm } from 'react-hook-form';
-import moment from 'moment/moment';
 
-
-
-function Item({ item, onPress }) {
-  const {getArtigoID} = useContext(AuthContext);
-  const [nomeArtigo, setNomeArtigo] = useState();
-  getArtigoID(item.artigo).then((res)=>{
-    setNomeArtigo(res.data.data.Nome)
-  })
-  return (
-    <View style={{marginTop: 8}}>
-      <Text>Artigo: {nomeArtigo} | Preço: {Number(item.preco)} € | QTD: {item.qtd} | Total: {Number(item.preco) * Number(item.qtd)} €</Text>
-      <View style={{marginTop: 4}}><Button title="Remover" color="#bf4346" onPress={onPress} /></View>
-    </View>
-  );
-}
 
 
 export default function CriarOrcamento({ navigation }) {
 
-  const { getOrcamentos } = useContext(AuthContext);
   const { getClientes } = useContext(AuthContext);
-  const { getclienteID } = useContext(AuthContext)
-  const { getArtigos } = useContext(AuthContext);
-  const {addOrcamentos} = useContext(AuthContext);
+  const { CriarOrcamento } = useContext(AuthContext);
+
+  const [dadosClientes, setDadosClientes] = useState([]);
+  const [clienteC, setCliente] = useState();
+  const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   var coisa;
 
   /*const {register, handleSubmit, errors} = useForm({
     resolver: yupResolver(schema)
   });*/
-  const [dadosClientes, setDadosClientes] = useState([]);
+ 
   const [dadosArtigos, setDadosArtigos] = useState([]);
   //const [cliente, setCliente] = useState();
   //const [linhas, setLinhas] = useState([]);
@@ -57,7 +38,7 @@ export default function CriarOrcamento({ navigation }) {
 
     //Dados para addOrçamento
 
-    const [clienteC, setCliente] = useState();
+
     const [serieC, setSerie] = useState(3);
     const [numeroC, setNumero] = useState(0);
     const [dataC, setData] = useState("12/12/2022");
@@ -81,28 +62,37 @@ export default function CriarOrcamento({ navigation }) {
     
     const [LinhasC, setLinhas] = useState([]);
     const [finalizarDocumentoC, setFinalizarDocumento] = useState(0);
+    useEffect(() => {
+      getClientes().then((res) => {
+        if (res.data) {
+          setDadosClientes(res.data)
+        }
+      });
+    }, []);
+
+    
 
 
   const onSubmit = (data) => {
     setLinhas([...LinhasC, data]);
   }
 
-  if (!dadosArtigos.length) {
-    getArtigos().then((res) => {
-      setDadosArtigos(res.data.aaData)
-      console.log(res.data.aaData)
-    });
-  }
+  //if (!dadosArtigos.length) {
+    //getArtigos().then((res) => {
+      //setDadosArtigos(res.data.aaData)
+      //console.log(res.data.aaData)
+    //});
+  //}
   if (!dadosClientes.length) {
     getClientes().then((res) => {
-      console.log(res.data)
+      
       setDadosClientes(res.data.aaData)
       
     });
-    getOrcamentos().then((res) => {
-      console.log(res.data);
+    //getOrcamentos().then((res) => {
+      //console.log(res.data);
 
-    })
+    //})
   }
   
   const removeItem = (index) => {
@@ -111,32 +101,45 @@ export default function CriarOrcamento({ navigation }) {
 
   console.log(LinhasC);
 
-  const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
 
   handleCreateOrcamento = () => {
+    const serieC = '';
+    const numeroC = '';
+    const dataC = '';
+    const validadeC = '';
+    const referenciaC = '';
+    const vencimentoC = '';
+    const moedaC = '';
+    const descontoC = '';
+    const observacoesC = '';
+    const LinhasC = '';
+    const finalizarDocumentoC = '';
 
-    console.log(clienteC + ' É aqui cepo');
-    addOrcamentos(clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC).then(response => {
+    console.log(clienteC);
+    CriarOrcamento(clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC).then(response => {
         console.log(response + ' Resposta Criar Orçamento')
         navigation.navigate("GesFaturação")
+        ToastAndroid.show("Orçamento Criado", ToastAndroid.SHORT)
     });
 }
 
+ {/*
   return (
+   
     <ScrollView>
     <View style={styles.container}>
 
       <View style={{marginTop: 10}}>
         <Text style={styles.titleSelect}>Cliente</Text>
         <View style={styles.borderMargin}>
-        <Picker  style={styles.pickerComponent} placeholder="Selecione um cliente" selectedValue={selectedIdCliente} onValueChange={itemValue => {
-          setSelectedIdCliente(itemValue); 
-          setCliente(itemValue[0]);}}>
-          {dadosClientes.map(function (object, i) {
-            return <Picker.Item label={object[2]} value={object[0]} key={i} />;
-          })}
-        </Picker>
+          <Picker  style={styles.pickerComponent} placeholder="Selecione um cliente" selectedValue={selectedIdCliente} onValueChange={itemValue => {
+            setSelectedIdCliente(itemValue); 
+            setCliente(itemValue);}}>
+            {dadosClientes.map(function (client, i) {
+              return <Picker.Item label={client.value} value={client.id.toString()} key={i} />;
+            })}
+          </Picker>
         </View>
 
         <Text style={styles.titleSelect}>Serie</Text>
@@ -273,7 +276,8 @@ export default function CriarOrcamento({ navigation }) {
           })}
         </Picker>
         </View>
-        {/* {errors.artigo && <Text>{errors.artigo.message}</Text>} */}
+        //{/* {errors.artigo && <Text>{errors.artigo.message}</Text>} */}
+        {/*
         <Text style={styles.titleSelect}>Quantidade</Text>
         <View style={styles.borderMargin}>
         <TextInput
@@ -284,7 +288,9 @@ export default function CriarOrcamento({ navigation }) {
         // ref={register({name: "quantidade"})} 
         />
         </View>
+        */}
         {/* {errors.quantidade && <Text>{errors.quantidade.message}</Text>} */}
+        {/*
         <Text style={styles.titleSelect}>Preço</Text>
         <View style={styles.borderMargin}>
         <TextInput
@@ -311,6 +317,7 @@ export default function CriarOrcamento({ navigation }) {
         </View>
         
         {/* {errors.preco && <Text>{errors.preco.message}</Text>} */}
+        {/*
         <View style={{marginBottom: 10, marginTop: 10}}>
         <Button title="Adicionar" color="#d0933f" onPress={() => {
           setLinhas([...LinhasC, {
@@ -349,9 +356,35 @@ export default function CriarOrcamento({ navigation }) {
       </View>
     </ScrollView>
   );
+        
 
+}*/}
+  return (
+    <ScrollView>
+    <View style={styles.container}>
+
+      {/* Cliente */}
+      <View style={{marginTop: 10}}>
+        <Text style={styles.titleSelect}>Client</Text>
+          <View style={styles.borderMargin}>
+            <Picker  style={styles.pickerComponent} placeholder="Selecione um cliente" selectedValue={selectedIdCliente} 
+              onValueChange={itemValue => {
+              setSelectedIdCliente(itemValue);
+              setCliente(itemValue);
+            }}>
+            {dadosClientes.map(function (client, i) {
+              return <Picker.Item label={client.name} value={client.id.toString()} key={i} />;
+            })}
+            </Picker>
+          </View>
+        </View>
+        <View style={{marginTop: 30,marginBottom: 10 ,width: 350}}>
+          <Button  title="Criar Orçamento" color="#d0933f" onPress={() => handleCreateOrcamento()} />
+        </View>
+      </View> 
+    </ScrollView>
+  )
 }
-
 
 const styles = StyleSheet.create({
   container: {

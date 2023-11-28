@@ -174,54 +174,47 @@ export const AuthProvider = ({children}) => {
     //   Orcamentos
     // ------!-------
     const CriarOrcamentos = async (clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC) => {
-
-        console.log(clienteC + ' Cliente');
-        console.log(serieC + ' Serie');
-        console.log(numeroC + ' num');
-        console.log(dataC + ' data');
-        console.log(validadeC + ' val');
-        console.log(referenciaC + ' ref');
-        console.log(vencimentoC + ' ven');
-        console.log(moedaC + ' moeda');
-        console.log(descontoC + ' des');
-        console.log(observacoesC + ' obs');
-        console.log(JSON.stringify(LinhasC) + ' linha');
-        console.log(finalizarDocumentoC + ' fim');
-           
+        
+        var token = await this.getToken();
         //const LinhasC = [{"artigo": "0001", "descricao":descricaoC, "qtd":qtdC, "preco": "19.01", "imposto": "1", "motivo":motivoC, "desconto":descontoCL, "retencao":retencaoC}];
         const stringifiedLinhas = JSON.stringify(LinhasC);
-
-        return axios({
-            url: 'https://demo.gesfaturacao.pt/gesfaturacao/server/webservices/api/orcamentos/orcamentos',
-            method: 'POST',
-            timeout: 5000,
-            data: qs.stringify({
-                opcao: '2',
-                _token: userToken,
-                cliente: clienteC, 
-                serie: serieC, 
-                numero: numeroC, 
-                data: dataC,  
-                validade: validadeC, 
-                referencia: referenciaC, 
-                vencimento: vencimentoC, 
-                moeda: moedaC, 
-                desconto: descontoC, 
-                observacoes: observacoesC, 
-                Linhas: stringifiedLinhas, 
-                finalizarDocumento: finalizarDocumentoC
-            }),
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded',
-            },
-        })
-        .then(async res => {
-            console.log(res.data)
-            //return res.data
-        }).catch(e =>{
-            console.log(`Erro: ${e}` + ' Grande Erro');
-            setIsLoading(false)
+        let data = qs.stringify({
+            'client': clienteC,
+            'serie': serieC,
+            'number': numeroC,
+            'date': dataC,
+            'expiration': validadeC,
+            'reference': referenciaC,
+            'dueDate': vencimentoC,
+            'coin': moedaC,
+            'discount': descontoC,
+            'observations': observacoesC,
+            'finalize': finalizarDocumentoC,
+            'payment': 0,
+            'lines': stringifiedLinhas,
+            'doc_origin': '9' 
         });
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/budgets`,
+            headers: { 
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'Authorization': token, 
+                'Cookie': 'PHPSESSID=2126001ea125fd6cd0c8d1029eb1497a'
+            },
+            data : data
+        };
+
+
+        return axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+            })
+            .catch((error) => {
+                console.log(error + ' Erro Faturas');
+            });
+        
     }
 
     const getOrcamentos = async ()=> {
