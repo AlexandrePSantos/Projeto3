@@ -4,20 +4,20 @@ import { AuthContext } from "../../Context/AuthContext";
 import { Picker } from '@react-native-picker/picker';
 
 export default function CriarFatura({ navigation }) {
-  const { userToken } = useContext(AuthContext);
   const { getClientes } = useContext(AuthContext);
   const { CriarFatura } = useContext(AuthContext);
 
   const [dadosClientes, setDadosClientes] = useState([]);
   const [clienteC, setCliente] = useState();
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
-
+  
+  
   useEffect(() => {
     getClientes().then((res) => {
       console.log(res.data)
-      setDadosClientes(res.data.aaData)
-    }).catch((error) => {
-      console.error(error);
+      if (res.data && res.data.aaData) {
+        setDadosClientes(res.data.aaData)
+      }
     });
   }, []);
 
@@ -59,7 +59,7 @@ export default function CriarFatura({ navigation }) {
         <Text style={styles.titleSelect}>Client</Text>
         <View style={styles.borderMargin}>
         <Picker  style={styles.pickerComponent} placeholder="Selecione um cliente" selectedValue={selectedIdCliente} onValueChange={itemValue => {
-          setSelectedIdCliente(itemValue);
+          setSelectedIdCliente(itemValue); 
           setCliente(itemValue[0]);}}>
           {dadosClientes.map(function (object, i) {
             return <Picker.Item label={object[2]} value={object[0]} key={i} />;

@@ -14,6 +14,7 @@ export const AuthProvider = ({children}) => {
     const [userInfo, setUserInfo] = useState(null);
     const [nome, setNome] = useState(null);
 
+    getToken = async () => AsyncStorage.getItem('@userToken');
     // ------!-------
     // Login & Logout
     // ------!-------
@@ -117,8 +118,35 @@ export const AuthProvider = ({children}) => {
                 console.log(JSON.stringify(response.data));
             })
             .catch((error) => {
-                console.log(error);
+                console.log(error + ' Erro Faturas');
             });
+    }
+
+    // ------!-------
+    //   Clientes
+    // ------!-------
+    const getClientes = async () => {
+        var token = await this.getToken();
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/clients',
+            headers: { 
+              'Authorization': token, 
+              'Cookie': 'PHPSESSID=2126001ea125fd6cd0c8d1029eb1497a'
+            },
+            data : data
+          };
+    
+        return axios.request(config)
+        .then((response) => {
+        console.log(JSON.stringify(response.data));
+        return response.data; // Add this line
+        })
+        .catch((error) => {
+        console.log(error);
+        });
     }
 
     // ------!-------
@@ -216,52 +244,6 @@ export const AuthProvider = ({children}) => {
     }
 
     // ------!-------
-    //   Clientes
-    // ------!-------
-    const getClientes = async () => {
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/clients`,
-            headers: {
-                'Authorization': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjo5LCJ1c2VybmFtZSI6ImlwdmMiLCJjcmVhdGVkIjoiMjAyMy0xMS0yOCAxMzo0NDowNSJ9.nH46hp-ANZ6tp5RXuekGVslavXE0hZwsME-E7uueKBk',
-                'Cookie': 'PHPSESSID=2126001ea125fd6cd0c8d1029eb1497a'
-            }
-        };
-    
-        try {
-            const response = await axios.request(config);
-            console.log(JSON.stringify(response.data));
-            return response.data; // return the data
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    const getclienteID = async (id) =>{
-        var token = await this.getToken();
-        
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/clients?id=${id}`,
-            headers: { 
-                'Authorization': token, 
-                'Cookie': 'PHPSESSID=2126001ea125fd6cd0c8d1029eb1497a'
-            }
-        };
-        
-        return axios.request(config)
-        .then((response) => {
-            console.log(JSON.stringify(response.data));
-            return response.data;
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-    }
-
-    // ------!-------
     // Return Values
     // ------!-------
     return(
@@ -269,7 +251,7 @@ export const AuthProvider = ({children}) => {
             CriarOrcamentos, getOrcamentos,
             getArtigos, 
             CriarFatura,
-            getClientes, getclienteID,
+            getClientes, 
             isLoading, userToken}}>
             {children}
         </AuthContext.Provider>
