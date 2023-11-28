@@ -1,27 +1,40 @@
-import React from "react";
-import { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View, FlatList, TextInput,ScrollView,ToastAndroid,LogBox  } from 'react-native';
 import { AuthContext } from "../../Context/AuthContext";
 import { Picker } from '@react-native-picker/picker';
 
 export default function CriarFatura({ navigation }) {
+  const { userToken } = useContext(AuthContext);
   const { getClientes } = useContext(AuthContext);
   const { CriarFatura } = useContext(AuthContext);
 
   const [dadosClientes, setDadosClientes] = useState([]);
-
   const [clienteC, setCliente] = useState();
+  const [selectedIdCliente, setSelectedIdCliente] = useState(null);
 
-  if (!dadosClientes.length) {
+  useEffect(() => {
     getClientes().then((res) => {
       console.log(res.data)
       setDadosClientes(res.data.aaData)
+    }).catch((error) => {
+      console.error(error);
     });
-  }
+  }, []);
 
-  const [selectedIdCliente, setSelectedIdCliente] = useState(null);
+  const handleCreateFatura = () => {
+    // Define the variables here
+    const serieC = '';
+    const numeroC = '';
+    const dataC = '';
+    const validadeC = '';
+    const referenciaC = '';
+    const vencimentoC = '';
+    const moedaC = '';
+    const descontoC = '';
+    const observacoesC = '';
+    const LinhasC = '';
+    const finalizarDocumentoC = '';
 
-  handleCreateFatura = () => {
     console.log(clienteC)
     CriarFatura(
       clienteC, serieC, 
@@ -35,7 +48,7 @@ export default function CriarFatura({ navigation }) {
       navigation.navigate('GesFaturação');
       ToastAndroid.show("Fatura Criada ", ToastAndroid.SHORT);
     });
-}
+  }
 
   return (
     <ScrollView>

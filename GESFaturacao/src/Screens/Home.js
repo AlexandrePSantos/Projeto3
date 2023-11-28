@@ -7,10 +7,6 @@ export default function Home({navigation}) {
 
   const {logout} = useContext(AuthContext);
 
-  const entrar = () =>{
-    navigation.navigate("Ecra2")
-  }
-
   return (
     <View style={styles.outerContainer}>
       <View style={styles.container}>

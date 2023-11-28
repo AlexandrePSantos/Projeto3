@@ -2,6 +2,7 @@ import React, {createContext, useEffect, useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { BASE_URL } from '../config';
+import qs from 'qs';
 
 import { ToastAndroid } from 'react-native';
 
@@ -18,8 +19,8 @@ export const AuthProvider = ({children}) => {
     // ------!-------
     const login = async (username, password) => {
         setIsLoading(true);
-        axios.post(`${BASE_URL}/authentication`, { username, password })
-        .then(async res => {
+        try {
+            const res = await axios.post(`${BASE_URL}/authentication`, { username, password });
             console.log(res.data);
             let userInfo = res.data;
             setUserInfo(userInfo);
@@ -27,14 +28,44 @@ export const AuthProvider = ({children}) => {
             setNome(username);
             await AsyncStorage.setItem('@userInfo', JSON.stringify(userInfo));
             await AsyncStorage.setItem('@userToken', userInfo._token);
+    
             console.log("User Token: " + userInfo._token);
             ToastAndroid.show("Bem-vindo, " + username, ToastAndroid.SHORT);
-        })
-        .catch(e => {
-            console.log(`Login error ${e}`);
-        });
     
-        setIsLoading(false);
+            // Validate token
+            const tokenRes = await axios.post(`${BASE_URL}/validate-token`, {}, {
+                headers: {
+                    'Authorization': userInfo._token,
+                }
+            });
+            console.log(tokenRes.data);
+    
+            // Prepare the data for the validate-version request
+            let data = qs.stringify({
+                'version': '6',
+                'os': 'android' 
+            });
+    
+            // Prepare the config for the validate-version request
+            let config = {
+                method: 'post',
+                maxBodyLength: Infinity,
+                url: 'https://licencas.gesfaturacao.pt/server/auto/validate-version',
+                headers: { 
+                    'Content-Type': 'application/x-www-form-urlencoded', 
+                    'Authorization': 'Basic UjBWVFJrRlVWVkpCUTBGUDpNWFk0T0dKaWQyZHJaWEkzYmpreWFXUTNNVGs9',
+                },
+                data : data
+            };
+    
+            // Validate version
+            const versionRes = await axios.request(config);
+            console.log(versionRes.data);
+        } catch(e) {
+            console.log(`Login error ${e}`);
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     const logout = async () => {
