@@ -1,15 +1,26 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View, FlatList, TextInput, ScrollView, ToastAndroid, LogBox } from 'react-native';
-import { AuthContext } from "../../Context/AuthContext";
-import { Picker } from '@react-native-picker/picker';
+import React, {useState, useEffect, useContext} from 'react';
+import {
+  Button,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+  TextInput,
+  ScrollView,
+  ToastAndroid,
+  LogBox,
+} from 'react-native';
+import {AuthContext} from '../../Context/AuthContext';
+import {Picker} from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment/moment';
 
-export default function CriarOrcamento({ navigation }) {
-  const { getClientes } = useContext(AuthContext);
-  const { CriarOrcamento } = useContext(AuthContext);
-  const { getSeries } = useContext(AuthContext);
+export default function CriarOrcamento({navigation}) {
+  const {getClientes} = useContext(AuthContext);
+  const {CriarOrcamento} = useContext(AuthContext);
+  const {getSeries} = useContext(AuthContext);
 
   const [dadosClientes, setDadosClientes] = useState([]);
   const [dadosSeries, setDadosSeries] = useState([]);
@@ -18,6 +29,8 @@ export default function CriarOrcamento({ navigation }) {
   const [vencimentoC, setVencimento] = useState('');
   const [moedaC, setMoeda] = useState('1'); // Valor inicial '1' para 'Euro (€)'
   const [descontoC, setDesconto] = useState('0'); // Valor inicial '0'
+  const [observacoesC, setObservacao] = useState('');
+  const [finalizarDocumentoC, setFinalizarDocumento] = useState(0);
   const [datei, setDatei] = useState();
 
   const [clienteC, setCliente] = useState();
@@ -44,7 +57,6 @@ export default function CriarOrcamento({ navigation }) {
           setDadosSeries(seriesResponse.data);
           console.log(seriesResponse.data);
         }
-
       } catch (error) {
         console.error(error);
       }
@@ -57,7 +69,7 @@ export default function CriarOrcamento({ navigation }) {
 
   const openDateTimePicker = async () => {
     try {
-      const { action, year, month, day } = await DateTimePickerAndroid.open({
+      const {action, year, month, day} = await DateTimePickerAndroid.open({
         date: selectedDate,
         mode: 'spinner', // Set the mode according to your requirement
       });
@@ -72,13 +84,13 @@ export default function CriarOrcamento({ navigation }) {
     }
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = data => {
     setLinhas([...LinhasC, data]);
-  }
+  };
 
-  const removeItem = (index) => {
+  const removeItem = index => {
     setLinhas(LinhasC.filter((_, i) => i !== index));
-  }
+  };
 
   console.log(LinhasC);
 
@@ -96,27 +108,49 @@ export default function CriarOrcamento({ navigation }) {
     const finalizarDocumentoC = '';
 
     console.log(clienteC);
-    CriarOrcamento(clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC).then(response => {
-      console.log(response + ' Resposta Criar Orçamento')
-      navigation.navigate("GesFaturação")
-      ToastAndroid.show("Orçamento Criado", ToastAndroid.SHORT)
+    CriarOrcamento(
+      clienteC,
+      serieC,
+      numeroC,
+      dataC,
+      validadeC,
+      referenciaC,
+      vencimentoC,
+      moedaC,
+      descontoC,
+      observacoesC,
+      LinhasC,
+      finalizarDocumentoC,
+    ).then(response => {
+      console.log(response + ' Resposta Criar Orçamento');
+      navigation.navigate('GesFaturação');
+      ToastAndroid.show('Orçamento Criado', ToastAndroid.SHORT);
     });
-  }
+  };
 
   return (
     <ScrollView>
       <View style={styles.container}>
         {/* Cliente */}
-        <View style={{ marginTop: 10 }}>
+        <View style={{marginTop: 10}}>
           <Text style={styles.titleSelect}>Client</Text>
           <View style={styles.borderMargin}>
-            <Picker style={styles.pickerComponent} placeholder="Selecione um cliente" selectedValue={selectedIdCliente}
+            <Picker
+              style={styles.pickerComponent}
+              placeholder="Selecione um cliente"
+              selectedValue={selectedIdCliente}
               onValueChange={itemValue => {
                 setSelectedIdCliente(itemValue);
                 setCliente(itemValue);
               }}>
               {dadosClientes.map(function (client, i) {
-                return <Picker.Item label={client.name} value={client.id.toString()} key={i} />;
+                return (
+                  <Picker.Item
+                    label={client.name}
+                    value={client.id.toString()}
+                    key={i}
+                  />
+                );
               })}
             </Picker>
           </View>
@@ -124,19 +158,50 @@ export default function CriarOrcamento({ navigation }) {
         {/* SERIE */}
         <Text style={styles.titleSelect}>Series</Text>
         <View style={styles.borderMargin}>
-          <Picker style={styles.pickerComponent} selectedValue={selectedIdSerie} onValueChange={itemValue => { setSelectedIdSerie(itemValue); setSerie(itemValue) }} >
+          <Picker
+            style={styles.pickerComponent}
+            selectedValue={selectedIdSerie}
+            onValueChange={itemValue => {
+              setSelectedIdSerie(itemValue);
+              setSerie(itemValue);
+            }}>
             <Picker.Item label="Selecione uma serie" value={null} />
-            {dadosSeries.map(function (serie, i) { return <Picker.Item label={serie.description} value={serie.id.toString()} key={i} />; })}
+            {dadosSeries.map(function (serie, i) {
+              return (
+                <Picker.Item
+                  label={serie.description}
+                  value={serie.id.toString()}
+                  key={i}
+                />
+              );
+            })}
           </Picker>
         </View>
 
         {/* date */}
         <Text style={styles.titleSelect}>Data</Text>
         <View style={styles.borderMargin}>
-          <TouchableOpacity onPress={() => setOpenV(true)} style={styles.touchableO}>
-            <DatePicker modal mode="date" open={openv} date={new Date()}
-              onConfirm={(datev) => { setOpenV(false); setDatev(datev); setValidade(moment(datev).format("DD/MM/YYYY")) }} onCancel={() => { setOpenV(false) }} />
-            <Text style={styles.textDate}> {todaiDate = moment(datei).format("DD/MM/YYYY")} </Text>
+          <TouchableOpacity
+            onPress={() => setOpenV(true)}
+            style={styles.touchableO}>
+            <DatePicker
+              modal
+              mode="date"
+              open={openv}
+              date={new Date()}
+              onConfirm={datev => {
+                setOpenV(false);
+                setDatev(datev);
+                setValidade(moment(datev).format('DD/MM/YYYY'));
+              }}
+              onCancel={() => {
+                setOpenV(false);
+              }}
+            />
+            <Text style={styles.textDate}>
+              {' '}
+              {(todaiDate = moment(datei).format('DD/MM/YYYY'))}{' '}
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -153,7 +218,7 @@ export default function CriarOrcamento({ navigation }) {
           <TextInput
             style={styles.input}
             value={referenciaC}
-            onChangeText={(text) => setReferencia(text)}
+            onChangeText={text => setReferencia(text)}
             placeholder="Referencia"
           />
         </View>
@@ -164,7 +229,7 @@ export default function CriarOrcamento({ navigation }) {
           <TextInput
             style={styles.input}
             value={vencimentoC}
-            onChangeText={(text) => setVencimento(text)}
+            onChangeText={text => setVencimento(text)}
             placeholder="Vencimento"
             keyboardType="numeric"
           />
@@ -175,9 +240,8 @@ export default function CriarOrcamento({ navigation }) {
         <View style={styles.borderMargin}>
           <Picker
             selectedValue={moedaC}
-            onValueChange={(itemValue) => setMoeda(itemValue)}
-            style={styles.pickerComponent}
-          >
+            onValueChange={itemValue => setMoeda(itemValue)}
+            style={styles.pickerComponent}>
             <Picker.Item label="Euro (€)" value="1" />
             <Picker.Item label="Libra ING (GBP)" value="2" />
             <Picker.Item label="Dólar USA ($)" value="3" />
@@ -192,18 +256,45 @@ export default function CriarOrcamento({ navigation }) {
           <TextInput
             style={styles.input}
             value={descontoC}
-            onChangeText={(text) => setDesconto(text)}
+            onChangeText={text => setDesconto(text)}
             placeholder="Desconto"
             keyboardType="numeric"
           />
         </View>
 
-        <View style={{ marginTop: 30, marginBottom: 10, width: 350 }}>
-          <Button title="Criar Orçamento" color="#d0933f" onPress={() => handleCreateOrcamento()} />
+        {/* Observações */}
+        <Text style={styles.titleSelect}>Observações</Text>
+        <View style={styles.borderMargin}>
+          <TextInput
+            style={styles.input}
+            value={observacoesC}
+            onChangeText={text => setObservacao(text)}
+            placeholder="Observações"
+          />
+        </View>
+        {/* Finalize */}
+        <Text style={styles.titleSelect}>Finalize</Text>
+        <View style={styles.borderMargin}>
+          <Picker
+            style={styles.pickerComponent}
+            placeholder="Finalizado"
+            selectedValue={finalizarDocumentoC}
+            onValueChange={itemValue => setFinalizarDocumento(itemValue)}>
+            <Picker.Item label="Rascunho" value="0" />
+            <Picker.Item label="Aberto" value="1" />
+          </Picker>
+        </View>
+
+        <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+          <Button
+            title="Criar Orçamento"
+            color="#d0933f"
+            onPress={() => handleCreateOrcamento()}
+          />
         </View>
       </View>
     </ScrollView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -212,7 +303,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#e5e9ec',
     alignItems: 'center',
     justifyContent: 'flex-start',
-
   },
   button: {
     alignItems: 'center',
@@ -222,34 +312,30 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   textfont: {
-    color: "#ffffff",
+    color: '#ffffff',
     fontSize: 16,
-    fontWeight: "bold"
-
+    fontWeight: 'bold',
   },
   titleSelect: {
     fontSize: 20,
     margin: 10,
-    fontWeight: "bold",
-    color: "#5F5D5C"
+    fontWeight: 'bold',
+    color: '#5F5D5C',
   },
   pickerComponent: {
     width: 350,
-
   },
   borderMargin: {
     borderWidth: 1,
     borderColor: 'grey',
-
   },
   touchableO: {
     width: 350,
     height: 55,
-    justifyContent: "center"
+    justifyContent: 'center',
   },
   input: {
     width: 350,
     padding: 10,
   },
-  
 });
