@@ -3,7 +3,10 @@ import { Button, StyleSheet, Text, TouchableOpacity, View, FlatList, TextInput,S
 import { AuthContext } from "../../Context/AuthContext";
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import moment from 'moment/moment';
+
 
 
 
@@ -20,11 +23,13 @@ export default function CriarOrcamento({ navigation }) {
   const [clienteC, setCliente] = useState();
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   const [selectedIdSerie, setSelectedIdSerie] = useState(null);
-  const [datev, setDatev] = useState();
+  const [datev, setDatev] = useState(new Date());
   const [openv, setOpenV] = useState(false);
 
     //Dados para addOrçamento
-    const [LinhasC, setLinhas] = useState([]);
+  const [LinhasC, setLinhas] = useState([]);
+
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,12 +42,11 @@ export default function CriarOrcamento({ navigation }) {
           console.log(clientesResponse.data);
         }
 
-
-        
         if (seriesResponse.data) {
           setDadosSeries(seriesResponse.data);
           console.log(seriesResponse.data);
         }
+
       } catch (error) {
         console.error(error);
       }
@@ -50,6 +54,27 @@ export default function CriarOrcamento({ navigation }) {
 
     fetchData();
   }, []);
+
+
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const openDateTimePicker = async () => {
+    try {
+      const { action, year, month, day } = await DateTimePickerAndroid.open({
+        date: selectedDate,
+        mode: 'spinner', // Set the mode according to your requirement
+      });
+
+      if (action !== DateTimePickerAndroid.dismissedAction) {
+        // Do something with the selected date (year, month, day)
+        const selected = new Date(year, month, day);
+        setSelectedDate(selected);
+      }
+    } catch (error) {
+      console.error('Error opening date picker: ', error);
+    }
+  };
+
 
   const onSubmit = (data) => {
     setLinhas([...LinhasC, data]);
@@ -346,6 +371,7 @@ export default function CriarOrcamento({ navigation }) {
                 {dadosSeries.map(function (serie, i) { return <Picker.Item label={serie.description} value={serie.id.toString()} key={i} />; })}
             </Picker>
           </View>
+
           {/* date */}
           <Text style={styles.titleSelect}>Data</Text>
             <View style={styles.borderMargin}>
@@ -357,13 +383,17 @@ export default function CriarOrcamento({ navigation }) {
             </View>
           {/* expiration */}
           <Text style={styles.titleSelect}>Validade</Text>
-            <View style={styles.borderMargin}>
+          <View>
+            <Button title="Open Date Picker" onPress={openDateTimePicker} />
+          </View>
+            {/* <View style={styles.borderMargin}>
               <TouchableOpacity  onPress={() => setOpenV(true)} style={styles.touchableO}>
                 <DatePicker modal mode="date" open={openv} date={new Date()}
                   onConfirm={(datev) => { setOpenV(false); setDatev(datev); setValidade(moment(datev).format("DD/MM/YYYY")) }} onCancel={() => { setOpenV(false) }} />
                 <Text style={styles.textDate}> {todayVDate = moment(datev).format("DD/MM/YYYY") }</Text>
               </TouchableOpacity>
-            </View>
+            </View> */}
+
         <View style={{marginTop: 30,marginBottom: 10 ,width: 350}}>
           <Button  title="Criar Orçamento" color="#d0933f" onPress={() => handleCreateOrcamento()} />
         </View>
