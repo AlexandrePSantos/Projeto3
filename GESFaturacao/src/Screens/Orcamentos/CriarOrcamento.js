@@ -17,6 +17,7 @@ export default function CriarOrcamento({ navigation }) {
   const [referenciaC, setReferencia] = useState('');
   const [vencimentoC, setVencimento] = useState('');
   const [moedaC, setMoeda] = useState('1'); // Valor inicial '1' para 'Euro (€)'
+  const [descontoC, setDesconto] = useState('0'); // Valor inicial '0'
   const [datei, setDatei] = useState();
 
   const [clienteC, setCliente] = useState();
@@ -184,6 +185,19 @@ export default function CriarOrcamento({ navigation }) {
             <Picker.Item label="Fr. Suiço (CHF)" value="5" />
           </Picker>
         </View>
+
+        {/* Desconto */}
+        <Text style={styles.titleSelect}>Desconto</Text>
+        <View style={styles.borderMargin}>
+          <TextInput
+            style={styles.input}
+            value={descontoC}
+            onChangeText={(text) => setDesconto(text)}
+            placeholder="Desconto"
+            keyboardType="numeric"
+          />
+        </View>
+
         <View style={{ marginTop: 30, marginBottom: 10, width: 350 }}>
           <Button title="Criar Orçamento" color="#d0933f" onPress={() => handleCreateOrcamento()} />
         </View>
