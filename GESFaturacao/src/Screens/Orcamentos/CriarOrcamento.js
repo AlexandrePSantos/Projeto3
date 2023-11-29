@@ -212,7 +212,6 @@ export default function CriarOrcamento({navigation}) {
         </View>
 
         {/* Referencia */}
-        {/*Referencia é guardada na variavel referenciaC */}
         <Text style={styles.titleSelect}>Referencia</Text>
         <View style={styles.borderMargin}>
           <TextInput
@@ -272,6 +271,7 @@ export default function CriarOrcamento({navigation}) {
             placeholder="Observações"
           />
         </View>
+
         {/* Finalize */}
         <Text style={styles.titleSelect}>Finalize</Text>
         <View style={styles.borderMargin}>
@@ -284,7 +284,6 @@ export default function CriarOrcamento({navigation}) {
             <Picker.Item label="Aberto" value="1" />
           </Picker>
         </View>
-
         <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
           <Button
             title="Criar Orçamento"
