@@ -9,12 +9,10 @@ import {
   TextInput,
   ScrollView,
   ToastAndroid,
-  LogBox,
 } from 'react-native';
 import {AuthContext} from '../../Context/AuthContext';
 import {Picker} from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment/moment';
 
 export default function CriarOrcamento({navigation}) {

@@ -1,27 +1,31 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Button,
   StyleSheet,
   Text,
   View,
   FlatList,
+  Item,
   TextInput,
   TouchableOpacity,
   ScrollView,
   ToastAndroid,
 } from 'react-native';
-import {AuthContext} from '../../Context/AuthContext';
-import {Picker} from '@react-native-picker/picker';
+import { AuthContext } from '../../Context/AuthContext';
+import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 
-export default function CriarFatura({navigation}) {
-  const {CriarFatura} = useContext(AuthContext);
-  const {getClientes} = useContext(AuthContext);
-  const {getSeries} = useContext(AuthContext);
+export default function CriarFatura({ navigation }) {
+  const { CriarFatura } = useContext(AuthContext);
+  const { getClientes } = useContext(AuthContext);
+  const { getSeries } = useContext(AuthContext);
+  const { getArtigos } = useContext(AuthContext);
 
   const [dadosClientes, setDadosClientes] = useState([]);
   const [dadosSeries, setDadosSeries] = useState([]);
+  const [dadosArtigos, setDadosArtigos] = useState([]);
+
   const [datei, setDatei] = useState();
   const [referenciaC, setReferencia] = useState('');
   const [moedaC, setMoeda] = useState('1'); // Valor inicial '1' para 'Euro (€)'
@@ -31,28 +35,36 @@ export default function CriarFatura({navigation}) {
   const [open, setOpen] = useState(false);
   const [clienteC, setCliente] = useState();
   const [serieC, setSerie] = useState();
-  const [dataC, setData] = useState('01/12/2023');
 
-  const [datev, setDatev] = useState();
-  const [openv, setOpenV] = useState(false);
+  const [dataC, setData] = useState();
+  const [openc, setopenc] = useState(false);
+  const [dataV, setDatev] = useState(new Date());
+  const [openv, setopenv] = useState(false);
+  const [validadeC, setValidade] = useState('');
+
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   const [selectedIdSerie, setSelectedIdSerie] = useState(null);
+  const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const clientesResponse = await getClientes();
         const seriesResponse = await getSeries();
+        const artigosResponse = await getArtigos();
 
         if (clientesResponse.data) {
           setDadosClientes(clientesResponse.data);
-          console.log(clientesResponse.data);
         }
 
         if (seriesResponse.data) {
           setDadosSeries(seriesResponse.data);
-          console.log(seriesResponse.data);
         }
+
+        if (artigosResponse.data) {
+          setDadosArtigos(artigosResponse.data);
+        }
+
       } catch (error) {
         console.error(error);
       }
@@ -75,7 +87,7 @@ export default function CriarFatura({navigation}) {
     const observacoesC = '';
     const LinhasC = '';
     const finalizarDocumentoC = '';
-
+  
     console.log(clienteC);
     CriarFatura(
       clienteC,
@@ -110,17 +122,16 @@ export default function CriarFatura({navigation}) {
               onValueChange={itemValue => {
                 setSelectedIdCliente(itemValue);
                 setCliente(itemValue);
-              }}>
+              }}
+            >
               <Picker.Item label="Selecione um cliente" value={null} />
-              {dadosClientes.map(function (client, i) {
-                return (
-                  <Picker.Item
-                    label={client.name}
-                    value={client.id.toString()}
-                    key={i}
-                  />
-                );
-              })}
+              {dadosClientes.map((client, i) => (
+                <Picker.Item
+                  label={client.name}
+                  value={client.id.toString()}
+                  key={i}
+                />
+              ))}
             </Picker>
           </View>
           {/* Serie */}
@@ -132,71 +143,60 @@ export default function CriarFatura({navigation}) {
               onValueChange={itemValue => {
                 setSelectedIdSerie(itemValue);
                 setSerie(itemValue);
-              }}>
+              }}
+            >
               <Picker.Item label="Selecione uma serie" value={null} />
-              {dadosSeries.map(function (serie, i) {
-                return (
-                  <Picker.Item
-                    label={serie.description}
-                    value={serie.id.toString()}
-                    key={i}
-                  />
-                );
-              })}
+              {dadosSeries.map((serie, i) => (
+                <Picker.Item
+                  label={serie.description}
+                  value={serie.id.toString()}
+                  key={i}
+                />
+              ))}
             </Picker>
           </View>
           {/* date */}
           <Text style={styles.titleSelect}>Data</Text>
           <View style={styles.borderMargin}>
-            <TouchableOpacity
-              onPress={() => setOpen(true)}
-              style={styles.touchableO}>
-              <DatePicker
-                modal
-                mode="date"
-                open={openv}
-                date={new Date()}
-                onConfirm={datev => {
-                  setOpenV(false);
-                  setDatev(datev);
-                  setValidade(moment(datev).format('DD/MM/YYYY'));
-                }}
-                onCancel={() => {
-                  setOpenV(false);
-                }}
+            <TouchableOpacity onPress={() => setopenc(true)} style={styles.touchableO}>
+              <DatePicker 
+                modal 
+                mode="date" 
+                open={openc} 
+                date={new Date()} 
+                onConfirm={dataC => {
+                  setopenc(false);
+                  if (moment(dataC).isBefore(moment(validadeC, 'DD/MM/YYYY'))) {
+                    setData(dataC);
+                  } else {
+                    alert('Selected date must be less than validade');
+                  }
+                }} 
+                onCancel={() => setopenc(false)}
               />
-              <Text style={styles.textDate}>
-                {' '}
-                {(todaiDate = moment(datei).format('DD/MM/YYYY'))}
-              </Text>
+              <Text> {' '} {(todaiDate = moment(dataC).format('DD/MM/YYYY'))}</Text>
             </TouchableOpacity>
           </View>
           {/* expiration */}
           <Text style={styles.titleSelect}>Validade</Text>
           <View style={styles.borderMargin}>
-            <TouchableOpacity
-              onPress={() => setOpenV(true)}
-              style={styles.touchableO}>
-              <DatePicker
-                modal
-                mode="date"
-                open={openv}
-                date={new Date()}
-                onConfirm={datev => {
-                  setOpenV(false);
-                  setDatev(datev);
-                  setValidade(moment(datev).format('DD/MM/YYYY'));
-                }}
-                onCancel={() => {
-                  setOpenV(false);
-                }}
+            <TouchableOpacity onPress={() => setopenv(true)} style={styles.touchableO}>
+              <DatePicker 
+                modal 
+                mode="date" 
+                open={openv} 
+                date={dataV} 
+                onConfirm={validadeC => { 
+                  setopenv(false);
+                  setDatev(validadeC);
+                  setValidade(moment(validadeC).format('DD/MM/YYYY'));
+                }} 
+                onCancel={() => { setopenv(false); }} 
               />
-              <Text style={styles.textDate}>
-                {' '}
-                {(todayVDate = moment(datev).format('DD/MM/YYYY'))}
-              </Text>
+              <Text style={styles.textDate}> {' '} {moment(dataV).format('DD/MM/YYYY')}</Text>
             </TouchableOpacity>
           </View>
+
           {/* reference */}
           <Text style={styles.titleSelect}>Referencia</Text>
           <View style={styles.borderMargin}>
@@ -207,15 +207,18 @@ export default function CriarFatura({navigation}) {
               placeholder="Referencia"
             />
           </View>
+
           {/* dueDate */}
           {/* A espera do Engenheiro */}
+
           {/* Coin */}
           <Text style={styles.titleSelect}>Moeda</Text>
           <View style={styles.borderMargin}>
             <Picker
               selectedValue={moedaC}
               onValueChange={itemValue => setMoeda(itemValue)}
-              style={styles.pickerComponent}>
+              style={styles.pickerComponent}
+            >
               <Picker.Item label="Euro (€)" value="1" />
               <Picker.Item label="Libra ING (GBP)" value="2" />
               <Picker.Item label="Dólar USA ($)" value="3" />
@@ -223,6 +226,7 @@ export default function CriarFatura({navigation}) {
               <Picker.Item label="Fr. Suiço (CHF)" value="5" />
             </Picker>
           </View>
+
           {/* discount */}
           <Text style={styles.titleSelect}>Desconto</Text>
           <View style={styles.borderMargin}>
@@ -234,6 +238,7 @@ export default function CriarFatura({navigation}) {
               keyboardType="numeric"
             />
           </View>
+
           {/* observations */}
           <Text style={styles.titleSelect}>Observações</Text>
           <View style={styles.borderMargin}>
@@ -244,6 +249,7 @@ export default function CriarFatura({navigation}) {
               placeholder="Observações"
             />
           </View>
+
           {/* finalize */}
           <Text style={styles.titleSelect}>Finalize</Text>
           <View style={styles.borderMargin}>
@@ -251,7 +257,8 @@ export default function CriarFatura({navigation}) {
               style={styles.pickerComponent}
               placeholder="Finalizado"
               selectedValue={finalizarDocumentoC}
-              onValueChange={itemValue => setFinalizarDocumento(itemValue)}>
+              onValueChange={itemValue => setFinalizarDocumento(itemValue)}
+            >
               <Picker.Item label="Rascunho" value="0" />
               <Picker.Item label="Aberto" value="1" />
             </Picker>
@@ -262,16 +269,16 @@ export default function CriarFatura({navigation}) {
           {/* lines/artigos */}
 
           {/* doc_origin */}
-        </View>
-        <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-          <Button
-            title="Criar Fatura"
-            color="#d0933f"
-            onPress={() => handleCreateFatura()}
-          />
-        </View>
-      </View>
-    </ScrollView>
+          </View>
+          <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+            <Button
+              title="Criar Fatura"
+              color="#d0933f"
+              onPress={() => handleCreateFatura()}
+            />
+          </View>
+          </View>
+          </ScrollView>
   );
 }
 
@@ -291,8 +298,7 @@ const styles = StyleSheet.create({
   },
   textfont: {
     color: '#ffffff',
-    fontSize: 16,
-    fontweight: 'bold',
+    fontSize: 16
   },
   titleSelect: {
     fontSize: 20,
@@ -304,8 +310,11 @@ const styles = StyleSheet.create({
     width: 350,
   },
   borderMargin: {
+    backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: 'grey',
+    marginBottom: 15,
+    borderRadius: 7,
   },
   touchableO: {
     width: 350,

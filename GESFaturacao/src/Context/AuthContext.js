@@ -160,16 +160,16 @@ export const AuthProvider = ({children}) => {
             headers: { 
               'Authorization': token
             }
-          };
+        };
           
-          return axios.request(config)
-          .then((response) => {
-            // console.log(JSON.stringify(response.data));
-            return response.data; // Add this line
-          })
-          .catch((error) => {
-            console.log(error + ' Erro Series');
-          });
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data; // Add this line
+        })
+        .catch((error) => {
+        console.log(error + ' Erro Series');
+        });
     }
 
     // ------!-------
@@ -188,7 +188,7 @@ export const AuthProvider = ({children}) => {
           
         return axios.request(config)
         .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
         return response.data; // Add this line
         })
         .catch((error) => {
