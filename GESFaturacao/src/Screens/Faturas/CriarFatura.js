@@ -26,7 +26,7 @@ export default function CriarFatura({ navigation }) {
   const [dadosSeries, setDadosSeries] = useState([]);
   const [dadosArtigos, setDadosArtigos] = useState([]);
 
-  const [datei, setDatei] = useState();
+  
   const [referenciaC, setReferencia] = useState('');
   const [moedaC, setMoeda] = useState('1'); // Valor inicial '1' para 'Euro (€)'
   const [descontoC, setDesconto] = useState('0'); // Valor inicial '0'

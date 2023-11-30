@@ -19,23 +19,29 @@ export default function CriarOrcamento({navigation}) {
   const {getClientes} = useContext(AuthContext);
   const {CriarOrcamento} = useContext(AuthContext);
   const {getSeries} = useContext(AuthContext);
+  const { getArtigos } = useContext(AuthContext);
 
   const [dadosClientes, setDadosClientes] = useState([]);
   const [dadosSeries, setDadosSeries] = useState([]);
 
+  const [clienteC, setCliente] = useState();
   const [referenciaC, setReferencia] = useState('');
-  const [vencimentoC, setVencimento] = useState('');
   const [moedaC, setMoeda] = useState('1'); // Valor inicial '1' para 'Euro (€)'
   const [descontoC, setDesconto] = useState('0'); // Valor inicial '0'
   const [observacoesC, setObservacao] = useState('');
   const [finalizarDocumentoC, setFinalizarDocumento] = useState(0);
-  const [datei, setDatei] = useState();
+  const [serieC, setSerie] = useState();
 
-  const [clienteC, setCliente] = useState();
+
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   const [selectedIdSerie, setSelectedIdSerie] = useState(null);
-  const [datev, setDatev] = useState(new Date());
-  const [openv, setOpenV] = useState(false);
+  const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
+
+  const [dataC, setData] = useState();
+  const [openc, setopenc] = useState(false);
+  const [dataV, setDatev] = useState(new Date());
+  const [openv, setopenv] = useState(false);
+  const [validadeC, setValidade] = useState('');
 
   // Dados para addOrçamento
   const [LinhasC, setLinhas] = useState([]);
@@ -46,6 +52,7 @@ export default function CriarOrcamento({navigation}) {
         const clientesResponse = await getClientes();
         const seriesResponse = await getSeries();
 
+
         if (clientesResponse.data) {
           setDadosClientes(clientesResponse.data);
           console.log(clientesResponse.data);
@@ -55,6 +62,8 @@ export default function CriarOrcamento({navigation}) {
           setDadosSeries(seriesResponse.data);
           console.log(seriesResponse.data);
         }
+
+
       } catch (error) {
         console.error(error);
       }
@@ -98,7 +107,6 @@ export default function CriarOrcamento({navigation}) {
     const dataC = '';
     const validadeC = '';
     const referenciaC = '';
-    const vencimentoC = '';
     const moedaC = '';
     const descontoC = '';
     const observacoesC = '';
@@ -179,34 +187,43 @@ export default function CriarOrcamento({navigation}) {
         {/* date */}
         <Text style={styles.titleSelect}>Data</Text>
         <View style={styles.borderMargin}>
-          <TouchableOpacity
-            onPress={() => setOpenV(true)}
-            style={styles.touchableO}>
-            <DatePicker
-              modal
-              mode="date"
-              open={openv}
-              date={new Date()}
-              onConfirm={datev => {
-                setOpenV(false);
-                setDatev(datev);
-                setValidade(moment(datev).format('DD/MM/YYYY'));
-              }}
-              onCancel={() => {
-                setOpenV(false);
-              }}
+          <TouchableOpacity onPress={() => setopenc(true)} style={styles.touchableO}>
+            <DatePicker 
+              modal 
+              mode="date" 
+              open={openc} 
+              date={new Date()} 
+              onConfirm={dataC => {
+                setopenc(false);
+                if (moment(dataC).isBefore(moment(validadeC, 'DD/MM/YYYY'))) {
+                  setData(dataC);
+                } else {
+                  alert('Selected date must be less than validade');
+                }
+              }} 
+              onCancel={() => setopenc(false)}
             />
-            <Text style={styles.textDate}>
-              {' '}
-              {(todaiDate = moment(datei).format('DD/MM/YYYY'))}{' '}
-            </Text>
+            <Text> {' '} {(todaiDate = moment(dataC).format('DD/MM/YYYY'))}</Text>
           </TouchableOpacity>
         </View>
-
         {/* expiration */}
         <Text style={styles.titleSelect}>Validade</Text>
-        <View>
-          <Button title="Open Date Picker" onPress={openDateTimePicker} />
+        <View style={styles.borderMargin}>
+          <TouchableOpacity onPress={() => setopenv(true)} style={styles.touchableO}>
+          <DatePicker 
+            modal 
+            mode="date" 
+            open={openv} 
+            date={dataV} 
+            onConfirm={validadeC => { 
+              setopenv(false);
+              setDatev(validadeC);
+              setValidade(moment(validadeC).format('DD/MM/YYYY'));
+            }} 
+            onCancel={() => { setopenv(false); }} 
+          />
+          <Text style={styles.textDate}> {' '} {moment(dataV).format('DD/MM/YYYY')}</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Referencia */}
@@ -217,18 +234,6 @@ export default function CriarOrcamento({navigation}) {
             value={referenciaC}
             onChangeText={text => setReferencia(text)}
             placeholder="Referencia"
-          />
-        </View>
-
-        {/* Vencimento */}
-        <Text style={styles.titleSelect}>Vencimento</Text>
-        <View style={styles.borderMargin}>
-          <TextInput
-            style={styles.input}
-            value={vencimentoC}
-            onChangeText={text => setVencimento(text)}
-            placeholder="Vencimento"
-            keyboardType="numeric"
           />
         </View>
 
