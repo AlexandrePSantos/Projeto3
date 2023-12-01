@@ -23,6 +23,7 @@ export default function CriarOrcamento({navigation}) {
 
   const [dadosClientes, setDadosClientes] = useState([]);
   const [dadosSeries, setDadosSeries] = useState([]);
+  const [dadosArtigos, setDadosArtigos] = useState([]);
 
   const [clienteC, setCliente] = useState();
   const [referenciaC, setReferencia] = useState('');
@@ -51,6 +52,7 @@ export default function CriarOrcamento({navigation}) {
       try {
         const clientesResponse = await getClientes();
         const seriesResponse = await getSeries();
+        const artigosResponse = await getArtigos();
 
 
         if (clientesResponse.data) {
@@ -63,6 +65,9 @@ export default function CriarOrcamento({navigation}) {
           console.log(seriesResponse.data);
         }
 
+        if (artigosResponse.data) {
+          setDadosArtigos(artigosResponse.data);
+        }
 
       } catch (error) {
         console.error(error);

@@ -32,7 +32,6 @@ export default function CriarFatura({ navigation }) {
   const [descontoC, setDesconto] = useState('0'); // Valor inicial '0'
   const [observacoesC, setObservacao] = useState('');
   const [finalizarDocumentoC, setFinalizarDocumento] = useState(0);
-  const [open, setOpen] = useState(false);
   const [clienteC, setCliente] = useState();
   const [serieC, setSerie] = useState();
 
