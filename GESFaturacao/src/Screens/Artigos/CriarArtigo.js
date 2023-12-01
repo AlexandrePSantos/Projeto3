@@ -29,6 +29,7 @@ export default function CriarArtigo({navigation}) {
   return (
     <ScrollView>
       <View style={styles.container}>
+
         {/* NAME */}
         <Text style={styles.titleSelect}>Nome</Text>
         <View style={styles.borderMargin}>
@@ -45,6 +46,7 @@ export default function CriarArtigo({navigation}) {
             )}
           />
         </View>
+
         {/* CODE */}
         <Text style={styles.titleSelect}>Código</Text>
         <View style={styles.borderMargin}>
@@ -61,6 +63,7 @@ export default function CriarArtigo({navigation}) {
             )}
           />
         </View>
+
         {/* CATEGORY */}
         <Text style={styles.titleSelect}>Categoria</Text>
         <View style={styles.borderMargin}>
@@ -77,6 +80,7 @@ export default function CriarArtigo({navigation}) {
             )}
           />
         </View>
+
         {/* TYPE */}
         <Text style={styles.titleSelect}>Tipo</Text>
         <View style={styles.borderMargin}>
@@ -93,6 +97,7 @@ export default function CriarArtigo({navigation}) {
             )}
           />
         </View>
+
         {/* STOCK */}
         <Text style={styles.titleSelect}>Stock</Text>
         <View style={styles.borderMargin}>
@@ -109,6 +114,7 @@ export default function CriarArtigo({navigation}) {
             )}
           />
         </View>
+
         {/* MIN STOCK */}
 
 
@@ -149,6 +155,7 @@ export default function CriarArtigo({navigation}) {
             )}
           />
         </View>
+
         {/* TAX */}
         <Text style={styles.titleSelect}>IVA</Text>
         <View style={styles.borderMargin}>
@@ -195,6 +202,7 @@ export default function CriarArtigo({navigation}) {
                 onBlur={onBlur}
                 value={value}
                 placeholder="CodigoBarras"
+                keyboardType='numeric'
               />
             )}
           />
