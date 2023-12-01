@@ -15,9 +15,9 @@ import {Picker} from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 
-export default function CriarOrcamento({navigation}) {
-  const {getClientes} = useContext(AuthContext);
-  const {CriarOrcamento} = useContext(AuthContext);
+export default function CriarOrcamento({ navigation }) {
+  const { CriarOrcamento } = useContext(AuthContext);
+  const { getClientes } = useContext(AuthContext);
   const {getSeries} = useContext(AuthContext);
   const { getArtigos } = useContext(AuthContext);
 
@@ -46,6 +46,7 @@ export default function CriarOrcamento({navigation}) {
 
   // Dados para addOrçamento
   const [LinhasC, setLinhas] = useState([]);
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,24 +78,6 @@ export default function CriarOrcamento({navigation}) {
     fetchData();
   }, []);
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
-  const openDateTimePicker = async () => {
-    try {
-      const {action, year, month, day} = await DateTimePickerAndroid.open({
-        date: selectedDate,
-        mode: 'spinner', // Set the mode according to your requirement
-      });
-
-      if (action !== DateTimePickerAndroid.dismissedAction) {
-        // Do something with the selected date (year, month, day)
-        const selected = new Date(year, month, day);
-        setSelectedDate(selected);
-      }
-    } catch (error) {
-      console.error('Error opening date picker: ', error);
-    }
-  };
 
   const onSubmit = data => {
     setLinhas([...LinhasC, data]);
@@ -106,12 +89,14 @@ export default function CriarOrcamento({navigation}) {
 
   console.log(LinhasC);
 
-  handleCreateOrcamento = () => {
-    const serieC = '';
+  const handleCreateOrcamento = () => {
+    const clienteC = clienteC;
+    const serieC = serieC;
     const numeroC = '';
     const dataC = '';
     const validadeC = '';
     const referenciaC = '';
+    const duedateC ='';
     const moedaC = '';
     const descontoC = '';
     const observacoesC = '';
@@ -119,6 +104,7 @@ export default function CriarOrcamento({navigation}) {
     const finalizarDocumentoC = '';
 
     console.log(clienteC);
+
     CriarOrcamento(
       clienteC,
       serieC,
@@ -126,12 +112,13 @@ export default function CriarOrcamento({navigation}) {
       dataC,
       validadeC,
       referenciaC,
-      vencimentoC,
+      duedateC,
       moedaC,
       descontoC,
       observacoesC,
       LinhasC,
       finalizarDocumentoC,
+      
     ).then(response => {
       console.log(response + ' Resposta Criar Orçamento');
       navigation.navigate('GesFaturação');
@@ -148,21 +135,19 @@ export default function CriarOrcamento({navigation}) {
           <View style={styles.borderMargin}>
             <Picker
               style={styles.pickerComponent}
-              placeholder="Selecione um cliente"
               selectedValue={selectedIdCliente}
               onValueChange={itemValue => {
                 setSelectedIdCliente(itemValue);
                 setCliente(itemValue);
               }}>
-              {dadosClientes.map(function (client, i) {
-                return (
-                  <Picker.Item
-                    label={client.name}
-                    value={client.id.toString()}
-                    key={i}
-                  />
-                );
-              })}
+              <Picker.Item label="Selecione um cliente" value={null} />
+              {dadosClientes.map((client, i) => (
+                <Picker.Item
+                  label={client.name}
+                  value={client.id.toString()}
+                  key={i}
+                />
+              ))}
             </Picker>
           </View>
         </View>
@@ -177,15 +162,13 @@ export default function CriarOrcamento({navigation}) {
               setSerie(itemValue);
             }}>
             <Picker.Item label="Selecione uma serie" value={null} />
-            {dadosSeries.map(function (serie, i) {
-              return (
+              {dadosSeries.map((serie, i) => (
                 <Picker.Item
                   label={serie.description}
                   value={serie.id.toString()}
                   key={i}
                 />
-              );
-            })}
+              ))}
           </Picker>
         </View>
 

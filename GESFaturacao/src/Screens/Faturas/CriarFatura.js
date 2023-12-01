@@ -102,7 +102,7 @@ export default function CriarFatura({ navigation }) {
       LinhasC,
       finalizarDocumentoC,
     ).then(response => {
-      console.log(response + ' Resposta Criar Orçamento');
+      console.log(response + ' Resposta Criar Fatura');
       navigation.navigate('GesFaturação');
       ToastAndroid.show('Fatura Criada ', ToastAndroid.SHORT);
     });

@@ -20,6 +20,19 @@ export default function CriarArtigo({navigation}) {
   const {CriarArtigo} = useContext(AuthContext);
   const {control, handleSubmit} = useForm();
 
+  const submitArtigo = (data) => {
+    // Verificar se todos os campos obrigatórios estão preenchidos
+    if (!data.Nome || !data.Codigo || !data.Categoria || !data.Tipo || !data.Stock || !data.Unidade || !data.PrecoPVP || !data.IVA || !data.Preco) {
+      // Se algum campo estiver vazio, exibir um alerta
+      Alert.alert("Atenção", "Preencha todos os campos obrigatórios.");
+    } else {
+      // Todos os campos estão preenchidos, então chame CriarArtigo
+      console.log("Dados do Artigo:");
+      console.log(data);
+      CriarArtigo(data);
+    }
+  }
+
   function submitcliente(data) {
     console.log('adsa');
     console.log(data);
@@ -305,7 +318,7 @@ export default function CriarArtigo({navigation}) {
           <Button
             title="Criar Artigo"
             color="#d0933f"
-            onPress={handleSubmit(submitcliente)}
+            onPress={handleSubmit(submitArtigo)}
           />
         </View>
       </View>
