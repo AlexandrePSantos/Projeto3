@@ -5,7 +5,6 @@ import {
   Text,
   View,
   FlatList,
-  Item,
   TextInput,
   TouchableOpacity,
   ScrollView,
@@ -15,6 +14,21 @@ import { AuthContext } from '../../Context/AuthContext';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
+
+function Item({ item, onPress }) {
+  const {getArtigoID} = useContext(AuthContext);
+  const [nomeArtigo, setNomeArtigo] = useState();
+  getArtigoID(item.artigo).then((res)=>{
+    setNomeArtigo(res.data.data.Nome)
+  })
+  return (
+    <View style={{marginTop: 8}}>
+      <Text>Artigo: {nomeArtigo} | Preço: {Number(item.preco)} € | QTD: {item.qtd} | Total: {Number(item.preco) * Number(item.qtd)} €</Text>
+      <View style={{marginTop: 4}}><Button title="Remover" color="#bf4346" onPress={onPress} /></View>
+    </View>
+  );
+}
+
 
 export default function CriarFatura({ navigation }) {
   // VARIAVEIS PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
@@ -38,6 +52,11 @@ export default function CriarFatura({ navigation }) {
   const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
   const [selectedMetodo, setSelectedIdMetodo] = useState(null);
 
+
+  const [artigo, setArtigo] = useState();
+  const [quantidade, setQuantidade] = useState();
+  const [listKey, setListKey] = useState(0);
+
   // VARIAVEIS PARA GUARDAR OS DADOS DA FATURA
   // SÃO USADOS PARA ENVIAR PARA A API
   const [ref, setReferencia] = useState('');
@@ -51,6 +70,7 @@ export default function CriarFatura({ navigation }) {
   const [dataVal, setDataVal] = useState(moment().format('DD/MM/YYYY'));
   const [vencimento, setVencimento] = useState('');
   const [metodo, setMetodo] = useState('');
+  const [LinhasC, setLinhas] = useState([]);
 
   const [openc, setopenc] = useState(false);
   const [openv, setopenv] = useState(false);
@@ -85,6 +105,10 @@ export default function CriarFatura({ navigation }) {
     fetchData();
   }, []);
 
+  const removeItem = (index) => {
+    setLinhas(LinhasC.filter((_, i) => i !== index));
+  }
+
   // METODO EXECUTADO QUANDO O BOTÃO DE CRIAR FATURA É PRESSIONADO
   // ENVIA OS DADOS PARA A API
   const handleCreateFatura = () => {
@@ -99,7 +123,7 @@ export default function CriarFatura({ navigation }) {
     const moedaC = moeda;
     const descontoC = desc;
     const observacoesC = obs;
-    // const LinhasC = linha;
+     const LinhasC = linha;
     const metodoC = metodo;
     const finalizarDocumentoC = finalizarDoc;
   
@@ -114,7 +138,7 @@ export default function CriarFatura({ navigation }) {
       moedaC,
       descontoC,
       observacoesC,
-    //   // LinhasC,
+      LinhasC,
       metodoC,
       finalizarDocumentoC,
     ).then(response => {
@@ -130,7 +154,7 @@ export default function CriarFatura({ navigation }) {
       <View style={styles.container}>
         <View style={{marginTop: 10}}>
 
-          {/* Cliente */}
+          {/* Cliente - DONE */}
           <Text style={styles.titleSelect}>Client</Text>
           <View style={styles.borderMargin}>
             <Picker
@@ -152,7 +176,7 @@ export default function CriarFatura({ navigation }) {
             </Picker>
           </View>
 
-          {/* Serie */}
+          {/* Serie - DONE */}
           <Text style={styles.titleSelect}>Series</Text>
           <View style={styles.borderMargin}>
             <Picker
@@ -183,7 +207,6 @@ export default function CriarFatura({ navigation }) {
               mode="date"
               open={openc}
               date={new Date(moment(dataIni, 'DD/MM/YYYY').format())}
-              minimumDate={new Date()}
               onConfirm={date => {
                 setopenc(false);
                 if (moment(date).isBefore(moment(dataVal, 'DD/MM/YYYY'))) {
@@ -207,7 +230,6 @@ export default function CriarFatura({ navigation }) {
               mode="date"
               open={openv}
               date={new Date(moment(dataVal, 'DD/MM/YYYY').format())}
-              minimumDate={new Date()}
               onConfirm={date => {
                 setopenv(false);
                 if (moment(date).isAfter(moment(dataIni, 'DD/MM/YYYY'))) {
@@ -288,7 +310,7 @@ export default function CriarFatura({ navigation }) {
             </Picker>
           </View>
 
-          {/* payment */}
+          {/* payment - DONE*/}
           <Text style={styles.titleSelect}>Método de Pagamento</Text>
           <View style={styles.borderMargin}>
             <Picker
@@ -312,13 +334,46 @@ export default function CriarFatura({ navigation }) {
 
           {/* lines/artigos */}
           {/* Deve permitir selecionar vários artigos e as quantidades de cada */}
-          <Text style={styles.titleSelect}>Artigos</Text>
+          <Text style={styles.titleSelect}>Artigo</Text>
           <View style={styles.borderMargin}>
-              
+            <Picker placeholder="Selecione um Artigo"
+              selectedValue={artigo} 
+              onValueChange={itemValue => {
+                setArtigo(itemValue);
+                setSelectedIdArtigo(itemValue[0]);
+              }} >
+              {dadosArtigos.map(function (object, i) {
+                return <Picker.Item label={object[1]} value={object} key={i} />;
+              })}
+            </Picker>
+          </View>
+          <Text style={styles.titleSelect}>Quantidade</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              value={quantidade}
+              onChangeText={(text) => setQuantidade(text)}
+              placeholder="Quantidade"
+              keyboardType="numeric"
+            />
           </View>
 
-          {/* doc_origin */}
+          <View style={{marginBottom: 10, marginTop: 10}}>
+          <Button title="Adicionar" color="#d0933f" onPress={() => {
+            setLinhas([...LinhasC, { artigo: selectedIdArtigo, qtd: quantidade }]);
+            setListKey(listKey + 1);
+          }}
+          />
+          </View>
 
+          <Text style={styles.titleSelect}>Linha de Artigos</Text>
+          <FlatList
+            data={LinhasC}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item, index }) => (
+              <Item item={item} onPress={() => removeItem(index)} />
+            )}
+          />
+          <View style={{marginTop: 30,marginBottom: 10 ,width: 350}}></View>
           </View>
           <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
             <Button
@@ -328,7 +383,7 @@ export default function CriarFatura({ navigation }) {
             />
           </View>
           </View>
-          </ScrollView>
+        </ScrollView>
   );
 }
 
