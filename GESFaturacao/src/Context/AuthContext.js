@@ -117,7 +117,7 @@ export const AuthProvider = ({children}) => {
             'date': dataC,
             'expiration': validadeC,
             'reference': referenciaC,
-            'dueDate': 0,
+            'dueDate': dueDateC,
             'coin': moedaC,
             'discount': descontoC,
             'observations': observacoesC,
