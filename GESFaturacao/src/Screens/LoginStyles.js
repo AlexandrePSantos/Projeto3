@@ -5,7 +5,7 @@ export default StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#D8D5D4',
+        backgroundColor: '#ffffff',
       },
       containerLogo: {
         justifyContent: 'center',
@@ -27,6 +27,7 @@ export default StyleSheet.create({
         backgroundColor: '#BE6E31',
         borderRadius: 7,
         marginBottom: 15,
+        marginTop: 15,
       },
       signIn: {
         margin: 10,

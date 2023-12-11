@@ -1,53 +1,77 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Button,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
-  FlatList,
+  Alert,
   TextInput,
+  TouchableOpacity,
   ScrollView,
   ToastAndroid,
 } from 'react-native';
-import {AuthContext} from '../../Context/AuthContext';
-import {Picker} from '@react-native-picker/picker';
+import { AuthContext } from '../../Context/AuthContext';
+import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 
+function Item({ item, onPress }) {
+  return (
+    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8}}>
+      <Text style={{flex: 1}}>
+        {"ID: " + item.id + "\n" +
+        "Artigo: " + item.description + "\n" +
+        "Preço Un.: " + Number(item.price) + " €\n" +
+        "QTD.: " + item.quantity + "\n" +
+        "Total: " + Number(item.price) * Number(item.quantity) + " €" +
+        "\n-------------------------"}
+      </Text>
+      <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onPress} /></View>
+    </View>
+  );
+}
+
 export default function CriarOrcamento({ navigation }) {
+  // VARIAVEIS PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
+  // SÃO USADOS PARA CARREGAR ARRAYS DOS PICKERS
   const { CriarOrcamento } = useContext(AuthContext);
   const { getClientes } = useContext(AuthContext);
-  const {getSeries} = useContext(AuthContext);
+  const { getSeries } = useContext(AuthContext);
   const { getArtigos } = useContext(AuthContext);
 
+  // ARRAYS PARA GUARDAR OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
+  // SÃO MOSTRADOS NOS PICKERS
   const [dadosClientes, setDadosClientes] = useState([]);
   const [dadosSeries, setDadosSeries] = useState([]);
   const [dadosArtigos, setDadosArtigos] = useState([]);
 
-  const [clienteC, setCliente] = useState();
-  const [referenciaC, setReferencia] = useState('');
-  const [moedaC, setMoeda] = useState('1'); // Valor inicial '1' para 'Euro (€)'
-  const [descontoC, setDesconto] = useState('0'); // Valor inicial '0'
-  const [observacoesC, setObservacao] = useState('');
-  const [finalizarDocumentoC, setFinalizarDocumento] = useState(0);
-  const [serieC, setSerie] = useState();
-
-
+  // VARIAVEIS PARA GUARDAR OS IDS DOS CLIENTES, SERIES, ARTIGOS E METODOS SELECIONADOS NOS PICKERS
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   const [selectedIdSerie, setSelectedIdSerie] = useState(null);
   const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
 
-  const [dataC, setData] = useState();
-  const [openc, setopenc] = useState(false);
-  const [dataV, setDatev] = useState(new Date());
-  const [openv, setopenv] = useState(false);
-  const [validadeC, setValidade] = useState('');
+  const [artigo, setArtigo] = useState();
+  const [quantidade, setQuantidade] = useState('Quantidade');
+  const [listKey, setListKey] = useState(0);
 
-  // Dados para addOrçamento
+  // VARIAVEIS PARA GUARDAR OS DADOS DA FATURA
+  // SÃO USADOS PARA ENVIAR PARA A API
+  const [ref, setReferencia] = useState('');
+  const [moeda, setMoeda] = useState('1'); // Valor inicial '1' para 'Euro (€)'
+  const [desc, setDesconto] = useState('0'); // Valor inicial '0'
+  const [obs, setObservacao] = useState('');
+  const [finalizarDoc, setFinalizarDocumento] = useState(0);
+  const [cliente, setCliente] = useState();
+  const [serie, setSerie] = useState();
+  const [dataIni, setDataIni] = useState(moment().format('DD/MM/YYYY'));
+  const [dataVal, setDataVal] = useState(moment().format('DD/MM/YYYY'));
+  const [vencimento, setVencimento] = useState('');
   const [LinhasC, setLinhas] = useState([]);
-  
 
+  const [openc, setopenc] = useState(false);
+  const [openv, setopenv] = useState(false);
+
+  // METODO PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,55 +79,42 @@ export default function CriarOrcamento({ navigation }) {
         const seriesResponse = await getSeries();
         const artigosResponse = await getArtigos();
 
-
         if (clientesResponse.data) {
           setDadosClientes(clientesResponse.data);
-          console.log(clientesResponse.data);
         }
 
         if (seriesResponse.data) {
           setDadosSeries(seriesResponse.data);
-          console.log(seriesResponse.data);
         }
 
         if (artigosResponse.data) {
           setDadosArtigos(artigosResponse.data);
         }
-
       } catch (error) {
         console.error(error);
       }
     };
-
     fetchData();
   }, []);
 
-
-  const onSubmit = data => {
-    setLinhas([...LinhasC, data]);
-  };
-
-  const removeItem = index => {
+  const removeItem = (index) => {
     setLinhas(LinhasC.filter((_, i) => i !== index));
-  };
-
-  console.log(LinhasC);
+  }
 
   const handleCreateOrcamento = () => {
-    const clienteC = clienteC;
-    const serieC = serieC;
-    const numeroC = '';
-    const dataC = '';
-    const validadeC = '';
-    const referenciaC = '';
-    const duedateC ='';
-    const moedaC = '';
-    const descontoC = '';
-    const observacoesC = '';
-    const LinhasC = '';
-    const finalizarDocumentoC = '';
-
-    console.log(clienteC);
+    // Define the variables here
+    const clienteC = cliente;
+    const serieC = serie;
+    const numeroC = 0;
+    const dataC = dataIni; 
+    const validadeC = dataVal; 
+    const dueDateC = vencimento;
+    const referenciaC = ref; 
+    const moedaC = moeda;
+    const descontoC = desc;
+    const observacoesC = obs;
+    const LinhaFinal = LinhasC;
+    const finalizarDocumentoC = finalizarDoc;
 
     CriarOrcamento(
       clienteC,
@@ -111,26 +122,28 @@ export default function CriarOrcamento({ navigation }) {
       numeroC,
       dataC,
       validadeC,
+      dueDateC,
       referenciaC,
-      duedateC,
       moedaC,
       descontoC,
       observacoesC,
-      LinhasC,
+      LinhaFinal,
       finalizarDocumentoC,
-      
     ).then(response => {
-      console.log(response + ' Resposta Criar Orçamento');
-      navigation.navigate('GesFaturação');
-      ToastAndroid.show('Orçamento Criado', ToastAndroid.SHORT);
+      navigation.navigate('Dashboard');
+      ToastAndroid.show("Orçamento Criada ", ToastAndroid.SHORT);
+    }).catch(error => {
+      console.error('Erro ao criar orçamento:', error);
+      ToastAndroid.show('Erro ao criar orçamento', ToastAndroid.SHORT);
     });
   };
 
   return (
     <ScrollView>
       <View style={styles.container}>
-        {/* Cliente */}
         <View style={{marginTop: 10}}>
+
+          {/* Cliente - DONE */}
           <Text style={styles.titleSelect}>Client</Text>
           <View style={styles.borderMargin}>
             <Picker
@@ -139,7 +152,8 @@ export default function CriarOrcamento({ navigation }) {
               onValueChange={itemValue => {
                 setSelectedIdCliente(itemValue);
                 setCliente(itemValue);
-              }}>
+              }}
+            >
               <Picker.Item label="Selecione um cliente" value={null} />
               {dadosClientes.map((client, i) => (
                 <Picker.Item
@@ -150,18 +164,19 @@ export default function CriarOrcamento({ navigation }) {
               ))}
             </Picker>
           </View>
-        </View>
-        {/* SERIE */}
-        <Text style={styles.titleSelect}>Series</Text>
-        <View style={styles.borderMargin}>
-          <Picker
-            style={styles.pickerComponent}
-            selectedValue={selectedIdSerie}
-            onValueChange={itemValue => {
-              setSelectedIdSerie(itemValue);
-              setSerie(itemValue);
-            }}>
-            <Picker.Item label="Selecione uma serie" value={null} />
+
+          {/* Serie - DONE */}
+          <Text style={styles.titleSelect}>Series</Text>
+          <View style={styles.borderMargin}>
+            <Picker
+              style={styles.pickerComponent}
+              selectedValue={selectedIdSerie}
+              onValueChange={itemValue => {
+                setSelectedIdSerie(itemValue);
+                setSerie(itemValue);
+              }}
+            >
+              <Picker.Item label="Selecione uma serie" value={null} />
               {dadosSeries.map((serie, i) => (
                 <Picker.Item
                   label={serie.description}
@@ -169,112 +184,202 @@ export default function CriarOrcamento({ navigation }) {
                   key={i}
                 />
               ))}
-          </Picker>
-        </View>
+            </Picker>
+          </View>
 
-        {/* date */}
-        <Text style={styles.titleSelect}>Data</Text>
-        <View style={styles.borderMargin}>
-          <TouchableOpacity onPress={() => setopenc(true)} style={styles.touchableO}>
-            <DatePicker 
+          {/* date - DONE */}
+          <Text style={styles.titleSelect}>Data</Text>
+          <View style={styles.borderMargin}>
+            <TouchableOpacity onPress={() => setopenc(true)} style={styles.touchableO}>
+            <DatePicker
               modal 
-              mode="date" 
-              open={openc} 
-              date={new Date()} 
-              onConfirm={dataC => {
+              mode="date"
+              open={openc}
+              date={new Date(moment(dataIni, 'DD/MM/YYYY').format())}
+              onConfirm={date => {
                 setopenc(false);
-                if (moment(dataC).isBefore(moment(validadeC, 'DD/MM/YYYY'))) {
-                  setData(dataC);
+                if (moment(date).isBefore(moment(dataVal, 'DD/MM/YYYY'))) {
+                  setDataIni(moment(date).format('DD/MM/YYYY'));
                 } else {
-                  alert('Selected date must be less than validade');
+                  ToastAndroid.show('Data de inicio não pode ser após a data de validade', ToastAndroid.SHORT);
                 }
-              }} 
+              }}
               onCancel={() => setopenc(false)}
             />
-            <Text> {' '} {(todaiDate = moment(dataC).format('DD/MM/YYYY'))}</Text>
-          </TouchableOpacity>
-        </View>
-        {/* expiration */}
-        <Text style={styles.titleSelect}>Validade</Text>
-        <View style={styles.borderMargin}>
-          <TouchableOpacity onPress={() => setopenv(true)} style={styles.touchableO}>
-          <DatePicker 
-            modal 
-            mode="date" 
-            open={openv} 
-            date={dataV} 
-            onConfirm={validadeC => { 
-              setopenv(false);
-              setDatev(validadeC);
-              setValidade(moment(validadeC).format('DD/MM/YYYY'));
-            }} 
-            onCancel={() => { setopenv(false); }} 
-          />
-          <Text style={styles.textDate}> {' '} {moment(dataV).format('DD/MM/YYYY')}</Text>
-          </TouchableOpacity>
-        </View>
+            <Text style={styles.textDate}> {' '} {dataIni}</Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Referencia */}
-        <Text style={styles.titleSelect}>Referencia</Text>
-        <View style={styles.borderMargin}>
-          <TextInput
-            style={styles.input}
-            value={referenciaC}
-            onChangeText={text => setReferencia(text)}
-            placeholder="Referencia"
-          />
-        </View>
+          {/* expiration - DONE */}
+          <Text style={styles.titleSelect}>Validade</Text>
+          <View style={styles.borderMargin}>
+            <TouchableOpacity onPress={() => setopenv(true)} style={styles.touchableO}>
+            <DatePicker
+              modal 
+              mode="date"
+              open={openv}
+              date={new Date(moment(dataVal, 'DD/MM/YYYY').format())}
+              onConfirm={date => {
+                setopenv(false);
+                if (moment(date).isAfter(moment(dataIni, 'DD/MM/YYYY'))) {
+                  setDataVal(moment(date).format('DD/MM/YYYY'));
+                  const vencimentoEmDias = moment(date).diff(moment(dataIni, 'DD/MM/YYYY'), 'days');
+                  setVencimento(vencimentoEmDias);
+                } else {
+                  ToastAndroid.show('Data de validade não pode ser anterior à data de inicio', ToastAndroid.SHORT);
+                }
+              }}
+              onCancel={() => setopenv(false)}
+            />
+              <Text style={styles.textDate}> {' '} {dataVal}</Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Moeda */}
-        <Text style={styles.titleSelect}>Moeda</Text>
-        <View style={styles.borderMargin}>
-          <Picker
-            selectedValue={moedaC}
-            onValueChange={itemValue => setMoeda(itemValue)}
-            style={styles.pickerComponent}>
-            <Picker.Item label="Euro (€)" value="1" />
-            <Picker.Item label="Libra ING (GBP)" value="2" />
-            <Picker.Item label="Dólar USA ($)" value="3" />
-            <Picker.Item label="Real Br. (R$)" value="4" />
-            <Picker.Item label="Fr. Suiço (CHF)" value="5" />
-          </Picker>
-        </View>
+          {/* reference - DONE */}
+          <Text style={styles.titleSelect}>Referencia</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={ref}
+              onChangeText={text => setReferencia(text)}
+              placeholder="Referencia"
+            />
+          </View>
 
-        {/* Desconto */}
-        <Text style={styles.titleSelect}>Desconto</Text>
-        <View style={styles.borderMargin}>
-          <TextInput
-            style={styles.input}
-            value={descontoC}
-            onChangeText={text => setDesconto(text)}
-            placeholder="Desconto"
-            keyboardType="numeric"
-          />
-        </View>
+          {/* Coin - DONE */}
+          <Text style={styles.titleSelect}>Moeda</Text>
+          <View style={styles.borderMargin}>
+            <Picker
+              selectedValue={moeda}
+              onValueChange={itemValue => setMoeda(itemValue)}
+              style={styles.pickerComponent}
+            >
+              <Picker.Item label="Euro (€)" value="1" />
+              <Picker.Item label="Libra ING (GBP)" value="2" />
+              <Picker.Item label="Dólar USA ($)" value="3" />
+              <Picker.Item label="Real Br. (R$)" value="4" />
+              <Picker.Item label="Fr. Suiço (CHF)" value="5" />
+            </Picker>
+          </View>
 
-        {/* Observações */}
-        <Text style={styles.titleSelect}>Observações</Text>
-        <View style={styles.borderMargin}>
-          <TextInput
-            style={styles.input}
-            value={observacoesC}
-            onChangeText={text => setObservacao(text)}
-            placeholder="Observações"
-          />
-        </View>
+          {/* discount - DONE */}
+          <Text style={styles.titleSelect}>Desconto</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={desc}
+              onChangeText={text => setDesconto(text)}
+              placeholder="Desconto"
+              keyboardType="numeric"
+            />
+          </View>
 
-        {/* Finalize */}
-        <Text style={styles.titleSelect}>Finalize</Text>
-        <View style={styles.borderMargin}>
-          <Picker
-            style={styles.pickerComponent}
-            placeholder="Finalizado"
-            selectedValue={finalizarDocumentoC}
-            onValueChange={itemValue => setFinalizarDocumento(itemValue)}>
-            <Picker.Item label="Rascunho" value="0" />
-            <Picker.Item label="Aberto" value="1" />
-          </Picker>
+          {/* observations - DONE */}
+          <Text style={styles.titleSelect}>Observações</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={obs}
+              onChangeText={text => setObservacao(text)}
+              placeholder="Observações"
+            />
+          </View>
+
+          {/* finalize - DONE */}
+          <Text style={styles.titleSelect}>Finalize</Text>
+          <View style={styles.borderMargin}>
+            <Picker
+              style={styles.pickerComponent}
+              placeholder="Finalizado"
+              selectedValue={finalizarDoc}
+              onValueChange={itemValue => setFinalizarDocumento(itemValue)}
+            >
+              <Picker.Item label="Rascunho" value="0" />
+              <Picker.Item label="Aberto" value="1" />
+            </Picker>
+          </View>
+
+          {/* lines/artigos */}
+          {/* Deve permitir selecionar vários artigos e as quantidades de cada */}
+          <Text style={styles.titleSelect}>Artigo e Quantidade</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', ...styles.borderMargin}}>
+            <Picker 
+              style={{flex: 2, marginRight: 10}} // Add margin to the right of the Picker
+              placeholder="Selecione um Artigo"
+              selectedValue={artigo} 
+              onValueChange={(itemValue, itemIndex) => {
+                // console.log('Selected item:', itemValue);
+                setArtigo(itemValue);
+                setSelectedIdArtigo(itemValue);
+                setQuantidade('1');
+              }} >
+              <Picker.Item label="Selecione artigo" value={null} />
+              {dadosArtigos.map(function (object, i) {
+                return <Picker.Item label={object.description} value={object} key={i} />;
+              })}
+            </Picker>
+            <TextInput
+              style={{flex: 1}}
+              onChangeText={(text) => setQuantidade(text)}
+              value={quantidade}
+              placeholder="Quantidade"
+              keyboardType="numeric"
+            />
+            </View>
+            <Button 
+              title="Adicionar" 
+              color="#d0933f" 
+              onPress={() => {
+                if (!artigo) {
+                  Alert.alert('Erro', 'Selecione um artigo');
+                  return;
+                } else if (!quantidade || quantidade === '0') {
+                  Alert.alert('Erro', 'Indique a quantidade');
+                  return;
+                } else {
+                  // Check if item already exists in LinhasC
+                  const existingItemIndex = LinhasC.findIndex(item => item.id === artigo.id.toString());
+
+                  if (existingItemIndex >= 0) {
+                    // If item exists, update its quantity and total
+                    LinhasC[existingItemIndex].quantity = Number(LinhasC[existingItemIndex].quantity) + Number(quantidade);
+                    LinhasC[existingItemIndex].price = Number(LinhasC[existingItemIndex].price) + Number(artigo.price);
+                  } else {
+                    // If item doesn't exist, add it as a new item
+                    const newItem = { 
+                      id: artigo.id.toString(), 
+                      description: artigo.description, 
+                      quantity: quantidade, 
+                      price: artigo.price, 
+                      discount: '0', 
+                      tax: artigo.taxID, 
+                      exemption: artigo.exemptionID.toString(), 
+                      retention: 0 
+                    };
+                    LinhasC.push(newItem);
+                  }
+
+                  setLinhas([...LinhasC]);
+                  setListKey(listKey + 1);
+                  // console.log(LinhasC);
+                  setArtigo(null); // Reset artigo
+                  setQuantidade(''); // Reset quantidade
+                }
+              }}
+            />
+
+          <Text style={styles.titleSelect}>Linha de Artigos</Text>
+          <View style={styles.borderMargin}>
+            {LinhasC.length === 0 ? (
+              <Text>Sem artigos selecionados</Text>
+            ) : (
+              LinhasC.map((item, index) => (
+                <Item key={index} item={item} onPress={() => removeItem(index)} />
+              ))
+            )}
+          </View>
         </View>
+        
         <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
           <Button
             title="Criar Orçamento"
@@ -303,8 +408,7 @@ const styles = StyleSheet.create({
   },
   textfont: {
     color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 16
   },
   titleSelect: {
     fontSize: 20,
@@ -316,16 +420,15 @@ const styles = StyleSheet.create({
     width: 350,
   },
   borderMargin: {
+    backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: 'grey',
+    marginBottom: 15,
+    borderRadius: 7,
   },
   touchableO: {
     width: 350,
     height: 55,
     justifyContent: 'center',
-  },
-  input: {
-    width: 350,
-    padding: 10,
   },
 });

@@ -38,7 +38,8 @@ export default StyleSheet.create({
     logoutText: {
       fontSize: 15,
       fontWeight: "bold",
-      color:'#ffffff',},
+      color:'#ffffff',
+    },
     header: {
       backgroundColor: '#e5e9ec',
       padding: 12,

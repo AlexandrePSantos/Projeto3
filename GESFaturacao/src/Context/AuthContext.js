@@ -22,7 +22,6 @@ export const AuthProvider = ({children}) => {
         setIsLoading(true);
         try {
             const res = await axios.post(`${BASE_URL}/authentication`, { username, password });
-            // console.log(res.data);
             let userInfo = res.data;
             setUserInfo(userInfo);
             setUserToken(userInfo._token);
@@ -30,7 +29,6 @@ export const AuthProvider = ({children}) => {
             await AsyncStorage.setItem('@userInfo', JSON.stringify(userInfo));
             await AsyncStorage.setItem('@userToken', userInfo._token);
     
-            // console.log("User Token: " + userInfo._token);
             ToastAndroid.show("Bem-vindo, " + username, ToastAndroid.SHORT);
     
             // Validate token
@@ -39,7 +37,6 @@ export const AuthProvider = ({children}) => {
                     'Authorization': userInfo._token,
                 }
             });
-            // console.log(tokenRes.data);
     
             // Prepare the data for the validate-version request
             let data = qs.stringify({
@@ -59,9 +56,7 @@ export const AuthProvider = ({children}) => {
                 data : data
             };
     
-            // Validate version
-            const versionRes = await axios.request(config);
-            // console.log(versionRes.data);
+            
         } catch(e) {
             console.log(`Login error ${e}`);
         } finally {
@@ -95,7 +90,6 @@ export const AuthProvider = ({children}) => {
     
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data; 
         })
         .catch((error) => {
@@ -106,10 +100,10 @@ export const AuthProvider = ({children}) => {
     // ------!-------
     //    Faturas
     // ------!-------
-    const CriarFatura = async (clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, metodoC, finalizarDocumentoC) => {
+    const CriarFatura = async (clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, metodoC, linhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
-        // const stringifiedLinhas = JSON.stringify(LinhasC);
     
+        const linhas = JSON.stringify(linhasC);
         let data = qs.stringify({
             'client': clienteC,
             'serie': serieC,
@@ -123,7 +117,7 @@ export const AuthProvider = ({children}) => {
             'observations': observacoesC,
             'finalize': finalizarDocumentoC,
             'payment': metodoC,
-            'lines': '[{"id":"113","description":"Tinteiro Compatível Epson T1631 Preto","quantity":"1","price":"1.22","discount":"0","tax":1,"exemption":"0","retention":0}]',
+            'lines': linhas,
             'doc_origin': '9' 
         });
     
@@ -165,7 +159,6 @@ export const AuthProvider = ({children}) => {
     
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data; 
         })
         .catch((error) => {
@@ -221,14 +214,34 @@ export const AuthProvider = ({children}) => {
         });
     }
 
+    const getArtigoID = async (id) =>{
+        var token = await this.getToken();
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/products/${id}`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+          
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
     // ------!-------
     //   Orcamentos
     // ------!-------
-    const CriarOrcamentos = async (clienteC, serieC, numeroC, dataC, validadeC, referenciaC, vencimentoC, moedaC, descontoC, observacoesC, LinhasC, finalizarDocumentoC) => {
-        
+    const CriarOrcamento  = async (clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, linhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
-        //const LinhasC = [{"artigo": "0001", "descricao":descricaoC, "qtd":qtdC, "preco": "19.01", "imposto": "1", "motivo":motivoC, "desconto":descontoCL, "retencao":retencaoC}];
-        const stringifiedLinhas = JSON.stringify(LinhasC);
+    
+        const linhas = JSON.stringify(linhasC);
         let data = qs.stringify({
             'client': clienteC,
             'serie': serieC,
@@ -236,36 +249,32 @@ export const AuthProvider = ({children}) => {
             'date': dataC,
             'expiration': validadeC,
             'reference': referenciaC,
-            'dueDate': vencimentoC,
+            'dueDate': dueDateC,
             'coin': moedaC,
             'discount': descontoC,
             'observations': observacoesC,
             'finalize': finalizarDocumentoC,
-            'payment': 0,
-            'lines': stringifiedLinhas,
-            'doc_origin': '9' 
+            'lines': linhas
         });
+    
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: `${BASE_URL}/budgets`,
+            url: `https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/budgets`,
             headers: { 
                 'Content-Type': 'application/x-www-form-urlencoded', 
                 'Authorization': token, 
-                'Cookie': 'PHPSESSID=2126001ea125fd6cd0c8d1029eb1497a'
             },
             data : data
         };
-
-
+    
         return axios.request(config)
             .then((response) => {
                 console.log(JSON.stringify(response.data));
             })
             .catch((error) => {
-                console.log(error + ' Erro Faturas');
+                console.log(error + ' Erro Orçamentos');
             });
-        
     }
 
     const getOrcamentos = async ()=> {
@@ -292,9 +301,9 @@ export const AuthProvider = ({children}) => {
     // ------!-------
     return(
         <AuthContext.Provider value={{login, logout, 
-            CriarOrcamentos, getOrcamentos,
+            CriarOrcamento, getOrcamentos,
             getSeries,
-            getArtigos, 
+            getArtigos, getArtigoID,
             CriarFatura,
             getClientes, 
             getMetodos,

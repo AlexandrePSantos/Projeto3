@@ -4,7 +4,7 @@ import {
   StyleSheet,
   Text,
   View,
-  FlatList,
+  Alert,
   TextInput,
   TouchableOpacity,
   ScrollView,
@@ -16,19 +16,20 @@ import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 
 function Item({ item, onPress }) {
-  const {getArtigoID} = useContext(AuthContext);
-  const [nomeArtigo, setNomeArtigo] = useState();
-  getArtigoID(item.artigo).then((res)=>{
-    setNomeArtigo(res.data.data.Nome)
-  })
   return (
-    <View style={{marginTop: 8}}>
-      <Text>Artigo: {nomeArtigo} | Preço: {Number(item.preco)} € | QTD: {item.qtd} | Total: {Number(item.preco) * Number(item.qtd)} €</Text>
-      <View style={{marginTop: 4}}><Button title="Remover" color="#bf4346" onPress={onPress} /></View>
+    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8}}>
+      <Text style={{flex: 1}}>
+        {"ID: " + item.id + "\n" +
+        "Artigo: " + item.description + "\n" +
+        "Preço Un.: " + Number(item.price) + " €\n" +
+        "QTD.: " + item.quantity + "\n" +
+        "Total: " + Number(item.price) * Number(item.quantity) + " €" +
+        "\n-------------------------"}
+      </Text>
+      <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onPress} /></View>
     </View>
   );
 }
-
 
 export default function CriarFatura({ navigation }) {
   // VARIAVEIS PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
@@ -54,7 +55,7 @@ export default function CriarFatura({ navigation }) {
 
 
   const [artigo, setArtigo] = useState();
-  const [quantidade, setQuantidade] = useState();
+  const [quantidade, setQuantidade] = useState('Quantidade');
   const [listKey, setListKey] = useState(0);
 
   // VARIAVEIS PARA GUARDAR OS DADOS DA FATURA
@@ -95,6 +96,7 @@ export default function CriarFatura({ navigation }) {
         if (artigosResponse.data) {
           setDadosArtigos(artigosResponse.data);
         }
+
         if (metodosResponse.data) {
           setDadosMetodo(metodosResponse.data);
         }
@@ -116,14 +118,14 @@ export default function CriarFatura({ navigation }) {
     const clienteC = cliente;
     const serieC = serie;
     const numeroC = 0;
-    const dataC = dataIni; // está undifined
-    const validadeC = dataVal; // está undifined
+    const dataC = dataIni; 
+    const validadeC = dataVal; 
     const dueDateC = vencimento;
     const referenciaC = ref; 
     const moedaC = moeda;
     const descontoC = desc;
     const observacoesC = obs;
-     const LinhasC = linha;
+    const LinhaFinal = LinhasC;
     const metodoC = metodo;
     const finalizarDocumentoC = finalizarDoc;
   
@@ -138,14 +140,15 @@ export default function CriarFatura({ navigation }) {
       moedaC,
       descontoC,
       observacoesC,
-      LinhasC,
       metodoC,
+      LinhaFinal,
       finalizarDocumentoC,
     ).then(response => {
-      console.log(clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, metodoC, finalizarDocumentoC);
-      console.log(response + ' Resposta Criar Fatura');
-    //   // navigation.navigate('GesFaturação');
-      ToastAndroid.show('Fatura Criada ', ToastAndroid.SHORT);
+      navigation.navigate('Dashboard');
+      ToastAndroid.show("Fatura Criada ", ToastAndroid.SHORT);
+    }).catch(error => {
+      console.error('Error creating invoice:', error);
+      ToastAndroid.show('Error creating invoice', ToastAndroid.SHORT);
     });
   };
 
@@ -318,9 +321,9 @@ export default function CriarFatura({ navigation }) {
               placeholder="Método de Pagamento"
               selectedValue={metodo}
               onValueChange={itemValue => {
-              setSelectedIdMetodo(itemValue); 
-              setMetodo(itemValue);}}
-            >
+                setSelectedIdMetodo(itemValue); 
+                setMetodo(itemValue);
+              }} >
               <Picker.Item label="Selecione um método de pagamento" value={null} />
               {dadosMetodo.map((metodo, i) => (
                 <Picker.Item
@@ -334,56 +337,94 @@ export default function CriarFatura({ navigation }) {
 
           {/* lines/artigos */}
           {/* Deve permitir selecionar vários artigos e as quantidades de cada */}
-          <Text style={styles.titleSelect}>Artigo</Text>
-          <View style={styles.borderMargin}>
-            <Picker placeholder="Selecione um Artigo"
+          <Text style={styles.titleSelect}>Artigo e Quantidade</Text>
+          <View style={{flexDirection: 'row', alignItems: 'center', ...styles.borderMargin}}>
+            <Picker 
+              style={{flex: 2, marginRight: 10}} // Add margin to the right of the Picker
+              placeholder="Selecione um Artigo"
               selectedValue={artigo} 
-              onValueChange={itemValue => {
+              onValueChange={(itemValue, itemIndex) => {
+                // console.log('Selected item:', itemValue);
                 setArtigo(itemValue);
-                setSelectedIdArtigo(itemValue[0]);
+                setSelectedIdArtigo(itemValue);
+                setQuantidade('1');
               }} >
+              <Picker.Item label="Selecione artigo" value={null} />
               {dadosArtigos.map(function (object, i) {
-                return <Picker.Item label={object[1]} value={object} key={i} />;
+                return <Picker.Item label={object.description} value={object} key={i} />;
               })}
             </Picker>
-          </View>
-          <Text style={styles.titleSelect}>Quantidade</Text>
-          <View style={styles.borderMargin}>
             <TextInput
-              value={quantidade}
+              style={{flex: 1}}
               onChangeText={(text) => setQuantidade(text)}
+              value={quantidade}
               placeholder="Quantidade"
               keyboardType="numeric"
             />
-          </View>
+            </View>
+            <Button 
+              title="Adicionar" 
+              color="#d0933f" 
+              onPress={() => {
+                if (!artigo) {
+                  Alert.alert('Erro', 'Selecione um artigo');
+                  return;
+                } else if (!quantidade || quantidade === '0') {
+                  Alert.alert('Erro', 'Indique a quantidade');
+                  return;
+                } else {
+                  // Check if item already exists in LinhasC
+                  const existingItemIndex = LinhasC.findIndex(item => item.id === artigo.id.toString());
 
-          <View style={{marginBottom: 10, marginTop: 10}}>
-          <Button title="Adicionar" color="#d0933f" onPress={() => {
-            setLinhas([...LinhasC, { artigo: selectedIdArtigo, qtd: quantidade }]);
-            setListKey(listKey + 1);
-          }}
-          />
-          </View>
+                  if (existingItemIndex >= 0) {
+                    // If item exists, update its quantity and total
+                    LinhasC[existingItemIndex].quantity = Number(LinhasC[existingItemIndex].quantity) + Number(quantidade);
+                    LinhasC[existingItemIndex].price = Number(LinhasC[existingItemIndex].price) + Number(artigo.price);
+                  } else {
+                    // If item doesn't exist, add it as a new item
+                    const newItem = { 
+                      id: artigo.id.toString(), 
+                      description: artigo.description, 
+                      quantity: quantidade, 
+                      price: artigo.price, 
+                      discount: '0', 
+                      tax: artigo.taxID, 
+                      exemption: artigo.exemptionID.toString(), 
+                      retention: 0 
+                    };
+                    LinhasC.push(newItem);
+                  }
+
+                  setLinhas([...LinhasC]);
+                  setListKey(listKey + 1);
+                  // console.log(LinhasC);
+                  setArtigo(null); // Reset artigo
+                  setQuantidade(''); // Reset quantidade
+                }
+              }}
+            />
 
           <Text style={styles.titleSelect}>Linha de Artigos</Text>
-          <FlatList
-            data={LinhasC}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item, index }) => (
-              <Item item={item} onPress={() => removeItem(index)} />
+          <View style={styles.borderMargin}>
+            {LinhasC.length === 0 ? (
+              <Text>Sem artigos selecionados</Text>
+            ) : (
+              LinhasC.map((item, index) => (
+                <Item key={index} item={item} onPress={() => removeItem(index)} />
+              ))
             )}
+          </View>
+        </View>
+        
+        <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+          <Button
+            title="Criar Fatura"
+            color="#d0933f"
+            onPress={() => handleCreateFatura()}
           />
-          <View style={{marginTop: 30,marginBottom: 10 ,width: 350}}></View>
-          </View>
-          <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-            <Button
-              title="Criar Fatura"
-              color="#d0933f"
-              onPress={() => handleCreateFatura()}
-            />
-          </View>
-          </View>
-        </ScrollView>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 

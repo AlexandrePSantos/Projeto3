@@ -16,6 +16,12 @@ export default function Home({navigation}) {
           onPress={() => navigation.navigate("Criar Fatura")}>
           <Text style={styles.menuText}>Criar Fatura</Text>
         </TouchableOpacity>
+        {/* Botão listar faturas */}
+        <TouchableOpacity
+          style={[styles.menuButton, styles.shadow]}
+          onPress={() => navigation.navigate("Listar Faturas")}>
+          <Text style={styles.menuText}>Listar Faturas</Text>
+        </TouchableOpacity>
         {/* Botão criar Orçamento */}
         <TouchableOpacity
           style={[styles.menuButton, styles.shadow]}
@@ -24,13 +30,9 @@ export default function Home({navigation}) {
         </TouchableOpacity>
         {/* Botão criar Artigo */}
         <TouchableOpacity
-          style={[styles.menuButton, styles.shadow]}
+          style={[styles.menuButton, styles.shadow, { backgroundColor: 'gray' }]}
           onPress={() => navigation.navigate("Criar Artigo")}>
           <Text style={styles.menuText}>Criar Artigo</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[styles.menuButton, styles.shadow]} onPress={() => {logout()}}>
-          <Text style={styles.menuText}>Logout</Text>
         </TouchableOpacity>
       </View>
     </View>
