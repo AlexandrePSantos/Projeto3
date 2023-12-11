@@ -22,6 +22,8 @@ export default StyleSheet.create({
         width: '90%',
         marginBottom: 15,
         borderRadius: 7,
+        borderBottomWidth: 1,
+        borderBottomColor: '#BE6E31',
       },
       btnSignIn: {
         backgroundColor: '#BE6E31',
