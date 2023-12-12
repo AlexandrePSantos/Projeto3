@@ -9,9 +9,9 @@ export default StyleSheet.create({
       },
       containerLogo: {
         justifyContent: 'center',
-        marginBottom: 100,
-        borderRadius: 15,
-      },
+        marginBottom: 170,
+        marginTop: 60,
+        },
       container: {
         flex: 1,
         alignItems: 'center',
@@ -19,7 +19,7 @@ export default StyleSheet.create({
       },
       input: {
         backgroundColor: '#fff',
-        width: '90%',
+        width: '80%',
         marginBottom: 15,
         borderRadius: 7,
         borderBottomWidth: 1,
@@ -36,5 +36,19 @@ export default StyleSheet.create({
         fontSize: 20,
         fontWeight: "bold",
         color:'#ffffff',
+      },
+      inputWrapper: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderRadius: 5,
+        marginBottom: 10,
+        position: 'relative',
+      },
+      showPasswordButton: {
+        position: 'absolute',
+        right: 10,
+        top: '27%',
+
       },
     });

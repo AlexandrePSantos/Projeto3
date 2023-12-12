@@ -1,10 +1,10 @@
-import React, {createContext, useEffect, useState} from 'react';
+import React, {createContext, useState} from 'react';
+import { ToastAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { BASE_URL } from '../config';
 import qs from 'qs';
 
-import { ToastAndroid } from 'react-native';
+const BASE_URL = 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2';
 
 export const AuthContext = createContext();
 
@@ -81,7 +81,7 @@ export const AuthProvider = ({children}) => {
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/payment-methods',
+            url: `${BASE_URL}/payment-methods`,
             headers: { 
               'Authorization': token
             },
@@ -118,13 +118,13 @@ export const AuthProvider = ({children}) => {
             'finalize': finalizarDocumentoC,
             'payment': metodoC,
             'lines': linhas,
-            'doc_origin': '9' 
+            'doc_origin': '0' 
         });
     
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: `https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/invoices`,
+            url: `${BASE_URL}/invoices`,
             headers: { 
                 'Content-Type': 'application/x-www-form-urlencoded', 
                 'Authorization': token, 
@@ -147,7 +147,7 @@ export const AuthProvider = ({children}) => {
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/invoices',
+            url: `${BASE_URL}/invoices`,
             headers: { 
               'Authorization': token
             },
@@ -161,8 +161,8 @@ export const AuthProvider = ({children}) => {
             .catch((error) => {
             console.log(error);
             });
-
     }    
+
     // ------!-------
     //   Clientes
     // ------!-------
@@ -172,7 +172,7 @@ export const AuthProvider = ({children}) => {
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/clients',
+            url: `${BASE_URL}/clients`,
             headers: { 
               'Authorization': token
             },
@@ -196,7 +196,7 @@ export const AuthProvider = ({children}) => {
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/series',
+            url: `${BASE_URL}/series`,
             headers: { 
               'Authorization': token
             }
@@ -220,7 +220,7 @@ export const AuthProvider = ({children}) => {
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/products',
+            url: `${BASE_URL}/products`,
             headers: { 
                 'Authorization': token
             }
@@ -241,7 +241,7 @@ export const AuthProvider = ({children}) => {
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: `https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/products/${id}`,
+            url: `${BASE_URL}/products/${id}`,
             headers: { 
                 'Authorization': token
             }
@@ -282,7 +282,7 @@ export const AuthProvider = ({children}) => {
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: `https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/budgets`,
+            url: `${BASE_URL}/budgets`,
             headers: { 
                 'Content-Type': 'application/x-www-form-urlencoded', 
                 'Authorization': token, 
@@ -301,22 +301,25 @@ export const AuthProvider = ({children}) => {
 
     const getOrcamentos = async ()=> {
         var token = await this.getToken();
-
-        return axios({
-            url: `${BASE_URL}/api/orcamentos/orcamentos`,
-            method: 'GET',
-            timeout: 5000,
-            params: {
-                opcao: '0',
-                _token: token,
-                pag: '0',
-                numRows: '25',
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/budgets`,
+            headers: { 
+              'Authorization': token
             },
-            headers: {
-                Accept: 'application/json',
-            }
-        }); 
-    }
+            data : data
+          };
+    
+        return axios.request(config)
+            .then((response) => {
+            return response.data; 
+            })
+            .catch((error) => {
+            console.log(error);
+        });
+    }    
 
     // ------!-------
     // Return Values

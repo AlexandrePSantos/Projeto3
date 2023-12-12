@@ -11,7 +11,9 @@ import Home from '../Screens/Home';
 import CriarFatura from '../Screens/Faturas/CriarFatura';
 import ListarFaturas from '../Screens/Faturas/ListarFaturas';
 import CriarOrcamentos from '../Screens/Orcamentos/CriarOrcamento';
+import ListarOrcamentos from '../Screens/Orcamentos/ListarOrcamentos';
 import CriarArtigo from '../Screens/Artigos/CriarArtigo';
+import ListarArtigos from '../Screens/Artigos/ListarArtigos';
 
 const Stack = createNativeStackNavigator();
 
@@ -56,7 +58,9 @@ const screens = [
   { name: 'Criar Fatura', component: CriarFatura },
   { name: 'Listar Faturas', component: ListarFaturas },
   { name: 'Criar Orçamento', component: CriarOrcamentos },
+  { name: 'Listar Orçamentos', component: ListarOrcamentos},
   { name: 'Criar Artigo', component: CriarArtigo },
+  { name: 'Listar Artigos', component: ListarArtigos },
 ];
 
 const AppStack = () => {

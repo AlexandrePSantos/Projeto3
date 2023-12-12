@@ -329,8 +329,7 @@ export default function CriarArtigo({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e5e9ec',
-
+    backgroundColor: '#ffffff',
     justifyContent: 'flex-start',
   },
   touch: {
