@@ -140,7 +140,24 @@ export const AuthProvider = ({children}) => {
                 console.log(error + ' Erro Faturas');
             });
     }
+    const getFaturas = async ()=> {
+        var token = await this.getToken();
 
+        return axios({
+            url: `${BASE_URL}/invoices`,
+            method: 'GET',
+            timeout: 5000,
+            params: {
+                opcao: '0',
+                _token: token,
+                pag: '0',
+                numRows: '25',
+            },
+            headers: {
+                Accept: 'application/json',
+            }
+        }); 
+    }    
     // ------!-------
     //   Clientes
     // ------!-------
@@ -304,7 +321,7 @@ export const AuthProvider = ({children}) => {
             CriarOrcamento, getOrcamentos,
             getSeries,
             getArtigos, getArtigoID,
-            CriarFatura,
+            CriarFatura, getFaturas,
             getClientes, 
             getMetodos,
             isLoading, userToken}}>

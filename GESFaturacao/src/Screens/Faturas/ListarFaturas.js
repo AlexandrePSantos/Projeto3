@@ -1,16 +1,47 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, ScrollView,ToastAndroid,LogBox,TextInput,Modal } from 'react-native';
+import { AuthContext } from '../../Context/AuthContext';
+import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 
 
 export default function ListarFaturas({navigation, route}) {
-  
+
+  const { getFaturas } = useContext(AuthContext);
+  const [faturas, setFaturas] = useState([]);
+
+  useEffect(() => {
+    const carregarFaturas = async () => {
+      try {
+        const response = await getFaturas(); // Substitua getFaturas pela função correta que busca as faturas
+        if (response.data) {
+          setFaturas(response.data); // Atualiza o estado com as faturas recebidas
+        }
+      } catch (error) {
+        console.error('Erro ao carregar faturas:', error);
+      }
+    };
+
+    carregarFaturas();
+  }, []); // O segundo argumento do useEffect é uma lista de dependências, neste caso, vazia, o que significa que será executado apenas uma vez.
+
   return (
     <ScrollView>
-      <Text style={styles.titleSelect}>Hello there!</Text>
+      <Text style={styles.titleSelect}>Lista de Faturas</Text>
+      {faturas.map((fatura, index) => (
+        <View key={index} style={styles.faturaContainer}>
+          <Text>ID: {fatura.id}</Text>
+          <Text>Cliente: {fatura.cliente}</Text>
+          {/* Adicione mais detalhes da fatura conforme necessário */}
+          <Button
+            title="Ver Detalhes"
+            onPress={() => navigation.navigate('DetalhesFatura', { id: fatura.id })}
+          />
+        </View>
+      ))}
     </ScrollView>
   );
-
 }
+
 
 
 const styles = StyleSheet.create({
