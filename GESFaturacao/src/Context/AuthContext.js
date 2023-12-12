@@ -140,23 +140,28 @@ export const AuthProvider = ({children}) => {
                 console.log(error + ' Erro Faturas');
             });
     }
+
     const getFaturas = async ()=> {
         var token = await this.getToken();
-
-        return axios({
-            url: `${BASE_URL}/invoices`,
-            method: 'GET',
-            timeout: 5000,
-            params: {
-                opcao: '0',
-                _token: token,
-                pag: '0',
-                numRows: '25',
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/invoices',
+            headers: { 
+              'Authorization': token
             },
-            headers: {
-                Accept: 'application/json',
-            }
-        }); 
+            data : data
+          };
+    
+        return axios.request(config)
+            .then((response) => {
+            return response.data; 
+            })
+            .catch((error) => {
+            console.log(error);
+            });
+
     }    
     // ------!-------
     //   Clientes
