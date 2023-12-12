@@ -1,21 +1,30 @@
 import React, { useContext } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Text, StyleSheet } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import { StatusBar } from 'react-native';
+import { Text, StyleSheet, Button, View, StatusBar } from 'react-native';
+import { AuthContext } from '../Context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 
+import LinearGradient from 'react-native-linear-gradient';
+
+import Login from '../Screens/Login';
 import Home from '../Screens/Home';
 import CriarFatura from '../Screens/Faturas/CriarFatura';
 import ListarFaturas from '../Screens/Faturas/ListarFaturas';
 import CriarOrcamentos from '../Screens/Orcamentos/CriarOrcamento';
 import CriarArtigo from '../Screens/Artigos/CriarArtigo';
 
-import { AuthContext } from '../Context/AuthContext';
-
-import { Button, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-
 const Stack = createNativeStackNavigator();
+
+const AuthStack = () => {
+  return (
+    <>
+      <StatusBar backgroundColor="rgba(154, 83, 27, 1)" barStyle="light-content" />
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Login" component={Login} />
+      </Stack.Navigator>
+    </>
+  );
+};
 
 const BackButton = () => {
   const navigation = useNavigation();
@@ -63,7 +72,11 @@ const AppStack = () => {
             name={screen.name} 
             component={screen.component} 
             options={{ 
-              header: () => <CustomHeader title={screen.name} showBackButton={screen.name.startsWith('Criar')} showLogoutButton={screen.name === 'Dashboard'} onLogout={logout} />,
+              header: () => 
+                <CustomHeader 
+                  title={screen.name} 
+                  showBackButton={screen.name.startsWith('Criar') || screen.name.startsWith('Listar')}
+                  showLogoutButton={screen.name === 'Dashboard'} onLogout={logout} />,
             }}
           />
         ))}
@@ -72,7 +85,7 @@ const AppStack = () => {
   );
 };
 
-export default AppStack;
+export { AuthStack, AppStack };
 
 // -------
 // Styling
