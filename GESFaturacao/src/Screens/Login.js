@@ -8,10 +8,14 @@ import {
   TouchableOpacity, 
   Image,
   StyleSheet,
-  useColorScheme
+  useColorScheme,
+  Switch,
+  ActivityIndicator
 } from 'react-native';
 import { AuthContext } from '../Context/AuthContext';
 import LinearGradient from 'react-native-linear-gradient';
+import * as Keychain from 'react-native-keychain'; // Add this line
+
 
 const Login = ({navigation}) => {
   const [username, setUsername] = useState(null);
@@ -19,7 +23,9 @@ const Login = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [keyboardStatus, setKeyboardStatus] = useState(false);
-  const {login} = useContext(AuthContext);
+  const {isLoggedIn, login} = useContext(AuthContext);
+
+  const [rememberCredentials, setRememberCredentials] = useState(false);
 
   const colorScheme = useColorScheme();
   const styles = StyleSheet.create({
@@ -54,7 +60,7 @@ const Login = ({navigation}) => {
       backgroundColor: colorScheme === 'dark' ? '#333333' : '#fff',
       color: colorScheme === 'dark' ? '#fff' : '#000',
       width: '90%',
-      marginBottom: 30,
+      marginBottom: 25,
       borderRadius: 7,
       borderBottomWidth: 1,
       borderBottomColor: '#BE6E31',
@@ -64,7 +70,6 @@ const Login = ({navigation}) => {
       justifyContent: 'space-between',
       alignItems: 'center',
       borderRadius: 5,
-      marginBottom: 10,
     },
     showPasswordButton: {
       position: 'absolute',
@@ -74,6 +79,7 @@ const Login = ({navigation}) => {
     btnSignIn: {
       backgroundColor: '#BE6E31',
       borderRadius: 7,
+      marginTop: 15,
       marginBottom: 15,
     },
     textSignIn: {
@@ -101,18 +107,33 @@ const Login = ({navigation}) => {
       }
     );
 
+    const loadCredentials = async () => {
+      const credentials = await Keychain.getGenericPassword();
+      if (credentials && !isLoggedIn) {
+        setUsername(credentials.username);
+        setPassword(credentials.password);
+        login(credentials.username, credentials.password); // Automatically log the user in
+      }
+    };
+    loadCredentials();
+
     return () => {
       keyboardDidHideListener.remove();
       keyboardDidShowListener.remove();
     };
   }, []);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!username || !password) {
         // Show some error message
         return;
     }
     setIsLoading(true);
+    if (rememberCredentials) {
+      await Keychain.setGenericPassword(username, password);
+    } else {
+      await Keychain.resetGenericPassword();
+    }
     login(username, password).finally(() => setIsLoading(false));
   }
 
@@ -154,6 +175,16 @@ const Login = ({navigation}) => {
         {showPassword ? 'Hide' : 'Show'}
       </Text>
       </TouchableOpacity>
+    </View>
+
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <Switch 
+        value={rememberCredentials} 
+        onValueChange={setRememberCredentials} 
+        trackColor={{ false: "#767577", true: "#BE6E31" }} 
+        thumbColor={rememberCredentials ? "#BE6E31" : "#f4f3f4"}
+      />
+      <Text style={{ color: colorScheme === 'dark' ? '#fff' : '#000' }}>Remember credentials?</Text>
     </View>
     <TouchableOpacity style={styles.btnSignIn} onPress={handleLogin} disabled={isLoading}>
       {isLoading ? <ActivityIndicator /> : <Text style={styles.textSignIn}>Sign-in</Text>}

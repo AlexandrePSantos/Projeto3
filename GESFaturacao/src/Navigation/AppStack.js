@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Text, StyleSheet, Button, View, StatusBar } from 'react-native';
 import { AuthContext } from '../Context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import * as Keychain from 'react-native-keychain';
 
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -41,7 +42,8 @@ const BackButton = () => {
 const LogoutButton = ({ onLogout }) => {
   const navigation = useNavigation();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await Keychain.resetGenericPassword();
     onLogout();
     navigation.navigate('Login');
   };

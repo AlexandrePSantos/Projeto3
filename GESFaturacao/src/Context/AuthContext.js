@@ -13,6 +13,7 @@ export const AuthProvider = ({children}) => {
     const [userToken, setUserToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [nome, setNome] = useState(null);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     getToken = async () => AsyncStorage.getItem('@userToken');
     // ------!-------
@@ -62,6 +63,7 @@ export const AuthProvider = ({children}) => {
         } finally {
             setIsLoading(false);
         }
+        setIsLoggedIn(true);
     }
 
     const logout = async () => {
@@ -70,6 +72,7 @@ export const AuthProvider = ({children}) => {
         await AsyncStorage.removeItem('@userInfo');
         await AsyncStorage.removeItem('@userToken');
         setIsLoading(false);
+        setIsLoggedIn(false);
     }
 
     // ------!-------   
@@ -325,7 +328,7 @@ export const AuthProvider = ({children}) => {
     // Return Values
     // ------!-------
     return(
-        <AuthContext.Provider value={{login, logout, 
+        <AuthContext.Provider value={{isLoggedIn, login, logout, 
             CriarOrcamento, getOrcamentos,
             getSeries,
             getArtigos, getArtigoID,
