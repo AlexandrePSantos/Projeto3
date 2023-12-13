@@ -1,0 +1,46 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html> <!--<![endif]-->
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <script src="./build/build.js"></script>
+  </head>
+    <body>
+      <script type="text/javascript">
+        require('number');
+        function assert (e, m) { if (e !== true) throw new Error(m || "AssertionError: "+e + " === "+ true ); }
+        // .times
+        i = 0;
+        (4).times(function (n) { i = n; });
+        assert(i === 3);
+
+        // .downto
+        (5).downto(1, function (n) { i = n });
+        assert(i === 1);
+
+        // .upto
+        (5).upto(10, function (n) { i = n });
+        assert(i === 10);
+
+        // .next
+        assert((5).next === 6);
+
+        // .even
+        assert((1).even === false);
+        assert((2).even === true);
+
+        // .odd
+        assert((3).odd === true);
+        assert((4).odd === false);
+
+        // .pred
+        assert((3).pred === 2);
+        assert((4).pred === 3);
+      </script>
+  </body>
+</html>
