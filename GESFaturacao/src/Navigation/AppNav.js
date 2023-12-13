@@ -1,10 +1,6 @@
 import {View, ActivityIndicator} from 'react-native';
 import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-
-//substituir pelo authstack e appstack
-// import AuthStack from './AuthStack';
-// import AppStack from './AppStack';
 import { AuthStack, AppStack } from './AppStack';
 import { AuthContext } from '../Context/AuthContext';
 
