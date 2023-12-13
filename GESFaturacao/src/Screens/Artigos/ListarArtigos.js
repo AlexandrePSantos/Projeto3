@@ -32,8 +32,8 @@ export default function ListarArtigos({ navigation, route }) {
           <View style={styles.artigoInfo}>
             
             <Text>ID: {artigo.id}</Text>
-            <Text>Preço: {artigo.price}</Text>
-            <Text>Preço+Tax: {artigo.pricePvp}</Text>
+            <Text>Preço: {parseFloat(artigo.price).toFixed(2)}</Text>
+            <Text>Preço+Tax: {parseFloat(artigo.pricePvp).toFixed(2)}</Text>
             <Text>Descrição: {artigo.description}</Text>
           </View>
           <Image source={{ uri: artigo.image }} style={styles.artigoImage} />
