@@ -442,10 +442,6 @@ const styles = StyleSheet.create({
     width: 300,
     padding: 10,
   },
-  textfont: {
-    color: '#ffffff',
-    fontSize: 16
-  },
   titleSelect: {
     fontSize: 20,
     margin: 10,
