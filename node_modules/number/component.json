@@ -1,0 +1,13 @@
+{
+  "name": "number",
+  "repo": "jwerle/number",
+  "description": "Number utility functions. Inspired by the ruby Integer object.",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {},
+  "development": {},
+  "license": "MIT",
+  "scripts": [
+    "index.js"
+  ]
+}
