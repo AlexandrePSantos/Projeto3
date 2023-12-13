@@ -5,8 +5,6 @@ import styles from './HomeStyles';
 
 export default function Home({navigation}) {
 
-  const {logout} = useContext(AuthContext);
-
   return (
     <View style={styles.outerContainer}>
       <Text style={styles.titles}>Faturas</Text>
@@ -20,7 +18,7 @@ export default function Home({navigation}) {
         </TouchableOpacity>
         {/* Botão listar faturas */}
         <TouchableOpacity
-          style={[styles.menuButton, styles.shadow, { backgroundColor: 'gray' }]}
+          style={[styles.menuButton, styles.shadow]}
           onPress={() => navigation.navigate("Listar Faturas")}>
           <Text style={styles.menuText}>Listar Faturas</Text>
         </TouchableOpacity>
@@ -37,7 +35,7 @@ export default function Home({navigation}) {
         </TouchableOpacity>
         {/* Botão listar Orçamentos */}
         <TouchableOpacity
-          style={[styles.menuButton, styles.shadow, { backgroundColor: 'gray' }]}
+          style={[styles.menuButton, styles.shadow]}
           onPress={() => navigation.navigate("Listar Orçamentos")}>
           <Text style={styles.menuText}>Listar Orçamentos</Text>
         </TouchableOpacity>
@@ -54,7 +52,7 @@ export default function Home({navigation}) {
         </TouchableOpacity>
         {/* Botão listar Artigos */}
         <TouchableOpacity
-          style={[styles.menuButton, styles.shadow, { backgroundColor: 'gray' }]}
+          style={[styles.menuButton, styles.shadow]}
           onPress={() => navigation.navigate("Listar Artigos")}>
           <Text style={styles.menuText}>Listar Artigos</Text>
         </TouchableOpacity>
