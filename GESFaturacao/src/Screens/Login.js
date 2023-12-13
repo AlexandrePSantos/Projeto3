@@ -10,7 +10,8 @@ import {
   StyleSheet,
   useColorScheme,
   Switch,
-  ActivityIndicator
+  ActivityIndicator,
+  ToastAndroid 
 } from 'react-native';
 import { AuthContext } from '../Context/AuthContext';
 import LinearGradient from 'react-native-linear-gradient';
@@ -125,14 +126,12 @@ const Login = ({navigation}) => {
 
   const handleLogin = async () => {
     if (!username || !password) {
-        // Show some error message
-        return;
+      ToastAndroid.show('Please enter both username and password.', ToastAndroid.SHORT);
+      return;
     }
     setIsLoading(true);
     if (rememberCredentials) {
       await Keychain.setGenericPassword(username, password);
-    } else {
-      await Keychain.resetGenericPassword();
     }
     login(username, password).finally(() => setIsLoading(false));
   }

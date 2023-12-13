@@ -4,7 +4,6 @@ import { Text, StyleSheet, Button, View, StatusBar } from 'react-native';
 import { AuthContext } from '../Context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import * as Keychain from 'react-native-keychain';
-
 import LinearGradient from 'react-native-linear-gradient';
 
 import Login from '../Screens/Login';
@@ -18,6 +17,8 @@ import ListarArtigos from '../Screens/Artigos/ListarArtigos';
 
 const Stack = createNativeStackNavigator();
 
+const { logout } = useContext(AuthContext);
+
 const AuthStack = () => {
   return (
     <>
@@ -29,30 +30,9 @@ const AuthStack = () => {
   );
 };
 
-const BackButton = () => {
-  const navigation = useNavigation();
-
-  return (
-    <View style={{ marginLeft: 10 }}>
-      <Button title="Back" onPress={() => navigation.goBack()} />
-    </View>
-  );
-};
-
-const LogoutButton = ({ onLogout }) => {
-  const navigation = useNavigation();
-
-  const handleLogout = async () => {
-    await Keychain.resetGenericPassword();
-    onLogout();
-    navigation.navigate('Login');
-  };
-
-  return (
-    <View style={{ marginRight: 10 }}>
-      <Button title="Logout" onPress={handleLogout} />
-    </View>
-  );
+const handleLogout = async () => {
+  await Keychain.resetGenericPassword();
+  logout();
 };
 
 const screens = [
@@ -82,7 +62,7 @@ const AppStack = () => {
                 <CustomHeader 
                   title={screen.name} 
                   showBackButton={screen.name.startsWith('Criar') || screen.name.startsWith('Listar')}
-                  showLogoutButton={screen.name === 'Dashboard'} onLogout={logout} />,
+                  showLogoutButton={screen.name === 'Dashboard'} onLogout={handleLogout} />,
             }}
           />
         ))}

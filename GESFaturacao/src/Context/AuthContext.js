@@ -55,11 +55,9 @@ export const AuthProvider = ({children}) => {
                     'Authorization': 'Basic UjBWVFJrRlVWVkpCUTBGUDpNWFk0T0dKaWQyZHJaWEkzYmpreWFXUTNNVGs9',
                 },
                 data : data
-            };
-    
-            
+            };           
         } catch(e) {
-            console.log(`Login error ${e}`);
+            ToastAndroid.show('Incorrect username or password.', ToastAndroid.SHORT);
         } finally {
             setIsLoading(false);
         }
