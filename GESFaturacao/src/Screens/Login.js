@@ -45,13 +45,14 @@ const Login = ({navigation}) => {
       backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     },
     inputsContainer: {
-      flex: 1,
-      width: '100%',
+      flex: 2,
+      width: '90%',
       alignItems: 'center',
+      marginTop: keyboardStatus ? '0%' : '10%', // Less top margin when the keyboard is visible
     },
     input: {
       backgroundColor: colorScheme === 'dark' ? '#333333' : '#fff',
-      width: '80%',
+      width: '90%',
       marginBottom: 30,
       borderRadius: 7,
       borderBottomWidth: 1,
@@ -73,7 +74,7 @@ const Login = ({navigation}) => {
       backgroundColor: '#BE6E31',
       borderRadius: 7,
       marginBottom: 15,
-      marginTop: 10,
+      // marginTop: 10,
     },
     textSignIn: {
       marginBottom: 8,
