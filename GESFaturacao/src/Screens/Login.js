@@ -52,6 +52,7 @@ const Login = ({navigation}) => {
     },
     input: {
       backgroundColor: colorScheme === 'dark' ? '#333333' : '#fff',
+      color: colorScheme === 'dark' ? '#fff' : '#000',
       width: '90%',
       marginBottom: 30,
       borderRadius: 7,
@@ -68,13 +69,12 @@ const Login = ({navigation}) => {
     showPasswordButton: {
       position: 'absolute',
       right: 10,
-      top: '27%',
+      top: '21%',
     },
     btnSignIn: {
       backgroundColor: '#BE6E31',
       borderRadius: 7,
       marginBottom: 15,
-      // marginTop: 10,
     },
     textSignIn: {
       marginBottom: 8,
@@ -134,6 +134,7 @@ const Login = ({navigation}) => {
       autoCapitalize='none'
       onChangeText={text => setUsername(text)}
       placeholder="Username"
+      placeholderTextColor={colorScheme === 'dark' ? '#fff' : '#000'} 
       accessibilityLabel="Username"
     />
 
@@ -144,11 +145,14 @@ const Login = ({navigation}) => {
         autoCapitalize='none'
         onChangeText={text => setPassword(text)}
         placeholder="Password"
+        placeholderTextColor={colorScheme === 'dark' ? '#fff' : '#000'}
         secureTextEntry={!showPassword}
         accessibilityLabel="Password"
       />
       <TouchableOpacity style={styles.showPasswordButton} onPress={() => setShowPassword(!showPassword)}>
-        <Text>{showPassword ? 'Hide' : 'Show'}</Text>
+      <Text style={{ color: colorScheme === 'dark' ? '#fff' : '#000' }}>
+        {showPassword ? 'Hide' : 'Show'}
+      </Text>
       </TouchableOpacity>
     </View>
     <TouchableOpacity style={styles.btnSignIn} onPress={handleLogin} disabled={isLoading}>
