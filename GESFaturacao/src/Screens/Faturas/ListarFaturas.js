@@ -30,11 +30,11 @@ return (
       <Text style={styles.titleSelect}>Lista de Faturas</Text>
       {faturas.map((fatura, index) => (
         <View key={index} style={styles.faturaContainer}>
-          <Text>ID: {fatura.id}</Text>
-          <Text>Cliente: {fatura.name}</Text>
-          <Text>Estado: {fatura.status}</Text>
-          <Text>Data: {fatura.dateFormatted}</Text>
-          <Text>Data de expiração: {fatura.expirationFormatted}</Text>
+          <Text style={styles.textInFaturaContainer}>ID: {fatura.id}</Text>
+          <Text style={styles.textInFaturaContainer}>Cliente: {fatura.name}</Text>
+          <Text style={styles.textInFaturaContainer}>Estado: {fatura.status}</Text>
+          <Text style={styles.textInFaturaContainer}>Data: {fatura.dateFormatted}</Text>
+          <Text style={styles.textInFaturaContainer}>Data de expiração: {fatura.expirationFormatted}</Text>
           {/*
           <Button
             title="Ver Detalhes"
@@ -118,13 +118,26 @@ const styles = StyleSheet.create({
     marginBottom: 7
   },
   faturaContainer: {
+    borderWidth: 1,
+    borderColor: '#BE6E31',
     width: 350,
     height: 100,
     backgroundColor: '#fff',
     borderRadius: 10,
-    margin: 10,
+    marginBottom: 15,
+    marginLeft:20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 8,
+  },
+  textInFaturaContainer: {
+    marginLeft: 10,
+    color: '#444444'
   },
   textSelect: {
+    margin: 10,
     fontSize: 20,
     padding: 10,
     fontWeight: 'bold'

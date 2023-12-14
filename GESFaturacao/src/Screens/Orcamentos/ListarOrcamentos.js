@@ -30,11 +30,11 @@ return (
       <Text style={styles.titleSelect}>Lista de Orçamentos</Text>
       {orcamentos.map((orcamento, index) => (
         <View key={index} style={styles.orcamentoContainer}>
-          <Text>ID: {orcamento.id}</Text>
-          <Text>Cliente: {orcamento.name}</Text>
-          <Text>Estado: {orcamento.status}</Text>
-          <Text>Data: {orcamento.dateFormatted}</Text>
-          <Text>Data de expiração: {orcamento.expirationFormatted}</Text>
+          <Text style={styles.textInOrcamentoContainer}>ID: {orcamento.id}</Text>
+          <Text style={styles.textInOrcamentoContainer}>Cliente: {orcamento.name}</Text>
+          <Text style={styles.textInOrcamentoContainer}>Estado: {orcamento.status}</Text>
+          <Text style={styles.textInOrcamentoContainer}>Data: {orcamento.dateFormatted}</Text>
+          <Text style={styles.textInOrcamentoContainer}>Data de expiração: {orcamento.expirationFormatted}</Text>
           {/*
           <Button
             title="Ver Detalhes"
@@ -118,11 +118,23 @@ const styles = StyleSheet.create({
     marginBottom: 7
   },
   orcamentoContainer: {
+    borderWidth: 1,
+    borderColor: '#BE6E31',
     width: 350,
     height: 100,
     backgroundColor: '#fff',
     borderRadius: 10,
-    margin: 10,
+    marginBottom: 15,
+    marginLeft:20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 8,
+  },
+  textInOrcamentoContainer: {
+    marginLeft: 10,
+    color: '#444444'
   },
   textSelect: {
     fontSize: 20,
