@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, ScrollView,Button, View } from 'react-native';
 import { AuthContext } from '../../Context/AuthContext';
-import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
-
 
 export default function ListarFaturas({navigation, route}) {
 
@@ -15,15 +13,13 @@ useEffect(() => {
         const response = await getFaturas();
         if (response.data) {
           setFaturas(response.data);
-          console.log(response.data); 
         }
       } catch (error) {
         console.error('Erro ao carregar faturas:', error);
       }
     };
-
 carregarFaturas();
-  }, []); // O segundo argumento do useEffect é uma lista de dependências, neste caso, vazia, o que significa que será executado apenas uma vez.
+  }, []); 
 
 return (
     <ScrollView>
@@ -35,21 +31,15 @@ return (
           <Text style={styles.textInFaturaContainer}>Estado: {fatura.status}</Text>
           <Text style={styles.textInFaturaContainer}>Data: {fatura.dateFormatted}</Text>
           <Text style={styles.textInFaturaContainer}>Data de expiração: {fatura.expirationFormatted}</Text>
-          {/*
-          <Button
+          {/*<Button
             title="Ver Detalhes"
             onPress={() => navigation.navigate('DetalhesFatura', { id: fatura.id })}
-          />
-      */}
+          />*/}
         </View>
       ))}
     </ScrollView>
   );
 }
-
-
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -57,8 +47,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e5e9ec',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    marginBottom: 20,
-
+    marginBottom: 20
   },
   touch: {
     padding: 10,

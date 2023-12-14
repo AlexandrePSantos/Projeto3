@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, ScrollView,Button, View } from 'react-native';
 import { AuthContext } from '../../Context/AuthContext';
-import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
-
 
 export default function ListarOrcamentos({navigation, route}) {
 
@@ -15,13 +13,11 @@ useEffect(() => {
         const response = await getOrcamentos();
         if (response.data) {
           setOrcamentos(response.data);
-          console.log(response.data); 
         }
       } catch (error) {
         console.error('Erro ao carregar Orçamentos:', error);
       }
     };
-
 carregarOrcamentos();
   }, []); 
 
@@ -35,21 +31,15 @@ return (
           <Text style={styles.textInOrcamentoContainer}>Estado: {orcamento.status}</Text>
           <Text style={styles.textInOrcamentoContainer}>Data: {orcamento.dateFormatted}</Text>
           <Text style={styles.textInOrcamentoContainer}>Data de expiração: {orcamento.expirationFormatted}</Text>
-          {/*
-          <Button
+          {/*<Button
             title="Ver Detalhes"
             onPress={() => navigation.navigate('DetalhesFatura', { id: fatura.id })}
-          />
-      */}
+          />*/}
         </View>
       ))}
     </ScrollView>
   );
 }
-
-
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -58,7 +48,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     marginBottom: 20,
-
   },
   touch: {
     padding: 10,
@@ -142,4 +131,3 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
 });
-

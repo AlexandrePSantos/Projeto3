@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, ScrollView, View, Image } from 'react-native';
 import { AuthContext } from '../../Context/AuthContext';
-import { toFixed } from 'number';
 
 export default function ListarArtigos({ navigation, route }) {
   const { getArtigos } = useContext(AuthContext);
@@ -13,14 +12,11 @@ export default function ListarArtigos({ navigation, route }) {
         const response = await getArtigos();
         if (response.data) {
           setArtigos(response.data);
-          console.log(response.data);
-          
         }
       } catch (error) {
         console.error('Erro ao carregar Artigos:', error);
       }
     };
-
     carregarArtigos();
   }, []);
 
@@ -30,7 +26,6 @@ export default function ListarArtigos({ navigation, route }) {
       {artigos.map((artigo, index) => (
         <View key={index} style={styles.artigoContainer}>
           <View style={styles.artigoInfo}>
-            
             <Text style={{ color: '#444444'}}>ID: {artigo.id}</Text>
             <Text style={{ color: '#444444'}}>Preço: {parseFloat(artigo.price).toFixed(2)}</Text>
             <Text style={{ color: '#444444'}}>Preço+Tax: {parseFloat(artigo.pricePvp).toFixed(2)}</Text>
@@ -134,8 +129,7 @@ const styles = StyleSheet.create({
     marginLeft: 30,
     marginTop: 5, 
     marginBottom: 5,
-    marginRight:3
-    
+    marginRight:3  
   },
   textSelect: {
     fontSize: 20,
