@@ -16,6 +16,7 @@ export const AuthProvider = ({children}) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     getToken = async () => AsyncStorage.getItem('@userToken');
+    
     // ------!-------
     // Login & Logout
     // ------!-------
@@ -216,6 +217,64 @@ export const AuthProvider = ({children}) => {
     // ------!-------
     //    Artigos
     // ------!-------
+    const criarArtigo = async () => {
+        var token = await this.getToken();
+
+        let data = qs.stringify({
+            'code': '',
+            'name': '',
+            'category': '',
+            'type': '',
+            'stock': '',
+            'minStock': '',
+            'stockAlert': '',
+            'unity': '',
+            'pvp': '',
+            'tax': '',
+            'price': '',
+            'serialNumber': '',
+            'retention': '',
+            'retentionPercentage': '',
+            'exemptionReason': '',
+            'observations': '',
+            'label': '',
+            'encomendaaqui': '',
+            'addWorkstation': '',
+            'idWorkstations': '["1", "2"]',
+            'categoryInvalid': '',
+            'availableMenuArticle': '',
+            'comentAutoFill': '',
+            'calculateMarginUnitaryArticle': '',
+            'profitMargin': '',
+            'phytoPharmaceutical': '',
+            'image': '',
+            'initialPrice': '',
+            'pricesLines': '[{"imposto": "", "preco": "", precoPvp: ""}]',
+            'supplierLines': '[{"fornecedor": "", "referencia": ""}]',
+            'barcodes': '[{"codigo": ""}]' 
+        });
+
+        let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${BASE_URL}/products`,
+        headers: { 
+            'Content-Type': 'application/x-www-form-urlencoded', 
+            'Authorization': token
+        },
+        data : data
+        };
+
+        return axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+    }
+
     const getArtigos = async () =>{
         var token = await this.getToken();
         let config = {
@@ -258,6 +317,26 @@ export const AuthProvider = ({children}) => {
         });
     }
 
+    const getCategorias = async () =>{
+        var token = await this.getToken();
+        let config = {
+          method: 'get',
+          maxBodyLength: Infinity,
+          url: `${BASE_URL}/categories`,
+          headers: { 
+            'Authorization': token
+          }
+        };
+        
+        return axios.request(config)
+        .then((response) => {
+          console.log(JSON.stringify(response.data));
+            return response.data;       
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
     // ------!-------
     //   Orcamentos
     // ------!-------
@@ -326,15 +405,11 @@ export const AuthProvider = ({children}) => {
     // Return Values
     // ------!-------
     return(
-        <AuthContext.Provider value={{isLoggedIn, login, logout, 
-            CriarOrcamento, getOrcamentos,
-            getSeries,
-            getArtigos, getArtigoID,
-            CriarFatura, getFaturas,
-            getClientes, 
-            getMetodos,
-            isLoading, userToken}}>
-            {children}
+        <AuthContext.Provider value = {{
+            isLoggedIn, login, logout, isLoading, userToken,
+            CriarOrcamento, criarArtigo, CriarFatura, 
+            getOrcamentos, getSeries, getArtigos, getArtigoID, getCategorias, getFaturas, getClientes, getMetodos 
+        }}> {children}
         </AuthContext.Provider>
     );
 }
