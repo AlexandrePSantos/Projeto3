@@ -216,41 +216,22 @@ export const AuthProvider = ({children}) => {
     // ------!-------
     //    Artigos
     // ------!-------
-    const criarArtigo = async () => {
+    const criarArtigo = async (code, name, type, unit, qtdStock, qtdStockMin, stockMin, pvp, precoUnit, precoIni, iva, category) => {
         var token = await this.getToken();
 
         let data = qs.stringify({
-            'code': ' ',
-            'name': '',
-            'category': '',
-            'type': '',
-            'stock': '',
-            'minStock': '',
-            'stockAlert': '',
-            'unity': '',
-            'pvp': '',
-            'tax': '',
-            'price': '',
-            'serialNumber': '',
-            'retention': '',
-            'retentionPercentage': '',
-            'exemptionReason': '',
-            'observations': '',
-            'label': '',
-            'encomendaaqui': '',
-            'addWorkstation': '',
-            'idWorkstations': '["1", "2"]',
-            'categoryInvalid': '',
-            'availableMenuArticle': '',
-            'comentAutoFill': '',
-            'calculateMarginUnitaryArticle': '',
-            'profitMargin': '',
-            'phytoPharmaceutical': '',
-            'image': '',
-            'initialPrice': '',
-            'pricesLines': '[{"imposto": "", "preco": "", precoPvp: ""}]',
-            'supplierLines': '[{"fornecedor": "", "referencia": ""}]',
-            'barcodes': '[{"codigo": ""}]' 
+            'code': code,
+            'name': name,
+            'category': category,
+            'type': type,
+            'stock': qtdStock,
+            'minStock': qtdStockMin,
+            'stockAlert': stockMin,
+            'unity': unit,
+            'pvp': pvp,
+            'tax': iva,
+            'price': precoUnit,
+            'initialPrice': precoIni
         });
 
         let config = {
@@ -340,6 +321,30 @@ export const AuthProvider = ({children}) => {
     }
 
     // ------!-------
+    //      IVA
+    // ------!-------
+    const getIVA = async () =>{
+        var token = await this.getToken();
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/vats`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+          
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    // ------!-------
     //   Orcamentos
     // ------!-------
     const CriarOrcamento  = async (clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, linhasC, finalizarDocumentoC) => {
@@ -409,7 +414,7 @@ export const AuthProvider = ({children}) => {
     return(
         <AuthContext.Provider value={{isLoggedIn, login, logout, 
             CriarOrcamento, getOrcamentos,
-            getSeries,
+            getSeries, getIVA,
             getCategorias,
             criarArtigo, getArtigos, getArtigoID,
             CriarFatura, getFaturas,

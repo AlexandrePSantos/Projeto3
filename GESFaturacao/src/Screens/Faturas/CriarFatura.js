@@ -166,8 +166,7 @@ export default function CriarFatura({ navigation }) {
               onValueChange={itemValue => {
                 setSelectedIdCliente(itemValue);
                 setCliente(itemValue);
-              }}
-            >
+              }} >
               <Picker.Item label="Selecione um cliente" value={null} />
               {dadosClientes.map((client, i) => (
                 <Picker.Item
@@ -431,7 +430,7 @@ export default function CriarFatura({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e5e9ec',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
