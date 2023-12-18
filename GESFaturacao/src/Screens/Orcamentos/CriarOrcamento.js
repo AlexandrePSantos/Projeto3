@@ -65,8 +65,10 @@ export default function CriarOrcamento({ navigation }) {
   const [serie, setSerie] = useState();
   const [dataIni, setDataIni] = useState(moment().format('DD/MM/YYYY'));
   const [dataVal, setDataVal] = useState(moment().format('DD/MM/YYYY'));
-  const [vencimento, setVencimento] = useState('');
+  const [vencimento, setVencimento] = useState('1');
   const [LinhasC, setLinhas] = useState([]);
+  
+
 
   const [openc, setopenc] = useState(false);
   const [openv, setopenv] = useState(false);
@@ -102,7 +104,19 @@ export default function CriarOrcamento({ navigation }) {
   }
 
   const handleCreateOrcamento = () => {
-    // Define the variables here
+    // Validation checks
+    if (!cliente || !serie || LinhasC.length === 0 || !dataIni) {
+      let errorMessage = "Os seguintes campos são obrigatórios:\n";
+      if (!cliente) errorMessage += "- Cliente\n";
+      if (!serie) errorMessage += "- Série\n";
+      if (LinhasC.length === 0) errorMessage += "- Selecione pelo menos um artigo\n";
+      if (!dataIni) errorMessage += "- Data de início\n";
+  
+      Alert.alert('Campos Obrigatórios', errorMessage);
+      return;
+    }
+  
+    // If all required fields are filled, proceed with creating the budget
     const clienteC = cliente;
     const serieC = serie;
     const numeroC = 0;
@@ -115,7 +129,7 @@ export default function CriarOrcamento({ navigation }) {
     const observacoesC = obs;
     const LinhaFinal = LinhasC;
     const finalizarDocumentoC = finalizarDoc;
-
+  
     CriarOrcamento(
       clienteC,
       serieC,
@@ -137,6 +151,7 @@ export default function CriarOrcamento({ navigation }) {
       ToastAndroid.show('Erro ao criar orçamento', ToastAndroid.SHORT);
     });
   };
+  
 
   return (
     <ScrollView>
@@ -191,49 +206,88 @@ export default function CriarOrcamento({ navigation }) {
           <Text style={styles.titleSelect}>Data</Text>
           <View style={styles.borderMargin}>
             <TouchableOpacity onPress={() => setopenc(true)} style={styles.touchableO}>
-            <DatePicker
-              modal 
-              mode="date"
-              open={openc}
-              date={new Date(moment(dataIni, 'DD/MM/YYYY').format())}
-              onConfirm={date => {
-                setopenc(false);
-                if (moment(date).isBefore(moment(dataVal, 'DD/MM/YYYY'))) {
-                  setDataIni(moment(date).format('DD/MM/YYYY'));
-                } else {
-                  ToastAndroid.show('Data de inicio não pode ser após a data de validade', ToastAndroid.SHORT);
-                }
-              }}
-              onCancel={() => setopenc(false)}
-            />
-            <Text style={styles.textDate}> {' '} {dataIni}</Text>
+              <DatePicker
+                modal 
+                mode="date"
+                open={openc}
+                date={new Date(moment(dataIni, 'DD/MM/YYYY').format())}
+                onConfirm={date => {
+                  setopenc(false);
+                  // Validar se a data de início é antes da data de validade
+                  
+                    setDataIni(moment(date).format('DD/MM/YYYY'));
+
+                    // Verificar a condição de pagamento e atualizar a data de validade
+                    const daysToAdd = {
+                      '1': 0,   // Pago a Pronto
+                      '2': 10,  // 10 Dias Após Emissão
+                      '3': 20,  // 20 Dias Após Emissão
+                      '4': 30,  // Add more conditions as needed
+                      '5': 60,
+                      '6': 75,
+                      '7': 90,
+                      '8': 120,
+                      '9': 180,
+                    }[vencimento];
+
+                    const expirationDate = moment(date).add(daysToAdd, 'days');
+                    setDataVal(expirationDate.format('DD/MM/YYYY'));
+                  
+                }}
+                onCancel={() => setopenc(false)}
+              />
+              <Text style={styles.textDate}> {' '} {dataIni}</Text>
             </TouchableOpacity>
           </View>
 
           {/* expiration - DONE */}
           <Text style={styles.titleSelect}>Validade</Text>
           <View style={styles.borderMargin}>
-            <TouchableOpacity onPress={() => setopenv(true)} style={styles.touchableO}>
-            <DatePicker
-              modal 
-              mode="date"
-              open={openv}
-              date={new Date(moment(dataVal, 'DD/MM/YYYY').format())}
-              onConfirm={date => {
-                setopenv(false);
-                if (moment(date).isAfter(moment(dataIni, 'DD/MM/YYYY'))) {
-                  setDataVal(moment(date).format('DD/MM/YYYY'));
-                  const vencimentoEmDias = moment(date).diff(moment(dataIni, 'DD/MM/YYYY'), 'days');
-                  setVencimento(vencimentoEmDias);
-                } else {
-                  ToastAndroid.show('Data de validade não pode ser anterior à data de inicio', ToastAndroid.SHORT);
-                }
-              }}
-              onCancel={() => setopenv(false)}
-            />
+            <View style={styles.touchableO}>
               <Text style={styles.textDate}> {' '} {dataVal}</Text>
-            </TouchableOpacity>
+            </View>
           </View>
+
+          {/* condicoes - DONE */}
+          <Text style={styles.titleSelect}>Condições de Pagamento</Text>
+          <View style={styles.borderMargin}>
+            <Picker
+              style={styles.pickerComponent}
+              selectedValue={vencimento}
+              onValueChange={itemValue => {
+                setVencimento(itemValue);
+                const daysToAdd = {
+                  '1': 0,   // Pago a Pronto
+                  '2': 10,  // 10 Dias Após Emissão
+                  '3': 20,  // 20 Dias Após Emissão
+                  '4': 30,  // Add more conditions as needed
+                  '5': 60,
+                  '6': 75,
+                  '7': 90,
+                  '8': 120,
+                  '9': 180,
+                }[itemValue];
+
+                const expirationDate = moment(dataIni, 'DD/MM/YYYY').add(daysToAdd, 'days');
+                setDataVal(expirationDate.format('DD/MM/YYYY'));
+              }}
+            >
+              <Picker.Item label="Pago a Pronto" value="1" />
+              <Picker.Item label="10 Dias Após Emissão" value="2" />
+              <Picker.Item label="20 Dias Após Emissão" value="3" />
+              <Picker.Item label="30 Dias Após Emissão" value="4" />
+              <Picker.Item label="60 Dias Após Emissão" value="5" />
+              <Picker.Item label="75 Dias Após Emissão" value="6" />
+              <Picker.Item label="90 Dias Após Emissão" value="7" />
+              <Picker.Item label="120 Dias Após Emissão" value="8" />
+              <Picker.Item label="180 Dias Após Emissão" value="9" />
+              {/* Add more conditions of payment as needed */}
+            </Picker>
+          </View>
+
+
+
+
 
           {/* reference - DONE */}
           <Text style={styles.titleSelect}>Referencia</Text>
@@ -315,7 +369,7 @@ export default function CriarOrcamento({ navigation }) {
               }} >
               <Picker.Item label="Selecione artigo" value={null} />
               {dadosArtigos.map(function (object, i) {
-                return <Picker.Item label={object.description} value={object} key={i} />;
+                return <Picker.Item label={object.description} value={object} key={i}  />;
               })}
             </Picker>
             <TextInput
@@ -350,7 +404,7 @@ export default function CriarOrcamento({ navigation }) {
                       id: artigo.id.toString(), 
                       description: artigo.description, 
                       quantity: quantidade, 
-                      price: artigo.price, 
+                      price: Number(artigo.price).toFixed(2), 
                       discount: '0', 
                       tax: artigo.taxID, 
                       exemption: artigo.exemptionID.toString(), 
