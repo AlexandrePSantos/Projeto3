@@ -216,7 +216,7 @@ export const AuthProvider = ({children}) => {
     // ------!-------
     //    Artigos
     // ------!-------
-    const criarArtigo = async (code, name, type, unit, qtdStock, qtdStockMin, stockMin, pvp, precoUnit, precoIni, iva, category) => {
+    const CriarArtigo = async (code, name, type, unit, qtdStock, qtdStockMin, stockMin, pvp, precoUnit, precoIni, iva, category) => {
         var token = await this.getToken();
 
         let data = qs.stringify({
@@ -416,7 +416,7 @@ export const AuthProvider = ({children}) => {
             CriarOrcamento, getOrcamentos,
             getSeries, getIVA,
             getCategorias,
-            criarArtigo, getArtigos, getArtigoID,
+            CriarArtigo, getArtigos, getArtigoID,
             CriarFatura, getFaturas,
             getClientes, 
             getMetodos,

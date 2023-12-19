@@ -46,7 +46,7 @@ export default function Home({navigation}) {
       <View style={styles.container}>
         {/* Botão criar Artigo */}
         <TouchableOpacity
-          style={[styles.menuButton, styles.shadow, { backgroundColor: 'gray' }]}
+          style={[styles.menuButton, styles.shadow]}
           onPress={() => navigation.navigate("Criar Artigo")}>
           <Text style={styles.menuText}>Criar Artigo</Text>
         </TouchableOpacity>

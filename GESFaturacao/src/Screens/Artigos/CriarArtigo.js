@@ -6,7 +6,9 @@ import {
   TextInput,
   View,
   ScrollView,
-  Button
+  Button,
+  Alert,
+  ToastAndroid
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import { Picker } from '@react-native-picker/picker';
@@ -152,6 +154,7 @@ export default function CriarArtigo({navigation}) {
         <Text style={styles.titleSelect}>Tipo</Text>
           <View style={styles.borderMargin}>
             <Picker selectedValue={type} onValueChange={itemValue => setType(itemValue)} style={styles.pickerComponent} >
+              <Picker.Item label="Selecione um tipo" value={null} />
               <Picker.Item label="Produto" value="P" />
               <Picker.Item label="Serviço" value="S" />
             </Picker>
@@ -161,6 +164,7 @@ export default function CriarArtigo({navigation}) {
         <Text style={styles.titleSelect}>Unidade de medida</Text>
           <View style={styles.borderMargin}>
             <Picker selectedValue={unit} onValueChange={itemValue => setUnit(itemValue)} style={styles.pickerComponent} >
+              <Picker.Item label="Selecione uma unidade de medida" value={null} />
               <Picker.Item label="Kilo" value="1" />
               <Picker.Item label="Metro" value="2" />
               <Picker.Item label="Metro Quadrado" value="3" />
