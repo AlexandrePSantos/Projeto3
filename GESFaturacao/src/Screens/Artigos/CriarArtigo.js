@@ -171,39 +171,44 @@ export default function CriarArtigo({navigation}) {
               <Picker.Item label="Litro" value="4" />
             </Picker>
           </View>
-
         {/* Qtd. Stock - Opcional - TextInput Numeric */}
         <Text style={styles.titleSelect}>QTD. Stock</Text>
-          <View style={styles.borderMargin}>
+        <View style={styles.borderMargin}>
           <TextInput
-              style={styles.input}
-              value={qtdStock}
-              onChangeText={text => setQtdStock(text)}
-              placeholder="QTD. Stock"
-              keyboardType="numeric"
-            />
-          </View>
-
-        {/* Qtd. Stock Min. - Opcional - TextInput Numeric */}
-        <Text style={styles.titleSelect}>QTD. Stock Min.</Text>
-          <View style={styles.borderMargin}>
-          <TextInput
-              style={styles.input}
-              value={qtdStockMin}
-              onChangeText={text => setQtdStockMin(text)}
-              placeholder="Quantidade Stock Min."
-              keyboardType="numeric"
-            />
-          </View>
+            style={styles.input}
+            value={qtdStock}
+            onChangeText={text => setQtdStock(text)}
+            placeholder="QTD. Stock"
+            keyboardType="numeric"
+          />
+        </View>
 
         {/* Stock Min.? - Opcional (Checkbox) */}
         <Text style={styles.titleSelect}>Stock Mínimo?</Text>
-          <View>
+        <View>
           <CheckBox
             value={stockMin === 1}
             onValueChange={newValue => setStockMin(newValue ? 1 : 0)}
           />
+        </View>
+
+        {/* Qtd. Stock Min. - Opcional - TextInput Numeric */}
+        {stockMin === 1 && (
+          <View>
+            <Text style={styles.titleSelect}>QTD. Stock Min.</Text>
+            <View style={styles.borderMargin}>
+              <TextInput
+                style={styles.input}
+                value={qtdStockMin}
+                onChangeText={text => setQtdStockMin(text)}
+                placeholder="Quantidade Stock Min."
+                keyboardType="numeric"
+              />
+            </View>
           </View>
+        )}
+
+
 
         {/* pvp - Obrigatório - TextInput Numeric */}
         <Text style={styles.titleSelect}>PVP</Text>

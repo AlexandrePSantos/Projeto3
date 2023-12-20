@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "number": "^0.0.1"
+    "@react-native-community/checkbox": "^0.5.16",
+    "number": "^0.0.1",
+    "react-native-linear-gradient": "^2.8.3"
   }
 }
