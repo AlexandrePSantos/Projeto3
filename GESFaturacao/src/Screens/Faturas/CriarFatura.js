@@ -35,6 +35,7 @@ export default function CriarFatura({ navigation }) {
   // VARIAVEIS PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   // SÃO USADOS PARA CARREGAR ARRAYS DOS PICKERS
   const { CriarFatura } = useContext(AuthContext);
+  const { enviarEmail } = useContext(AuthContext);
   const { getClientes } = useContext(AuthContext);
   const { getSeries } = useContext(AuthContext);
   const { getArtigos } = useContext(AuthContext);
@@ -72,6 +73,8 @@ export default function CriarFatura({ navigation }) {
   const [vencimento, setVencimento] = useState('1');
   const [metodo, setMetodo] = useState('');
   const [LinhasC, setLinhas] = useState([]);
+
+  const [email, setEmail] = useState(''); // Email para enviar a fatura
 
   const [openc, setopenc] = useState(false);
   const [openv, setopenv] = useState(false);
@@ -157,6 +160,16 @@ export default function CriarFatura({ navigation }) {
     ).then(response => {
       navigation.navigate('Dashboard');
       ToastAndroid.show("Fatura Criada ", ToastAndroid.SHORT);
+      if (finalizarDoc == 1) {
+        const documentId = response.fatura;
+        enviarEmail(email, "FT", documentId)
+          .then(() => {
+            console.log('Email sent successfully');
+          })
+          .catch(error => {
+            console.error('Failed to send email:', error);
+          });
+      }
     }).catch(error => {
       console.error('Error creating invoice:', error);
       ToastAndroid.show('Error creating invoice', ToastAndroid.SHORT);
@@ -167,7 +180,6 @@ export default function CriarFatura({ navigation }) {
     <ScrollView>
       <View style={styles.container}>
         <View style={{marginTop: 10}}>
-
           {/* Cliente - DONE */}
           <Text style={styles.titleSelect}>Client</Text>
           <View style={styles.borderMargin}>
@@ -357,6 +369,18 @@ export default function CriarFatura({ navigation }) {
               <Picker.Item label="Aberto" value="1" />
             </Picker>
           </View>
+
+          {/* Email - DONE */}
+          {finalizarDoc === '1' && (
+          <View style={styles.borderMargin}>
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={text => setEmail(text)}
+                placeholder="Email"
+              />  
+          </View>
+          )}
 
           {/* payment - DONE*/}
           <Text style={styles.titleSelect}>Método de Pagamento</Text>

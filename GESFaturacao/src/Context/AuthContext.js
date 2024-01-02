@@ -16,6 +16,7 @@ export const AuthProvider = ({children}) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     getToken = async () => AsyncStorage.getItem('@userToken');
+    
     // ------!-------
     // Login & Logout
     // ------!-------
@@ -135,7 +136,8 @@ export const AuthProvider = ({children}) => {
     
         return axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
+                // console.log(JSON.stringify(response.data));
+                return response.data;
             })
             .catch((error) => {
                 console.log(error + ' Erro Faturas');
@@ -163,6 +165,82 @@ export const AuthProvider = ({children}) => {
             console.log(error);
             });
     }    
+
+    const getFaturasById = async (id) => {
+        var token = await this.getToken();
+
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/invoices?id=${id}`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+
+        return axios.request(config)
+        .then((response) => {
+        console.log(JSON.stringify(response.data));
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const finalizarFatura = async (id) => {
+        var token = await this.getToken();
+
+        let data = qs.stringify({ 
+            'id': id,
+            'finalize': '1' 
+        });
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/invoices',
+            headers: { 
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'Authorization': token
+            },
+            data : data
+        };
+    
+        return axios.request(config)
+            .then((response) => {
+                console.log(response.data);
+                return response.data; 
+            })
+            .catch((error) => {
+                console.log(error);
+        });
+    }
+
+    const removerFatura = async (id) => {
+        var token = await this.getToken();
+
+        let data = qs.stringify({
+            'id': id
+        });
+        let config = {
+            method: 'delete',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/invoices`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': token
+            },
+            data: data
+        };
+
+        return axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+                return response.data;
+            })
+            .catch((error) => {
+                console.log(error + ' Erro Remover Faturas');
+            });
+    }
 
     // ------!-------
     //   Clientes
@@ -296,6 +374,32 @@ export const AuthProvider = ({children}) => {
         });
     }
 
+    const removerArtigo = async (id) => {
+        var token = await this.getToken();
+
+        let data = qs.stringify({
+            'id': id
+        });
+        let config = {
+            method: 'delete',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/products`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': token
+            },
+            data: data
+        };
+
+        return axios.request(config)
+            .then((response) => {
+                return response.data;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
     // ------!-------
     //   Categorias
     // ------!-------
@@ -379,7 +483,8 @@ export const AuthProvider = ({children}) => {
     
         return axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
+                // console.log(JSON.stringify(response.data));
+                return response.data;
             })
             .catch((error) => {
                 console.log(error + ' Erro Orçamentos');
@@ -408,19 +513,106 @@ export const AuthProvider = ({children}) => {
         });
     }    
 
+    const finalizarOrcamento = async (id) => {
+        var token = await this.getToken();
+
+        let data = qs.stringify({ 
+            'finalizeDocument': id 
+        });
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/budgets`,
+            headers: { 
+              'Authorization': token
+            },
+            data : data
+          };
+    
+        return axios.request(config)
+            .then((response) => {
+            return response.data; 
+            })
+            .catch((error) => {
+            console.log(error);
+        });
+    }
+
+    const removerOrcamento = async (id) => {
+        var token = await this.getToken();
+
+        let data = qs.stringify({
+            'id': id
+        });
+        let config = {
+            method: 'delete',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/budgets`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': token
+            },
+            data: data
+        };
+
+        return axios.request(config)
+            .then((response) => {
+                return response.data;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    // ------!-------
+    //     Email
+    // ------!-------
+    const enviarEmail = async (email, type, docId) => {
+        var token = await this.getToken();
+    
+        let data = qs.stringify({
+            'email': email,
+            'type': type,
+            'document': docId
+        });
+    
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/send-email`,
+            headers: { 
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'Authorization': token, 
+            },
+            data : data
+        };
+    
+        return axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+            })
+            .catch((error) => {
+                console.log(error + ' Erro Email');
+            });
+    }
+
     // ------!-------
     // Return Values
     // ------!-------
     return(
-        <AuthContext.Provider value={{isLoggedIn, login, logout, 
-            CriarOrcamento, getOrcamentos,
-            getSeries, getIVA,
-            getCategorias,
-            CriarArtigo, getArtigos, getArtigoID,
-            CriarFatura, getFaturas,
-            getClientes, 
-            getMetodos,
-            isLoading, userToken}}>
+        <AuthContext.Provider 
+            value={{
+                isLoggedIn, login, logout, 
+                CriarOrcamento, getOrcamentos, finalizarOrcamento, removerOrcamento,
+                getSeries, getIVA,
+                getCategorias,
+                CriarArtigo, getArtigos, getArtigoID, removerArtigo,
+                CriarFatura, getFaturas, finalizarFatura, removerFatura,
+                getClientes, 
+                getMetodos,
+                enviarEmail,
+                isLoading, userToken
+            }}>
             {children}
         </AuthContext.Provider>
     );

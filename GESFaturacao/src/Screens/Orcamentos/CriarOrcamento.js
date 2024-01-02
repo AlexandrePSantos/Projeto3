@@ -35,6 +35,7 @@ export default function CriarOrcamento({ navigation }) {
   // VARIAVEIS PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   // SÃO USADOS PARA CARREGAR ARRAYS DOS PICKERS
   const { CriarOrcamento } = useContext(AuthContext);
+  const { enviarEmail } = useContext(AuthContext);
   const { getClientes } = useContext(AuthContext);
   const { getSeries } = useContext(AuthContext);
   const { getArtigos } = useContext(AuthContext);
@@ -67,8 +68,8 @@ export default function CriarOrcamento({ navigation }) {
   const [dataVal, setDataVal] = useState(moment().format('DD/MM/YYYY'));
   const [vencimento, setVencimento] = useState('1');
   const [LinhasC, setLinhas] = useState([]);
-  
 
+  const [email, setEmail] = useState(''); // Email para enviar a fatura
 
   const [openc, setopenc] = useState(false);
   const [openv, setopenv] = useState(false);
@@ -146,6 +147,16 @@ export default function CriarOrcamento({ navigation }) {
     ).then(response => {
       navigation.navigate('Dashboard');
       ToastAndroid.show("Orçamento Criada ", ToastAndroid.SHORT);
+      if (finalizarDoc == 1) {
+        const documentId = response.orcamento;
+        enviarEmail(email, "OR", documentId)
+          .then(() => {
+            console.log('Email sent successfully');
+          })
+          .catch(error => {
+            console.error('Failed to send email:', error);
+          });
+      }
     }).catch(error => {
       console.error('Erro ao criar orçamento:', error);
       ToastAndroid.show('Erro ao criar orçamento', ToastAndroid.SHORT);
@@ -352,6 +363,18 @@ export default function CriarOrcamento({ navigation }) {
               <Picker.Item label="Aberto" value="1" />
             </Picker>
           </View>
+
+          {/* Email - DONE */}
+          {finalizarDoc === '1' && (
+          <View style={styles.borderMargin}>
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={text => setEmail(text)}
+                placeholder="Email"
+              />  
+          </View>
+          )}
 
           {/* lines/artigos */}
           {/* Deve permitir selecionar vários artigos e as quantidades de cada */}
