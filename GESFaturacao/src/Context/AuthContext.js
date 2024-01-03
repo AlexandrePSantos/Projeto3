@@ -180,7 +180,8 @@ export const AuthProvider = ({children}) => {
 
         return axios.request(config)
         .then((response) => {
-        console.log(JSON.stringify(response.data));
+        // console.log(JSON.stringify(response.data));
+        return response.data;
         })
         .catch((error) => {
         console.log(error);
@@ -607,7 +608,7 @@ export const AuthProvider = ({children}) => {
                 getSeries, getIVA,
                 getCategorias,
                 CriarArtigo, getArtigos, getArtigoID, removerArtigo,
-                CriarFatura, getFaturas, finalizarFatura, removerFatura,
+                CriarFatura, getFaturas, getFaturasById, finalizarFatura, removerFatura,
                 getClientes, 
                 getMetodos,
                 enviarEmail,

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, ScrollView,Button, View, TextInput, Modal} from 'react-native';
+import { StyleSheet, Text, ScrollView,Button, View, TextInput, Modal, TouchableOpacity} from 'react-native';
 import { AuthContext } from '../../Context/AuthContext';
 
-export default function ListarFaturas({navigation, route}) {
+export default function ListarFaturas({navigation}) {
 
 const { getFaturas } = useContext(AuthContext);
 const { enviarEmail } = useContext(AuthContext);
@@ -35,11 +35,15 @@ return (
       <Text style={styles.titleSelect}>Lista de Faturas</Text>
       {faturas.map((fatura, index) => (
         <View key={index} style={styles.faturaContainer}>
-          <Text style={styles.textInFaturaContainer}>ID: {fatura.id}</Text>
-          <Text style={styles.textInFaturaContainer}>Cliente: {fatura.name}</Text>
-          <Text style={styles.textInFaturaContainer}>Estado: {fatura.status}</Text>
-          <Text style={styles.textInFaturaContainer}>Data: {fatura.dateFormatted}</Text>
-          <Text style={styles.textInFaturaContainer}>Data de expiração: {fatura.expirationFormatted}</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Detalhes Fatura', { faturaId: fatura.id })} >
+            <View>
+              <Text style={styles.textInFaturaContainer}>ID: {fatura.id}</Text>
+              <Text style={styles.textInFaturaContainer}>Cliente: {fatura.name}</Text>
+              <Text style={styles.textInFaturaContainer}>Estado: {fatura.status}</Text>
+              <Text style={styles.textInFaturaContainer}>Data: {fatura.dateFormatted}</Text>
+              <Text style={styles.textInFaturaContainer}>Data de expiração: {fatura.expirationFormatted}</Text>
+            </View>
+          </TouchableOpacity>
           <View style={styles.buttonContainer}>
             <Button
               title={fatura.status === 'Aberto' ? 'Enviar' : 'Finalizar'}
@@ -58,10 +62,6 @@ return (
                     });
                 }
               }}
-            />
-            <Button
-              title="Editar"
-              onPress={() => navigation.navigate('DetalhesFatura', { id: fatura.id })}
             />
             <Button
               title="Remover"
@@ -125,7 +125,6 @@ return (
           </View>
         </View>
       </Modal>
-
     </ScrollView>
   );
 }

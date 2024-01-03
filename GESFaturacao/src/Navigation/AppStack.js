@@ -10,6 +10,7 @@ import Login from '../Screens/Login';
 import Home from '../Screens/Home';
 import CriarFatura from '../Screens/Faturas/CriarFatura';
 import ListarFaturas from '../Screens/Faturas/ListarFaturas';
+import DetalhesFatura from '../Screens/Faturas/DetalhesFatura';
 import CriarOrcamentos from '../Screens/Orcamentos/CriarOrcamento';
 import ListarOrcamentos from '../Screens/Orcamentos/ListarOrcamentos';
 import CriarArtigo from '../Screens/Artigos/CriarArtigo';
@@ -39,6 +40,7 @@ const screens = [
   { name: 'Dashboard', component: Home },
   { name: 'Criar Fatura', component: CriarFatura },
   { name: 'Listar Faturas', component: ListarFaturas },
+  { name: 'Detalhes Fatura', component: DetalhesFatura},
   { name: 'Criar Orçamento', component: CriarOrcamentos },
   { name: 'Listar Orçamentos', component: ListarOrcamentos},
   { name: 'Criar Artigo', component: CriarArtigo },
