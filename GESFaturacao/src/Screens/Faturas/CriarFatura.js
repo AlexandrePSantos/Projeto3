@@ -10,21 +10,20 @@ import {
   ScrollView,
   ToastAndroid,
 } from 'react-native';
-import { AuthContext } from '../../Context/AuthContext';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
+import { AuthContext } from '../../Context/AuthContext';
 
 function Item({ item, onPress }) {
   return (
-    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8}}>
+    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, borderBottomWidth: 1, borderColor: '#000'}}>
       <Text style={{flex: 1}}>
         {"ID: " + item.id + "\n" +
         "Artigo: " + item.description + "\n" +
         "Preço Un.: " + Number(item.price) + " €\n" +
         "QTD.: " + item.quantity + "\n" +
-        "Total: " + Number(item.price) * Number(item.quantity) + " €" +
-        "\n-------------------------"}
+        "Total: " + Number(item.price) * Number(item.quantity) + " €"}
       </Text>
       <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onPress} /></View>
     </View>
@@ -77,7 +76,6 @@ export default function CriarFatura({ navigation }) {
   const [email, setEmail] = useState(''); // Email para enviar a fatura
 
   const [openc, setopenc] = useState(false);
-  const [openv, setopenv] = useState(false);
 
   // METODO PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   useEffect(() => {

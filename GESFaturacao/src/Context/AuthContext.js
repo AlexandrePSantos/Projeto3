@@ -144,6 +144,11 @@ export const AuthProvider = ({children}) => {
             });
     }
 
+    const EditarFatura = async () => {
+        var token = await this.getToken();
+    
+    }
+
     const getFaturas = async ()=> {
         var token = await this.getToken();
         let data = qs.stringify({ });
@@ -188,6 +193,8 @@ export const AuthProvider = ({children}) => {
         });
     }
 
+    // TODO - Finalizar fatura
+    // !!! Retorna erro 400 !!!
     const finalizarFatura = async (id) => {
         var token = await this.getToken();
 
@@ -198,7 +205,7 @@ export const AuthProvider = ({children}) => {
         let config = {
             method: 'put',
             maxBodyLength: Infinity,
-            url: 'https://devipvc.gesfaturacao.pt/gesfaturacao/server/webservices/api/mobile/v1.0.2/invoices',
+            url: `${BASE_URL}/invoices`,
             headers: { 
                 'Content-Type': 'application/x-www-form-urlencoded', 
                 'Authorization': token
@@ -216,12 +223,12 @@ export const AuthProvider = ({children}) => {
         });
     }
 
+    // TODO - Remover fatura    
+    // !!! Retorna erro 400 !!!
     const removerFatura = async (id) => {
         var token = await this.getToken();
 
-        let data = qs.stringify({
-            'id': id
-        });
+        let data = qs.stringify({ 'id': id });
         let config = {
             method: 'delete',
             maxBodyLength: Infinity,
@@ -236,7 +243,6 @@ export const AuthProvider = ({children}) => {
         return axios.request(config)
             .then((response) => {
                 console.log(JSON.stringify(response.data));
-                return response.data;
             })
             .catch((error) => {
                 console.log(error + ' Erro Remover Faturas');
@@ -333,6 +339,11 @@ export const AuthProvider = ({children}) => {
             });
     }
 
+    const EditarArtigo = async () => {
+        var token = await this.getToken();
+    
+    }
+
     const getArtigos = async () =>{
         var token = await this.getToken();
         let config = {
@@ -375,6 +386,7 @@ export const AuthProvider = ({children}) => {
         });
     }
 
+    // TODO - Remover artigo
     const removerArtigo = async (id) => {
         var token = await this.getToken();
 
@@ -492,6 +504,11 @@ export const AuthProvider = ({children}) => {
             });
     }
 
+    const EditarOrcamento = async () => {
+        var token = await this.getToken();
+    
+    }
+
     const getOrcamentos = async ()=> {
         var token = await this.getToken();
         let data = qs.stringify({ });
@@ -514,6 +531,8 @@ export const AuthProvider = ({children}) => {
         });
     }    
 
+    // TODO - Finalizar orcamento
+    // !!! Retorna erro 400 !!!
     const finalizarOrcamento = async (id) => {
         var token = await this.getToken();
 
@@ -539,6 +558,8 @@ export const AuthProvider = ({children}) => {
         });
     }
 
+    // TODO - Remover orcamento
+    // !!! Retorna erro 400 !!!
     const removerOrcamento = async (id) => {
         var token = await this.getToken();
 
@@ -604,11 +625,11 @@ export const AuthProvider = ({children}) => {
         <AuthContext.Provider 
             value={{
                 isLoggedIn, login, logout, 
-                CriarOrcamento, getOrcamentos, finalizarOrcamento, removerOrcamento,
+                CriarOrcamento, EditarOrcamento, getOrcamentos, finalizarOrcamento, removerOrcamento,
                 getSeries, getIVA,
                 getCategorias,
-                CriarArtigo, getArtigos, getArtigoID, removerArtigo,
-                CriarFatura, getFaturas, getFaturasById, finalizarFatura, removerFatura,
+                CriarArtigo, EditarArtigo, getArtigos, getArtigoID, removerArtigo,
+                CriarFatura, EditarFatura, getFaturas, getFaturasById, finalizarFatura, removerFatura,
                 getClientes, 
                 getMetodos,
                 enviarEmail,

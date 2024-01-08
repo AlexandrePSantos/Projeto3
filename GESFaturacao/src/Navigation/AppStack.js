@@ -16,9 +16,8 @@ import ListarOrcamentos from '../Screens/Orcamentos/ListarOrcamentos';
 import CriarArtigo from '../Screens/Artigos/CriarArtigo';
 import ListarArtigos from '../Screens/Artigos/ListarArtigos';
 
-const Stack = createNativeStackNavigator();
 
-const { logout } = useContext(AuthContext);
+const Stack = createNativeStackNavigator();
 
 const AuthStack = () => {
   return (
@@ -29,11 +28,6 @@ const AuthStack = () => {
       </Stack.Navigator>
     </>
   );
-};
-
-const handleLogout = async () => {
-  await Keychain.resetGenericPassword();
-  logout();
 };
 
 const screens = [
@@ -50,6 +44,11 @@ const screens = [
 const AppStack = () => {
   const { logout } = useContext(AuthContext);
 
+  const handleLogout = async () => {
+    await Keychain.resetGenericPassword();
+    logout();
+  };
+
   return (
     <>
       <StatusBar backgroundColor="rgba(154, 83, 27, 1)" barStyle="light-content" />
@@ -63,7 +62,7 @@ const AppStack = () => {
               header: () => 
                 <CustomHeader 
                   title={screen.name} 
-                  showBackButton={screen.name.startsWith('Criar') || screen.name.startsWith('Listar')}
+                  showBackButton={screen.name.startsWith('Criar') || screen.name.startsWith('Listar') || screen.name.startsWith('Detalhes')}
                   showLogoutButton={screen.name === 'Dashboard'} onLogout={handleLogout} />,
             }}
           />
@@ -75,9 +74,6 @@ const AppStack = () => {
 
 export { AuthStack, AppStack };
 
-// -------
-// Styling
-// -------
 const CustomHeader = ({ title, showBackButton, showLogoutButton, onLogout }) => {
   const navigation = useNavigation();
 
@@ -86,16 +82,10 @@ const CustomHeader = ({ title, showBackButton, showLogoutButton, onLogout }) => 
       colors={['rgba(154, 83, 27, 1)', 'rgba(154, 83, 27, 0.6)']}
       style={styles.customHeader}
     >
-      {showBackButton && (
-        <View style={{ position: 'absolute', left: 10 }}>
-          <Button title="Back" color="gray" onPress={() => navigation.goBack()} />
-        </View>
-      )}
-      {showLogoutButton && (
-        <View style={{ position: 'absolute', left: 10 }}>
-          <Button title="Logout" color="gray" onPress={onLogout} />
-        </View>
-      )}
+      <View style={{ position: 'absolute', left: 10 }}>
+        {showBackButton && <Button title="Back" color="gray" onPress={() => navigation.goBack()} />}
+        {showLogoutButton && <Button title="Logout" color="gray" onPress={onLogout} />}
+      </View>
       <Text style={styles.headerText}>{title}</Text>
     </LinearGradient>
   );

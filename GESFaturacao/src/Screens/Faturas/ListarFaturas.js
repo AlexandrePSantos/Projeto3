@@ -1,21 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, ScrollView,Button, View, TextInput, Modal, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, ScrollView, Button, View, TextInput, Modal, TouchableOpacity } from 'react-native';
 import { AuthContext } from '../../Context/AuthContext';
 
-export default function ListarFaturas({navigation}) {
+export default function ListarFaturas({ navigation }) {
+  const { getFaturas, enviarEmail, finalizarFatura, removerFatura } = useContext(AuthContext);
+  const [faturas, setFaturas] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedFatura, setSelectedFatura] = useState(null);
+  const [email, setEmail] = useState('');
 
-const { getFaturas } = useContext(AuthContext);
-const { enviarEmail } = useContext(AuthContext);
-const { finalizarFatura } = useContext(AuthContext);
-const { removerFatura } = useContext(AuthContext);
-
-const [faturas, setFaturas] = useState([]);
-
-const [modalVisible, setModalVisible] = useState(false);
-const [selectedFatura, setSelectedFatura] = useState(null);
-const [email, setEmail] = useState('');
-
-useEffect(() => {
+  useEffect(() => {
     const carregarFaturas = async () => {
       try {
         const response = await getFaturas();
@@ -27,21 +21,53 @@ useEffect(() => {
         console.error('Erro ao carregar faturas:', error);
       }
     };
-carregarFaturas();
-  }, []); 
+    carregarFaturas();
+  }, []);
 
-return (
+  const handleFinalizarFatura = async (fatura) => {
+    try {
+      await finalizarFatura(fatura.id);
+      console.log('Fatura finalizada com sucesso');
+    } catch (error) {
+      console.error('Erro ao finalizar fatura:', error);
+    }
+  };
+
+  const handleRemoverFatura = async (fatura) => {
+    try {
+      await removerFatura(fatura.id);
+      console.log('Fatura removida com sucesso', fatura.id);
+    } catch (error) {
+      console.error('Erro ao remover fatura:', error);
+    }
+  };
+
+  const handleEnviarEmail = async () => {
+    try {
+      await enviarEmail(email, "FT", selectedFatura.id);
+      console.log('Email sent successfully');
+      setEmail('');
+      setModalVisible(false);
+    } catch (error) {
+      console.error('Failed to send email:', error);
+    }
+  };
+
+  return (
     <ScrollView>
       <Text style={styles.titleSelect}>Lista de Faturas</Text>
       {faturas.map((fatura, index) => (
         <View key={index} style={styles.faturaContainer}>
           <TouchableOpacity onPress={() => navigation.navigate('Detalhes Fatura', { faturaId: fatura.id })} >
             <View>
-              <Text style={styles.textInFaturaContainer}>ID: {fatura.id}</Text>
+              <Text style={styles.textInFaturaContainer}>Número: {fatura.title}</Text>
               <Text style={styles.textInFaturaContainer}>Cliente: {fatura.name}</Text>
-              <Text style={styles.textInFaturaContainer}>Estado: {fatura.status}</Text>
+              <Text style={styles.textInFaturaContainer}>NIF: {fatura.vatNumber} </Text>
               <Text style={styles.textInFaturaContainer}>Data: {fatura.dateFormatted}</Text>
-              <Text style={styles.textInFaturaContainer}>Data de expiração: {fatura.expirationFormatted}</Text>
+              <Text style={styles.textInFaturaContainer}>Data Venc.: {fatura.expirationFormatted}</Text>
+              <Text style={styles.textInFaturaContainer}>Total: {parseFloat(fatura.total).toFixed(2)} €</Text>
+              <Text style={styles.textInFaturaContainer}>Saldo: {parseFloat(fatura.saldo).toFixed(2)} €</Text>
+              <Text style={styles.textInFaturaContainer}>Estado: {fatura.status}</Text>
             </View>
           </TouchableOpacity>
           <View style={styles.buttonContainer}>
@@ -52,28 +78,13 @@ return (
                   setSelectedFatura(fatura);
                   setModalVisible(true);
                 } else {
-                  console.log('Fatura:', fatura.id)
-                  finalizarFatura(fatura.id)
-                    .then(() => {
-                      console.log('Fatura finalizada com sucesso');
-                    })
-                    .catch(error => {
-                      console.error('Erro ao finalizar fatura:', error);
-                    });
+                  handleFinalizarFatura(fatura);
                 }
               }}
             />
             <Button
               title="Remover"
-              onPress={() => {
-                removerFatura(fatura.id)
-                  .then(() => {
-                    console.log('Fatura removida com sucesso', fatura.id);
-                  })
-                  .catch(error => {
-                    console.error('Erro ao remover fatura:', error);
-                  });
-              }}
+              onPress={() => handleRemoverFatura(fatura)}
             />
           </View>
         </View>
@@ -83,9 +94,7 @@ return (
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
+        onRequestClose={() => setModalVisible(!modalVisible)}
       >
         <View style={styles.overlay}>
           <View style={styles.modalView}>
@@ -100,17 +109,7 @@ return (
             <View style={styles.button}>
               <Button
                 title="Enviar"
-                onPress={() => {
-                  enviarEmail(email, "FT", selectedFatura.id)
-                    .then(() => {
-                      console.log('Email sent successfully');
-                      setEmail('');
-                      setModalVisible(false);
-                    })
-                    .catch(error => {
-                      console.error('Failed to send email:', error);
-                    });
-                }}
+                onPress={handleEnviarEmail}
               />
             </View>
             <View style={styles.button}>
@@ -145,7 +144,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#BE6E31',
     width: 350,
-    height: 100,
+    // height: 100,
     backgroundColor: '#fff',
     borderRadius: 10,
     marginBottom: 50,
