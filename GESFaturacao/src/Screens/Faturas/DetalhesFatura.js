@@ -15,21 +15,114 @@ import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 import { AuthContext } from '../../Context/AuthContext';
 
+function Item({ item, onPress }) {
+  return (
+    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, borderBottomWidth: 1, borderColor: '#000'}}>
+      <Text style={{flex: 1}}>
+      {"ID: " + item.article.id + "\n" +
+        "Artigo: " + item.article.name + "\n" +
+        "Preço Un.: " + Number(item.price.value) + " €\n" +
+        "QTD.: " + item.quantity.value + "\n" +
+        "Total: " + (Number(item.price.value) * Number(item.quantity.value)).toFixed(2) + " €"}
+      </Text>
+      <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onPress} /></View>
+    </View>
+  );
+}
+
 export default function DetalhesFatura({ route }) {
+  
   const { faturaId } = route.params;
-  const { EditarFatura } = useContext(AuthContext);
-  const { enviarEmail } = useContext(AuthContext);
-  const { getFaturasById } = useContext(AuthContext);
-  const [fatura, setFatura] = useState(null);
-   
+  const { EditarFatura, enviarEmail, getFaturasById, getClientes, getSeries, getArtigos, getMetodos} = useContext(AuthContext);
+
+  // ARRAYS PARA GUARDAR OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
+  // SÃO MOSTRADOS NOS PICKERS
+  const [dadosClientes, setDadosClientes] = useState([]);
+  const [dadosSeries, setDadosSeries] = useState([]);
+  const [dadosMetodo, setDadosMetodo] = useState([]);
+  const [dadosArtigos, setDadosArtigos] = useState([]);
+
+  // VARIAVEIS PARA GUARDAR OS IDS DOS CLIENTES, SERIES, ARTIGOS E METODOS SELECIONADOS NOS PICKERS
+  const [selectedIdCliente, setSelectedIdCliente] = useState(null);
+  const [selectedIdSerie, setSelectedIdSerie] = useState(null);
+  const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
+  const [selectedMetodo, setSelectedIdMetodo] = useState(null);
+
+
+  const [artigo, setArtigo] = useState();
+  const [quantidade, setQuantidade] = useState('Quantidade');
+  const [listKey, setListKey] = useState(0);
+
+  // VARIAVEIS PARA GUARDAR OS DADOS DA FATURA
+  // SÃO USADOS PARA ENVIAR PARA A API
+  const [ref, setReferencia] = useState('');
+  const [moeda, setMoeda] = useState('1'); // Valor inicial '1' para 'Euro (€)'
+  const [desc, setDesconto] = useState('0'); // Valor inicial '0'
+  const [obs, setObservacao] = useState('');
+  const [finalizarDoc, setFinalizarDocumento] = useState(0);
+  const [cliente, setCliente] = useState();
+  const [serie, setSerie] = useState();
+  const [dataIni, setDataIni] = useState(moment().format('DD/MM/YYYY'));
+  const [dataVal, setDataVal] = useState(moment().format('DD/MM/YYYY'));
+  const [vencimento, setVencimento] = useState('1');
+  const [metodo, setMetodo] = useState('');
+  const [LinhasC, setLinhas] = useState([]);
+
+  const [email, setEmail] = useState(''); // Email para enviar a fatura
+
+  const [openc, setopenc] = useState(false);
+
+  // METODO PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const clientesResponse = await getClientes();
+        const seriesResponse = await getSeries();
+        const artigosResponse = await getArtigos();
+        const metodosResponse = await getMetodos();
+
+        if (clientesResponse.data) {
+          setDadosClientes(clientesResponse.data);
+        }
+
+        if (seriesResponse.data) {
+          setDadosSeries(seriesResponse.data);
+        }
+
+        if (artigosResponse.data) {
+          setDadosArtigos(artigosResponse.data);
+        }
+
+        if (metodosResponse.data) {
+          setDadosMetodo(metodosResponse.data);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
+
   useEffect(() => {
     getFaturasById(faturaId)
       .then(fetchedFatura => {
         if (fetchedFatura && fetchedFatura.data) {
           const simplifiedFatura = fetchedFatura.data;
           console.log('Fetched fatura:', fetchedFatura.data);
-          setFatura(simplifiedFatura);
-          console.log('Fatura:', fatura.client.name)
+          // Set the selected items
+          setSelectedIdCliente(simplifiedFatura.client.id);
+          setSelectedIdSerie(simplifiedFatura.serie.id);
+          setReferencia(simplifiedFatura.reference);
+          setMoeda(simplifiedFatura.coin.iso);
+          setDesconto(simplifiedFatura.discount);
+          setObservacao(simplifiedFatura.observations);
+          setSerie(simplifiedFatura.serie.value);
+          setDataIni(simplifiedFatura.date);
+          setDataVal(simplifiedFatura.expiration);
+          setVencimento(simplifiedFatura.dueDate.toString());
+          setLinhas(simplifiedFatura.lines);
+          setEmail(simplifiedFatura.client.email);
+          console.log('Fetched fatura lines:', simplifiedFatura.lines)
         } else {
           console.error('Fetched fatura is undefined or does not contain data');
         }

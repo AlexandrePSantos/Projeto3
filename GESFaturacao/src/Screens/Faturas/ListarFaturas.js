@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, ScrollView, Button, View, TextInput, Modal, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, Button, View, TextInput, TouchableOpacity } from 'react-native';
+// import { FlatList } from 'react-native';
+// import Modal from 'react-native-modal';
+
 import { AuthContext } from '../../Context/AuthContext';
 
 export default function ListarFaturas({ navigation }) {
@@ -53,6 +56,15 @@ export default function ListarFaturas({ navigation }) {
     }
   };
 
+  const handlePress = (fatura) => {
+    if (fatura.status === 'Aberto') {
+      setSelectedFatura(fatura);
+      setModalVisible(true);
+    } else {
+      handleFinalizarFatura(fatura);
+    }
+  };
+
   return (
     <ScrollView>
       <Text style={styles.titleSelect}>Lista de Faturas</Text>
@@ -71,21 +83,13 @@ export default function ListarFaturas({ navigation }) {
             </View>
           </TouchableOpacity>
           <View style={styles.buttonContainer}>
-            <Button
-              title={fatura.status === 'Aberto' ? 'Enviar' : 'Finalizar'}
-              onPress={() => {
-                if (fatura.status === 'Aberto') {
-                  setSelectedFatura(fatura);
-                  setModalVisible(true);
-                } else {
-                  handleFinalizarFatura(fatura);
-                }
-              }}
-            />
-            <Button
-              title="Remover"
-              onPress={() => handleRemoverFatura(fatura)}
-            />
+          <Button color={'gray'}
+            title={fatura.status === 'Aberto' ? 'Enviar' : 'Finalizar'}
+            onPress={() => handlePress(fatura)} />
+          {fatura.status === 'Rascunho' && (
+            <Button color={'gray'} title="Remover"
+              onPress={() => handleRemoverFatura(fatura)} />
+          )}
           </View>
         </View>
       ))}
@@ -108,12 +112,14 @@ export default function ListarFaturas({ navigation }) {
             />
             <View style={styles.button}>
               <Button
+                color={'gray'}
                 title="Enviar"
                 onPress={handleEnviarEmail}
               />
             </View>
             <View style={styles.button}>
               <Button
+                color={'gray'}
                 title="Cancel"
                 onPress={() => {
                   setEmail('');

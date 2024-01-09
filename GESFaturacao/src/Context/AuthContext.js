@@ -74,33 +74,8 @@ export const AuthProvider = ({children}) => {
         setIsLoggedIn(false);
     }
 
-    // ------!-------   
-    //  M. Pagamento
     // ------!-------
-    const getMetodos = async () => {
-        var token = await this.getToken();
-        let data = qs.stringify({ });
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/payment-methods`,
-            headers: { 
-              'Authorization': token
-            },
-            data : data
-          };
-    
-        return axios.request(config)
-        .then((response) => {
-        return response.data; 
-        })
-        .catch((error) => {
-        console.log(error);
-        });
-    }
-
-    // ------!-------
-    //    Faturas
+    //      POST
     // ------!-------
     const CriarFatura = async (clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, metodoC, linhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
@@ -140,167 +115,23 @@ export const AuthProvider = ({children}) => {
                 return response.data;
             })
             .catch((error) => {
-                console.log(error + ' Erro Faturas');
+                if (error.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    console.error('Server responded with an error status:', error.response.status);
+                    console.error('Error details:', error.response.data);
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    console.error('No response received from the server');
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    console.error('Error setting up the request:', error.message);
+                }
+            
+                throw error; // Rethrow the error if needed for further handling
             });
     }
 
-    const EditarFatura = async () => {
-        var token = await this.getToken();
-    
-    }
-
-    const getFaturas = async ()=> {
-        var token = await this.getToken();
-        let data = qs.stringify({ });
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/invoices`,
-            headers: { 
-              'Authorization': token
-            },
-            data : data
-          };
-    
-        return axios.request(config)
-            .then((response) => {
-            return response.data; 
-            })
-            .catch((error) => {
-            console.log(error);
-            });
-    }    
-
-    const getFaturasById = async (id) => {
-        var token = await this.getToken();
-
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/invoices?id=${id}`,
-            headers: { 
-                'Authorization': token
-            }
-        };
-
-        return axios.request(config)
-        .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        return response.data;
-        })
-        .catch((error) => {
-        console.log(error);
-        });
-    }
-
-    // TODO - Finalizar fatura
-    // !!! Retorna erro 400 !!!
-    const finalizarFatura = async (id) => {
-        var token = await this.getToken();
-
-        let data = qs.stringify({ 
-            'id': id,
-            'finalize': '1' 
-        });
-        let config = {
-            method: 'put',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/invoices`,
-            headers: { 
-                'Content-Type': 'application/x-www-form-urlencoded', 
-                'Authorization': token
-            },
-            data : data
-        };
-    
-        return axios.request(config)
-            .then((response) => {
-                console.log(response.data);
-                return response.data; 
-            })
-            .catch((error) => {
-                console.log(error);
-        });
-    }
-
-    // TODO - Remover fatura    
-    // !!! Retorna erro 400 !!!
-    const removerFatura = async (id) => {
-        var token = await this.getToken();
-
-        let data = qs.stringify({ 'id': id });
-        let config = {
-            method: 'delete',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/invoices`,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': token
-            },
-            data: data
-        };
-
-        return axios.request(config)
-            .then((response) => {
-                console.log(JSON.stringify(response.data));
-            })
-            .catch((error) => {
-                console.log(error + ' Erro Remover Faturas');
-            });
-    }
-
-    // ------!-------
-    //   Clientes
-    // ------!-------
-    const getClientes = async () => {
-        var token = await this.getToken();
-        let data = qs.stringify({ });
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/clients`,
-            headers: { 
-              'Authorization': token
-            },
-            data : data
-          };
-    
-        return axios.request(config)
-        .then((response) => {
-        return response.data; 
-        })
-        .catch((error) => {
-        console.log(error);
-        });
-    }
-
-    // ------!-------
-    //    Series
-    // ------!-------
-    const getSeries = async () => {
-        var token = await this.getToken();
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/series`,
-            headers: { 
-              'Authorization': token
-            }
-        };
-          
-        return axios.request(config)
-        .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        return response.data; 
-        })
-        .catch((error) => {
-        console.log(error + ' Erro Series');
-        });
-    }
-
-    // ------!-------
-    //    Artigos
-    // ------!-------
     const CriarArtigo = async (code, name, type, unit, qtdStock, qtdStockMin, stockMin, pvp, precoUnit, precoIni, iva, category) => {
         var token = await this.getToken();
 
@@ -339,131 +170,6 @@ export const AuthProvider = ({children}) => {
             });
     }
 
-    const EditarArtigo = async () => {
-        var token = await this.getToken();
-    
-    }
-
-    const getArtigos = async () =>{
-        var token = await this.getToken();
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/products`,
-            headers: { 
-                'Authorization': token
-            }
-        };
-          
-        return axios.request(config)
-        .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        return response.data; 
-        })
-        .catch((error) => {
-        console.log(error);
-        });
-    }
-
-    const getArtigoID = async (id) =>{
-        var token = await this.getToken();
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/products/${id}`,
-            headers: { 
-                'Authorization': token
-            }
-        };
-          
-        return axios.request(config)
-        .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        return response.data; 
-        })
-        .catch((error) => {
-        console.log(error);
-        });
-    }
-
-    // TODO - Remover artigo
-    const removerArtigo = async (id) => {
-        var token = await this.getToken();
-
-        let data = qs.stringify({
-            'id': id
-        });
-        let config = {
-            method: 'delete',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/products`,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': token
-            },
-            data: data
-        };
-
-        return axios.request(config)
-            .then((response) => {
-                return response.data;
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }
-
-    // ------!-------
-    //   Categorias
-    // ------!-------
-    const getCategorias = async () =>{
-        var token = await this.getToken();
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/categories`,
-            headers: { 
-                'Authorization': token
-            }
-        };
-          
-        return axios.request(config)
-        .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        return response.data; 
-        })
-        .catch((error) => {
-        console.log(error);
-        });
-    }
-
-    // ------!-------
-    //      IVA
-    // ------!-------
-    const getIVA = async () =>{
-        var token = await this.getToken();
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/vats`,
-            headers: { 
-                'Authorization': token
-            }
-        };
-          
-        return axios.request(config)
-        .then((response) => {
-        // console.log(JSON.stringify(response.data));
-        return response.data; 
-        })
-        .catch((error) => {
-        console.log(error);
-        });
-    }
-
-    // ------!-------
-    //   Orcamentos
-    // ------!-------
     const CriarOrcamento  = async (clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, linhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
     
@@ -504,91 +210,10 @@ export const AuthProvider = ({children}) => {
             });
     }
 
-    const EditarOrcamento = async () => {
+    const CriarCliente = async () => {
         var token = await this.getToken();
-    
     }
 
-    const getOrcamentos = async ()=> {
-        var token = await this.getToken();
-        let data = qs.stringify({ });
-        let config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/budgets`,
-            headers: { 
-              'Authorization': token
-            },
-            data : data
-          };
-    
-        return axios.request(config)
-            .then((response) => {
-            return response.data; 
-            })
-            .catch((error) => {
-            console.log(error);
-        });
-    }    
-
-    // TODO - Finalizar orcamento
-    // !!! Retorna erro 400 !!!
-    const finalizarOrcamento = async (id) => {
-        var token = await this.getToken();
-
-        let data = qs.stringify({ 
-            'finalizeDocument': id 
-        });
-        let config = {
-            method: 'put',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/budgets`,
-            headers: { 
-              'Authorization': token
-            },
-            data : data
-          };
-    
-        return axios.request(config)
-            .then((response) => {
-            return response.data; 
-            })
-            .catch((error) => {
-            console.log(error);
-        });
-    }
-
-    // TODO - Remover orcamento
-    // !!! Retorna erro 400 !!!
-    const removerOrcamento = async (id) => {
-        var token = await this.getToken();
-
-        let data = qs.stringify({
-            'id': id
-        });
-        let config = {
-            method: 'delete',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/budgets`,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': token
-            },
-            data: data
-        };
-
-        return axios.request(config)
-            .then((response) => {
-                return response.data;
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }
-
-    // ------!-------
-    //     Email
-    // ------!-------
     const enviarEmail = async (email, type, docId) => {
         var token = await this.getToken();
     
@@ -619,21 +244,632 @@ export const AuthProvider = ({children}) => {
     }
 
     // ------!-------
+    //    GET ALL
+    // ------!-------
+    const getArtigos = async () =>{
+        var token = await this.getToken();
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/products`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+          
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getClientes = async () => {
+        var token = await this.getToken();
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/clients`,
+            headers: { 
+              'Authorization': token
+            },
+            data : data
+          };
+    
+        return axios.request(config)
+        .then((response) => {
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getSeries = async () => {
+        var token = await this.getToken();
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/series`,
+            headers: { 
+              'Authorization': token
+            }
+        };
+          
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error + ' Erro Series');
+        });
+    }
+
+    const getCategorias = async () =>{
+        var token = await this.getToken();
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/categories`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+          
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getCentrosCusto = async () =>{
+        var token = await this.getToken();
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/cost-centers`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getIVA = async () =>{
+        var token = await this.getToken();
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/vats`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+          
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+    
+    const getOrcamentos = async ()=> {
+        var token = await this.getToken();
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/budgets`,
+            headers: { 
+              'Authorization': token
+            },
+            data : data
+          };
+    
+        return axios.request(config)
+            .then((response) => {
+            return response.data; 
+            })
+            .catch((error) => {
+            console.log(error);
+        });
+    }    
+
+    const getFaturas = async ()=> {
+        var token = await this.getToken();
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/invoices`,
+            headers: { 
+              'Authorization': token
+            },
+            data : data
+          };
+    
+        return axios.request(config)
+            .then((response) => {
+            return response.data; 
+            })
+            .catch((error) => {
+            console.log(error);
+            });
+    } 
+
+    const getBancos = async () => {
+        var token = await this.getToken();
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/banks`,
+            headers: { 
+              'Authorization': token
+            },
+            data : data
+          };
+    
+        return axios.request(config)
+        .then((response) => {
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getAnos = async () => {
+        var token = await this.getToken();
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/years`,
+            headers: { 
+              'Authorization': token
+            },
+            data : data
+          };
+    
+        return axios.request(config)
+        .then((response) => {
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getMetodos = async () => {
+        var token = await this.getToken();
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/payment-methods`,
+            headers: { 
+              'Authorization': token
+            },
+            data : data
+          };
+    
+        return axios.request(config)
+        .then((response) => {
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getCidades = async () => {
+        var token = await this.getToken();
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/cities`,
+            headers: { 
+              'Authorization': token
+            },
+            data : data
+          };
+    
+        return axios.request(config)
+        .then((response) => {
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+
+
+    // ------!-------
+    //   GET BY VALUE
+    // ------!-------
+    const getArtigoID = async (id) =>{
+        var token = await this.getToken();
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/products/${id}`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+          
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getCategoriasByPosto = async (id) =>{
+        var token = await this.getToken();
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/categories?workstation=${id}`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+          
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getFaturasById = async (id) => {
+        var token = await this.getToken();
+
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/invoices?id=${id}`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data;
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getClientesById = async (id) => {
+        var token = await this.getToken();
+
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/clients?id=${id}`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data;
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getClienteCodInterno = async (codInterno) => {
+        var token = await this.getToken();
+
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/clients?internalCode=${codInterno}`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data;
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    const getClientByNif = async (nif, iso) => {
+        var token = await this.getToken();
+
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/clients?vatNumber=${nif}&isoCountry=${iso}`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data;
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    // ------!-------
+    //      PUT
+    // ------!-------
+    const EditarFatura = async () => {
+        var token = await this.getToken();
+    
+    }
+
+    const EditarArtigo = async () => {
+        var token = await this.getToken();
+    
+    }
+
+    const EditarOrcamento = async () => {
+        var token = await this.getToken();
+    
+    }
+
+    const EditarCliente = async () => {
+        var token = await this.getToken();
+    }
+
+    // TODO - Finalizar orcamento
+    // !!! Retorna erro 400 !!!
+    const finalizarOrcamento = async (id) => {
+        var token = await this.getToken();
+
+        let data = qs.stringify({ 
+            'finalizeDocument': id 
+        });
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/budgets`,
+            headers: { 
+              'Authorization': token
+            },
+            data : data
+          };
+    
+        return axios.request(config)
+            .then((response) => {
+            return response.data; 
+            })
+            .catch((error) => {
+            console.log(error);
+        });
+    }
+    
+    // TODO - Finalizar fatura
+    // !!! Retorna erro 400 !!!
+    const finalizarFatura = async (id) => {
+        try {
+            var token = await this.getToken();
+
+            let data = qs.stringify({ 
+                'id': id,
+                'finalize': '1' 
+            });
+
+            let config = {
+                method: 'put',
+                maxBodyLength: Infinity,
+                url: `${BASE_URL}/invoices`,
+                headers: { 
+                    'Content-Type': 'application/x-www-form-urlencoded', 
+                    'Authorization': token
+                },
+                data: data
+            };
+
+            const response = await axios.request(config);
+            console.log(response.data);
+            return response.data;
+        } catch (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.error('Server responded with an error status:', error.response.status);
+                console.error('Error details:', error.response.data);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.error('No response received from the server');
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.error('Error setting up the request:', error.message);
+            }
+
+            throw error; // Rethrow the error if needed for further handling
+        }
+    };
+
+    // ------!-------
+    //     DELETE
+    // ------!-------
+    // TODO - Remover fatura - Apenas funciona com faturas finalizadas
+    const removerFatura = async (id) => {
+        try {
+        var token = await this.getToken();
+
+        let data = qs.stringify({ 'id': id });
+        let config = {
+            method: 'delete',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/invoices`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': token
+            },
+            data: data
+        };
+
+        const response = await axios.request(config);
+            console.log(response.data);
+            return response.data;
+        } catch (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.error('Server responded with an error status:', error.response.status);
+                console.error('Error details:', error.response.data);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.error('No response received from the server');
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.error('Error setting up the request:', error.message);
+            }
+
+            throw error; // Rethrow the error if needed for further handling
+        }
+    };
+
+    // TODO - Remover orcamento - Apenas funciona com orcamentos finalizados
+    const removerOrcamento = async (id) => {
+        var token = await this.getToken();
+
+        let data = qs.stringify({
+            'id': id
+        });
+        let config = {
+            method: 'delete',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/budgets`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': token
+            },
+            data: data
+        };
+
+        return axios.request(config)
+            .then((response) => {
+                return response.data;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
+
+    // TODO - Remover artigo
+    const removerArtigo = async (id) => {
+        var token = await this.getToken();
+    }
+
+    // TODO - Remover cliente
+    const removerCliente = async (id) => {
+        var token = await this.getToken();
+    }
+
+    // ------!-------
     // Return Values
     // ------!-------
     return(
         <AuthContext.Provider 
             value={{
-                isLoggedIn, login, logout, 
-                CriarOrcamento, EditarOrcamento, getOrcamentos, finalizarOrcamento, removerOrcamento,
-                getSeries, getIVA,
-                getCategorias,
-                CriarArtigo, EditarArtigo, getArtigos, getArtigoID, removerArtigo,
-                CriarFatura, EditarFatura, getFaturas, getFaturasById, finalizarFatura, removerFatura,
+                //LOGIN & LOGOUT
+                isLoggedIn, 
+                login, 
+                logout, 
+                userToken,
+
+                //POST
+                enviarEmail,
+                CriarOrcamento, 
+                CriarFatura, 
+                CriarArtigo,
+                CriarCliente,
+
+                //GET
+                getSeries,
+                getAnos,
+                getBancos,
+                getIVA,
+                getOrcamentos,
+                getArtigos,
+                getFaturas,
                 getClientes, 
                 getMetodos,
-                enviarEmail,
-                isLoading, userToken
+                getAnos,
+                getCentrosCusto,
+                getCategorias,
+                getCidades,
+
+                //GET BY VALUE
+                getCategoriasByPosto,
+                getArtigoID,
+                getFaturasById,
+                getClientesById,
+                getClienteCodInterno,
+                getClientByNif,
+
+                //PUT
+                EditarOrcamento,
+                finalizarOrcamento,
+                EditarArtigo,
+                removerArtigo,
+                removerCliente,
+                removerCliente,
+                EditarCliente,
+                EditarFatura,
+                finalizarFatura,
+
+                //DELETE
+                removerOrcamento,
+                removerFatura,
+                removerArtigo,
+
+                //OUTROS
+                isLoading
             }}>
             {children}
         </AuthContext.Provider>
