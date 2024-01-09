@@ -108,7 +108,7 @@ export default function DetalhesFatura({ route }) {
       .then(fetchedFatura => {
         if (fetchedFatura && fetchedFatura.data) {
           const simplifiedFatura = fetchedFatura.data;
-          console.log('Fetched fatura:', fetchedFatura.data);
+          // console.log('Fetched fatura:', fetchedFatura.data);
           // Set the selected items
           setSelectedIdCliente(simplifiedFatura.client.id);
           setSelectedIdSerie(simplifiedFatura.serie.id);
@@ -122,7 +122,7 @@ export default function DetalhesFatura({ route }) {
           setVencimento(simplifiedFatura.dueDate.toString());
           setLinhas(simplifiedFatura.lines);
           setEmail(simplifiedFatura.client.email);
-          console.log('Fetched fatura lines:', simplifiedFatura.lines)
+          // console.log('Fetched fatura lines:', simplifiedFatura.lines)
         } else {
           console.error('Fetched fatura is undefined or does not contain data');
         }
