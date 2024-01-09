@@ -8,7 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  ToastAndroid,
+  ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
@@ -31,9 +31,10 @@ function Item({ item, onPress }) {
 }
 
 export default function DetalhesFatura({ route }) {
-  
+  // Add a new state for loading
+  const [loading, setLoading] = useState(true);
   const { faturaId } = route.params;
-  const { EditarFatura, enviarEmail, getFaturasById, getClientes, getSeries, getArtigos, getMetodos} = useContext(AuthContext);
+  const { EditarFatura, enviarEmail, getFaturasById, getClientes, getSeries, getArtigos, getMetodos, getMoedas} = useContext(AuthContext);
 
   // ARRAYS PARA GUARDAR OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   // SÃO MOSTRADOS NOS PICKERS
@@ -41,13 +42,14 @@ export default function DetalhesFatura({ route }) {
   const [dadosSeries, setDadosSeries] = useState([]);
   const [dadosMetodo, setDadosMetodo] = useState([]);
   const [dadosArtigos, setDadosArtigos] = useState([]);
+  const [dadosMoedas, setDadosMoedas] = useState([]);
 
   // VARIAVEIS PARA GUARDAR OS IDS DOS CLIENTES, SERIES, ARTIGOS E METODOS SELECIONADOS NOS PICKERS
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   const [selectedIdSerie, setSelectedIdSerie] = useState(null);
   const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
   const [selectedMetodo, setSelectedIdMetodo] = useState(null);
-
+  const [selectedMoeda, setSelectedIdMoeda] = useState(null);
 
   const [artigo, setArtigo] = useState();
   const [quantidade, setQuantidade] = useState('Quantidade');
@@ -56,10 +58,10 @@ export default function DetalhesFatura({ route }) {
   // VARIAVEIS PARA GUARDAR OS DADOS DA FATURA
   // SÃO USADOS PARA ENVIAR PARA A API
   const [ref, setReferencia] = useState('');
-  const [moeda, setMoeda] = useState('1'); // Valor inicial '1' para 'Euro (€)'
-  const [desc, setDesconto] = useState('0'); // Valor inicial '0'
+  const [moeda, setMoeda] = useState('1'); 
+  const [desc, setDesconto] = useState('0'); 
   const [obs, setObservacao] = useState('');
-  const [finalizarDoc, setFinalizarDocumento] = useState(0);
+  const [finalizarDoc, setFinalizarDocumento] = useState('0');
   const [cliente, setCliente] = useState();
   const [serie, setSerie] = useState();
   const [dataIni, setDataIni] = useState(moment().format('DD/MM/YYYY'));
@@ -68,52 +70,31 @@ export default function DetalhesFatura({ route }) {
   const [metodo, setMetodo] = useState('');
   const [LinhasC, setLinhas] = useState([]);
 
-  const [email, setEmail] = useState(''); // Email para enviar a fatura
+  const [email, setEmail] = useState('');
 
   const [openc, setopenc] = useState(false);
 
-  // METODO PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const clientesResponse = await getClientes();
-        const seriesResponse = await getSeries();
-        const artigosResponse = await getArtigos();
-        const metodosResponse = await getMetodos();
-
-        if (clientesResponse.data) {
-          setDadosClientes(clientesResponse.data);
-        }
-
-        if (seriesResponse.data) {
-          setDadosSeries(seriesResponse.data);
-        }
-
-        if (artigosResponse.data) {
-          setDadosArtigos(artigosResponse.data);
-        }
-
-        if (metodosResponse.data) {
-          setDadosMetodo(metodosResponse.data);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchData();
-  }, []);
-
   useEffect(() => {
     getFaturasById(faturaId)
-      .then(fetchedFatura => {
+      .then(async fetchedFatura => {
         if (fetchedFatura && fetchedFatura.data) {
           const simplifiedFatura = fetchedFatura.data;
-          // console.log('Fetched fatura:', fetchedFatura.data);
+          const metodoPagamento = fetchedFatura.result.MetodoPagamento;
+          // Find the method that has the name equal to metodoPagamento 
+          const selectedMethod = dadosMetodo.find(method => method.name === metodoPagamento);
+          // If such a method is found, use its id as the selected value
+          const selectedValue = selectedMethod ? selectedMethod.id.toString() : null;
+
+          console.log('metodoPagamento: ', metodoPagamento);
+          console.log('dadosMetodo: ', dadosMetodo);
+          console.log('selectedMethod: ', selectedMethod);
+          console.log('selectedValue: ', selectedValue);
+
           // Set the selected items
-          setSelectedIdCliente(simplifiedFatura.client.id);
-          setSelectedIdSerie(simplifiedFatura.serie.id);
+          setSelectedIdCliente(simplifiedFatura.client.id.toString());
+          setSelectedIdSerie(simplifiedFatura.serie.id.toString());
           setReferencia(simplifiedFatura.reference);
-          setMoeda(simplifiedFatura.coin.iso);
+          setMoeda(simplifiedFatura.coin.name.toString());
           setDesconto(simplifiedFatura.discount);
           setObservacao(simplifiedFatura.observations);
           setSerie(simplifiedFatura.serie.value);
@@ -121,8 +102,41 @@ export default function DetalhesFatura({ route }) {
           setDataVal(simplifiedFatura.expiration);
           setVencimento(simplifiedFatura.dueDate.toString());
           setLinhas(simplifiedFatura.lines);
-          setEmail(simplifiedFatura.client.email);
-          // console.log('Fetched fatura lines:', simplifiedFatura.lines)
+          setMetodo(selectedValue);
+          setFinalizarDocumento(simplifiedFatura.status === 'Aberto' ? '1' : '0');
+
+          // Fetch the data for the Picker items
+          try {
+            const clientesResponse = await getClientes();
+            const seriesResponse = await getSeries();
+            const artigosResponse = await getArtigos();
+            const metodosResponse = await getMetodos();
+            const moedasResponse = await getMoedas();
+  
+            if (clientesResponse.data) {
+              setDadosClientes(clientesResponse.data);
+            }
+  
+            if (seriesResponse.data) {
+              setDadosSeries(seriesResponse.data);
+            }
+  
+            if (artigosResponse.data) {
+              setDadosArtigos(artigosResponse.data);
+            }
+  
+            if (metodosResponse.data) {
+              setDadosMetodo(metodosResponse.data);
+            }
+            if (moedasResponse.data) {
+              setDadosMoedas(moedasResponse.data);
+            }
+          } catch (error) {
+            console.error(error);
+          }
+
+          // Set loading to false after the data is fetched and state is updated
+          setLoading(false);
         } else {
           console.error('Fetched fatura is undefined or does not contain data');
         }
@@ -142,6 +156,32 @@ export default function DetalhesFatura({ route }) {
     // TODO - Cancelar torna os campos não editáveis outra vez com os valores por defeito da API 
   };
 
+  const calculateExpirationDate = (startDate, paymentCondition) => {
+    const daysToAdd = {
+      '1': 0,   
+      '2': 10,  
+      '3': 20,  
+      '4': 30,  
+      '5': 60,
+      '6': 75,
+      '7': 90,
+      '8': 120,
+      '9': 180,
+    }[paymentCondition];
+  
+    const expirationDate = moment(startDate, 'DD/MM/YYYY').add(daysToAdd, 'days');
+    return expirationDate.format('DD/MM/YYYY');
+  };
+
+  // Loading indicator
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#d0933f" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView>
     <View style={styles.container}>
@@ -153,17 +193,17 @@ export default function DetalhesFatura({ route }) {
         />
       </View>
       <View style={{marginTop: 10}}>
+
         {/* Cliente - DONE */}
         <Text style={styles.titleSelect}>Client</Text>
         <View style={styles.borderMargin}>
           <Picker
+            key={selectedIdCliente}
             style={styles.pickerComponent}
             selectedValue={selectedIdCliente}
-            onValueChange={itemValue => {
-              setSelectedIdCliente(itemValue);
-              setCliente(itemValue);
-            }} >
-            <Picker.Item label="Selecione um cliente" value={null} />
+            onValueChange={itemValue => { setSelectedIdCliente(itemValue); setCliente(itemValue); }} 
+          >
+            <Picker.Item label="Selecione um cliente" value={null} /> 
             {dadosClientes.map((client, i) => (
               <Picker.Item
                 label={client.name}
@@ -207,26 +247,9 @@ export default function DetalhesFatura({ route }) {
               date={new Date(moment(dataIni, 'DD/MM/YYYY').format())}
               onConfirm={date => {
                 setopenc(false);
-                // Validar se a data de início é antes da data de validade
-                
-                  setDataIni(moment(date).format('DD/MM/YYYY'));
-
-                  // Verificar a condição de pagamento e atualizar a data de validade
-                  const daysToAdd = {
-                    '1': 0,   // Pago a Pronto
-                    '2': 10,  // 10 Dias Após Emissão
-                    '3': 20,  // 20 Dias Após Emissão
-                    '4': 30,  // Add more conditions as needed
-                    '5': 60,
-                    '6': 75,
-                    '7': 90,
-                    '8': 120,
-                    '9': 180,
-                  }[vencimento];
-
-                  const expirationDate = moment(date).add(daysToAdd, 'days');
-                  setDataVal(expirationDate.format('DD/MM/YYYY'));
-                
+                setDataIni(moment(date).format('DD/MM/YYYY'));
+                const expirationDate = calculateExpirationDate(date, vencimento);
+                setDataVal(expirationDate);
               }}
               onCancel={() => setopenc(false)}
             />
@@ -236,7 +259,7 @@ export default function DetalhesFatura({ route }) {
 
         {/* expiration - DONE */}
         <Text style={styles.titleSelect}>Validade</Text>
-        <View style={styles.borderMargin}>
+        <View style={[styles.borderMargin,{backgroundColor: '#B3B6B7'}]}>
           <View style={styles.touchableO}>
             <Text style={styles.textDate}> {' '} {dataVal}</Text>
           </View>
@@ -250,20 +273,8 @@ export default function DetalhesFatura({ route }) {
             selectedValue={vencimento}
             onValueChange={itemValue => {
               setVencimento(itemValue);
-              const daysToAdd = {
-                '1': 0,   // Pago a Pronto
-                '2': 10,  // 10 Dias Após Emissão
-                '3': 20,  // 20 Dias Após Emissão
-                '4': 30,  // Add more conditions as needed
-                '5': 60,
-                '6': 75,
-                '7': 90,
-                '8': 120,
-                '9': 180,
-              }[itemValue];
-
-              const expirationDate = moment(dataIni, 'DD/MM/YYYY').add(daysToAdd, 'days');
-              setDataVal(expirationDate.format('DD/MM/YYYY'));
+              const expirationDate = calculateExpirationDate(dataIni, itemValue);
+              setDataVal(expirationDate);
             }}
           >
             <Picker.Item label="Pago a Pronto" value="1" />
@@ -294,15 +305,20 @@ export default function DetalhesFatura({ route }) {
         <Text style={styles.titleSelect}>Moeda</Text>
         <View style={styles.borderMargin}>
           <Picker
-            selectedValue={moeda}
-            onValueChange={itemValue => setMoeda(itemValue)}
+            selectedValue={selectedMoeda}
+            onValueChange={itemValue => {
+              setSelectedIdMoeda(itemValue);
+              setMoeda(itemValue);
+            }}
             style={styles.pickerComponent}
           >
-            <Picker.Item label="Euro (€)" value="1" />
-            <Picker.Item label="Libra ING (GBP)" value="2" />
-            <Picker.Item label="Dólar USA ($)" value="3" />
-            <Picker.Item label="Real Br. (R$)" value="4" />
-            <Picker.Item label="Fr. Suiço (CHF)" value="5" />
+            {dadosMoedas.map((moeda, i) => (
+              <Picker.Item
+                label={moeda.description}
+                value={moeda.id.toString()}
+                key={i}
+              />
+            ))}
           </Picker>
         </View>
 
@@ -311,7 +327,7 @@ export default function DetalhesFatura({ route }) {
         <View style={styles.borderMargin}>
           <TextInput
             style={styles.input}
-            value={desc}
+            value={parseFloat(desc).toFixed(2)}
             onChangeText={text => setDesconto(text)}
             placeholder="Desconto"
             keyboardType="numeric"
@@ -361,7 +377,7 @@ export default function DetalhesFatura({ route }) {
           <Picker
             style={styles.pickerComponent}
             placeholder="Método de Pagamento"
-            selectedValue={metodo}
+            selectedValue={selectedMetodo}
             onValueChange={itemValue => {
               setSelectedIdMetodo(itemValue); 
               setMetodo(itemValue);

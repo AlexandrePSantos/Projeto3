@@ -39,6 +39,7 @@ export default function CriarFatura({ navigation }) {
   const { getSeries } = useContext(AuthContext);
   const { getArtigos } = useContext(AuthContext);
   const { getMetodos } = useContext(AuthContext);
+  const { getMoedas } = useContext(AuthContext);
 
   // ARRAYS PARA GUARDAR OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   // SÃO MOSTRADOS NOS PICKERS
@@ -46,12 +47,15 @@ export default function CriarFatura({ navigation }) {
   const [dadosSeries, setDadosSeries] = useState([]);
   const [dadosMetodo, setDadosMetodo] = useState([]);
   const [dadosArtigos, setDadosArtigos] = useState([]);
+  const [dadosMoedas, setDadosMoedas] = useState([]);
 
   // VARIAVEIS PARA GUARDAR OS IDS DOS CLIENTES, SERIES, ARTIGOS E METODOS SELECIONADOS NOS PICKERS
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   const [selectedIdSerie, setSelectedIdSerie] = useState(null);
   const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
   const [selectedMetodo, setSelectedIdMetodo] = useState(null);
+  const [selectedMoeda, setSelectedIdMoeda] = useState(null);
+  
 
 
   const [artigo, setArtigo] = useState();
@@ -85,6 +89,7 @@ export default function CriarFatura({ navigation }) {
         const seriesResponse = await getSeries();
         const artigosResponse = await getArtigos();
         const metodosResponse = await getMetodos();
+        const moedasResponse = await getMoedas();
 
         if (clientesResponse.data) {
           setDadosClientes(clientesResponse.data);
@@ -100,6 +105,9 @@ export default function CriarFatura({ navigation }) {
 
         if (metodosResponse.data) {
           setDadosMetodo(metodosResponse.data);
+        }
+        if (moedasResponse.data) {
+          setDadosMoedas(moedasResponse.data);
         }
       } catch (error) {
         console.error(error);
@@ -318,17 +326,22 @@ export default function CriarFatura({ navigation }) {
           {/* Coin - DONE */}
           <Text style={styles.titleSelect}>Moeda</Text>
           <View style={styles.borderMargin}>
-            <Picker
-              selectedValue={moeda}
-              onValueChange={itemValue => setMoeda(itemValue)}
-              style={styles.pickerComponent}
-            >
-              <Picker.Item label="Euro (€)" value="1" />
-              <Picker.Item label="Libra ING (GBP)" value="2" />
-              <Picker.Item label="Dólar USA ($)" value="3" />
-              <Picker.Item label="Real Br. (R$)" value="4" />
-              <Picker.Item label="Fr. Suiço (CHF)" value="5" />
-            </Picker>
+          <Picker
+            selectedValue={selectedMoeda}
+            onValueChange={itemValue => {
+              setSelectedIdMoeda(itemValue);
+              setMoeda(itemValue);
+            }}
+            style={styles.pickerComponent}
+          >
+            {dadosMoedas.map((moeda, i) => (
+              <Picker.Item
+                label={moeda.description}
+                value={moeda.id.toString()}
+                key={i}
+              />
+            ))}
+          </Picker>
           </View>
 
           {/* discount - DONE */}

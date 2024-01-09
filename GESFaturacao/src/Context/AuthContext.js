@@ -505,6 +505,27 @@ export const AuthProvider = ({children}) => {
         });
     }
 
+    const getMoedas = async () => {
+        var token = await this.getToken();
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/coins`,
+            headers: {
+                'Authorization': token
+            },
+            data : data
+          };
+    
+        return axios.request(config)
+        .then((response) => {
+        return response.data; 
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
 
 
     // ------!-------
@@ -843,6 +864,7 @@ export const AuthProvider = ({children}) => {
                 getCentrosCusto,
                 getCategorias,
                 getCidades,
+                getMoedas,
 
                 //GET BY VALUE
                 getCategoriasByPosto,

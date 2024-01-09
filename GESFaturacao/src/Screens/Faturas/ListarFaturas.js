@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, Button, View, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, Text, Button, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import Modal from 'react-native-modal';
 
 import { AuthContext } from '../../Context/AuthContext';
 
 export default function ListarFaturas({ navigation }) {
+  const [loading, setLoading] = useState(true);
   const { getFaturas, enviarEmail, finalizarFatura, removerFatura } = useContext(AuthContext);
   const [faturas, setFaturas] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -18,6 +19,7 @@ export default function ListarFaturas({ navigation }) {
         if (response.data) {
           const sortedFaturas = response.data.sort((a, b) => b.id - a.id);
           setFaturas(sortedFaturas);
+          setLoading(false);
         }
       } catch (error) {
         console.error('Erro ao carregar faturas:', error);
@@ -96,6 +98,15 @@ export default function ListarFaturas({ navigation }) {
   );
 
   const keyExtractor = (item) => item.id.toString();
+
+  // Loading indicator
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#d0933f" />
+      </View>
+    );
+  }
 
   return (
     <View>
