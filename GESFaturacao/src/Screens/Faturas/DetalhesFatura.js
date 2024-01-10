@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
@@ -19,18 +20,18 @@ function Item({ item, onPress }) {
   return (
     <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, borderBottomWidth: 1, borderColor: '#000'}}>
       <Text style={{flex: 1}}>
-      {"ID: " + item.article.id + "\n" +
-        "Artigo: " + item.article.name + "\n" +
-        "Preço Un.: " + Number(item.price.value) + " €\n" +
-        "QTD.: " + item.quantity.value + "\n" +
-        "Total: " + (Number(item.price.value) * Number(item.quantity.value)).toFixed(2) + " €"}
+        {"ID: " + item.id + "\n" +
+        "Artigo: " + item.description + "\n" +
+        "Preço Un.: " + Number(item.price) + " €\n" +
+        "QTD.: " + item.quantity + "\n" +
+        "Total: " + Number(item.price) * Number(item.quantity) + " €"}
       </Text>
       <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onPress} /></View>
     </View>
   );
 }
 
-export default function DetalhesFatura({ route }) {
+export default function DetalhesFatura({ route, navigation }) {
   // Add a new state for loading
   const [loading, setLoading] = useState(true);
   const { faturaId } = route.params;
@@ -57,20 +58,20 @@ export default function DetalhesFatura({ route }) {
 
   // VARIAVEIS PARA GUARDAR OS DADOS DA FATURA
   // SÃO USADOS PARA ENVIAR PARA A API
-  const [ref, setReferencia] = useState('');
-  const [moeda, setMoeda] = useState('1'); 
-  const [desc, setDesconto] = useState('0'); 
-  const [obs, setObservacao] = useState('');
+  const [ref, setReferencia] = useState();
+  const [moeda, setMoeda] = useState(); 
+  const [desc, setDesconto] = useState(); 
+  const [obs, setObservacao] = useState();
   const [finalizarDoc, setFinalizarDocumento] = useState('0');
   const [cliente, setCliente] = useState();
   const [serie, setSerie] = useState();
   const [dataIni, setDataIni] = useState(moment().format('DD/MM/YYYY'));
   const [dataVal, setDataVal] = useState(moment().format('DD/MM/YYYY'));
-  const [vencimento, setVencimento] = useState('1');
-  const [metodo, setMetodo] = useState('');
+  const [vencimento, setVencimento] = useState();
+  const [metodo, setMetodo] = useState();
   const [LinhasC, setLinhas] = useState([]);
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState();
 
   const [openc, setopenc] = useState(false);
 
@@ -79,38 +80,53 @@ export default function DetalhesFatura({ route }) {
       .then(async fetchedFatura => {
         if (fetchedFatura && fetchedFatura.data) {
           const simplifiedFatura = fetchedFatura.data;
-          const metodoPagamento = fetchedFatura.result.MetodoPagamento;
-          // Find the method that has the name equal to metodoPagamento 
-          const selectedMethod = dadosMetodo.find(method => method.name === metodoPagamento);
-          // If such a method is found, use its id as the selected value
-          const selectedValue = selectedMethod ? selectedMethod.id.toString() : null;
-
-          console.log('metodoPagamento: ', metodoPagamento);
-          console.log('dadosMetodo: ', dadosMetodo);
-          console.log('selectedMethod: ', selectedMethod);
-          console.log('selectedValue: ', selectedValue);
-
-          // Set the selected items
-          setSelectedIdCliente(simplifiedFatura.client.id.toString());
-          setSelectedIdSerie(simplifiedFatura.serie.id.toString());
-          setReferencia(simplifiedFatura.reference);
-          setMoeda(simplifiedFatura.coin.name.toString());
-          setDesconto(simplifiedFatura.discount);
-          setObservacao(simplifiedFatura.observations);
-          setSerie(simplifiedFatura.serie.value);
-          setDataIni(simplifiedFatura.date);
-          setDataVal(simplifiedFatura.expiration);
-          setVencimento(simplifiedFatura.dueDate.toString());
-          setLinhas(simplifiedFatura.lines);
-          setMetodo(selectedValue);
-          setFinalizarDocumento(simplifiedFatura.status === 'Aberto' ? '1' : '0');
-
-          // Fetch the data for the Picker items
+  
           try {
+            const metodosResponse = await getMetodos();
+            if (metodosResponse.data) {
+              setDadosMetodo(metodosResponse.data);
+            }
+  
+            const metodoPagamento = fetchedFatura.result.MetodoPagamento;
+            const selectedMethod = metodosResponse.data.find(method => method.name === metodoPagamento);
+            const selectedValue = selectedMethod ? selectedMethod.id.toString() : null;
+  
+            setSelectedIdCliente(simplifiedFatura.client.id.toString());
+            setCliente(simplifiedFatura.client.id.toString());
+            setSelectedIdSerie(simplifiedFatura.serie.id.toString());
+            setSerie(simplifiedFatura.serie.id.toString());
+            setReferencia(simplifiedFatura.reference);
+            setSelectedIdMoeda(simplifiedFatura.coin.id.toString());
+            setMoeda(simplifiedFatura.coin.id.toString());
+            setDesconto(simplifiedFatura.discount);
+            setObservacao(simplifiedFatura.observations);
+            setSelectedIdSerie(simplifiedFatura.serie.id.toString());
+            setSerie(simplifiedFatura.serie.id.toString());
+            setDataIni(simplifiedFatura.date);
+            setDataVal(simplifiedFatura.expiration);
+            setVencimento(simplifiedFatura.dueDate.toString());
+            setSelectedIdMetodo(selectedValue);
+            setMetodo(selectedValue);
+            setFinalizarDocumento(simplifiedFatura.status === 'Aberto' ? '1' : '0');
+  
+            const transformedLines = simplifiedFatura.lines.map(line => ({
+              id: line.article.id.toString(),
+              description: line.article.name,
+              quantity: line.quantity.value,
+              price: line.price.value,
+              discount: line.percentageDiscount.value, // changed from line.discount.value
+              tax: line.tax.id.toString(),
+              exemption: line.exemption.id ? line.exemption.id.toString() : null,
+              retention: line.retention.value
+            }));
+            setLinhas(transformedLines);
+
+            console.log('transformedLines: ', transformedLines);
+
+            // Fetch the remaining data
             const clientesResponse = await getClientes();
             const seriesResponse = await getSeries();
             const artigosResponse = await getArtigos();
-            const metodosResponse = await getMetodos();
             const moedasResponse = await getMoedas();
   
             if (clientesResponse.data) {
@@ -125,16 +141,13 @@ export default function DetalhesFatura({ route }) {
               setDadosArtigos(artigosResponse.data);
             }
   
-            if (metodosResponse.data) {
-              setDadosMetodo(metodosResponse.data);
-            }
             if (moedasResponse.data) {
               setDadosMoedas(moedasResponse.data);
             }
           } catch (error) {
             console.error(error);
           }
-
+  
           // Set loading to false after the data is fetched and state is updated
           setLoading(false);
         } else {
@@ -147,7 +160,39 @@ export default function DetalhesFatura({ route }) {
   }, [faturaId]);
   
   const handleConfirmarEditar = () => {
-    // TODO - Chama o método da API para atualizar o documento
+    console.log('LinhasC: ', LinhasC);
+    EditarFatura(
+      faturaId,
+      cliente,
+      serie,
+      0,
+      dataIni,
+      dataVal,
+      vencimento,
+      ref,
+      moeda,
+      desc,
+      obs,
+      metodo,
+      LinhasC,
+      finalizarDoc,
+    ).then(response => {
+      navigation.navigate('Dashboard');
+      ToastAndroid.show("Fatura Editada ", ToastAndroid.SHORT);
+      if (finalizarDoc == 1) {
+        const documentId = response.fatura;
+        enviarEmail(email, "FT", documentId)
+          .then(() => {
+            console.log('Email sent successfully');
+          })
+          .catch(error => {
+            console.error('Failed to send email:', error);
+          });
+      }
+    }).catch(error => {
+      console.error('Error editing invoice:', error);
+      ToastAndroid.show('Error editing invoice', ToastAndroid.SHORT);
+    });
   };
 
   const handleEditavel = () => {
@@ -171,6 +216,10 @@ export default function DetalhesFatura({ route }) {
   
     const expirationDate = moment(startDate, 'DD/MM/YYYY').add(daysToAdd, 'days');
     return expirationDate.format('DD/MM/YYYY');
+  };
+
+  const removeItem = (index) => {
+    setLinhas(LinhasC.filter((_, i) => i !== index));
   };
 
   // Loading indicator
@@ -286,7 +335,6 @@ export default function DetalhesFatura({ route }) {
             <Picker.Item label="90 Dias Após Emissão" value="7" />
             <Picker.Item label="120 Dias Após Emissão" value="8" />
             <Picker.Item label="180 Dias Após Emissão" value="9" />
-            {/* Add more conditions of payment as needed */}
           </Picker>
         </View>
 
@@ -402,7 +450,6 @@ export default function DetalhesFatura({ route }) {
             placeholder="Selecione um Artigo"
             selectedValue={artigo} 
             onValueChange={(itemValue, itemIndex) => {
-              // console.log('Selected item:', itemValue);
               setArtigo(itemValue);
               setSelectedIdArtigo(itemValue);
               setQuantidade('1');
@@ -431,33 +478,31 @@ export default function DetalhesFatura({ route }) {
                 Alert.alert('Erro', 'Indique a quantidade');
                 return;
               } else {
-                // Check if item already exists in LinhasC
                 const existingItemIndex = LinhasC.findIndex(item => item.id === artigo.id.toString());
 
                 if (existingItemIndex >= 0) {
-                  // If item exists, update its quantity and total
-                  LinhasC[existingItemIndex].quantity = Number(LinhasC[existingItemIndex].quantity) + Number(quantidade);
-                  LinhasC[existingItemIndex].price = Number(LinhasC[existingItemIndex].price) + Number(artigo.price);
-                } else {
-                  // If item doesn't exist, add it as a new item
-                  const newItem = { 
-                    id: artigo.id.toString(), 
-                    description: artigo.description, 
-                    quantity: quantidade, 
-                    price: artigo.price, 
-                    discount: '0', 
-                    tax: artigo.taxID, 
-                    exemption: artigo.exemptionID.toString(), 
-                    retention: 0 
-                  };
-                  LinhasC.push(newItem);
-                }
+                    // If item exists, update its quantity and total
+                    LinhasC[existingItemIndex].quantity = Number(LinhasC[existingItemIndex].quantity) + Number(quantidade);
+                    LinhasC[existingItemIndex].price = Number(LinhasC[existingItemIndex].price) + Number(artigo.price);
+                  } else {
+                    // If item doesn't exist, add it as a new item
+                    const newItem = { 
+                      id: artigo.id.toString(), 
+                      description: artigo.description, 
+                      quantity: quantidade, 
+                      price: artigo.price, 
+                      discount: '0', 
+                      tax: artigo.taxID, 
+                      exemption: artigo.exemptionID.toString(), 
+                      retention: 0 
+                    };
+                    LinhasC.push(newItem);
+                  }
 
                 setLinhas([...LinhasC]);
                 setListKey(listKey + 1);
-                // console.log(LinhasC);
-                setArtigo(null); // Reset artigo
-                setQuantidade(''); // Reset quantidade
+                setArtigo(null); 
+                setQuantidade('');
               }
             }}
           />
