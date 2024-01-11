@@ -8,13 +8,16 @@ import {
   ScrollView,
   Button,
   Alert,
-  ToastAndroid
+  ToastAndroid,
+  useColorScheme,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import { Picker } from '@react-native-picker/picker';
 import {AuthContext} from '../../Context/AuthContext';
 
 export default function CriarArtigo({navigation}) {
+  const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme);
 
   const {CriarArtigo} = useContext(AuthContext);
 
@@ -272,10 +275,10 @@ export default function CriarArtigo({navigation}) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
@@ -290,15 +293,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     margin: 10,
     fontWeight: 'bold',
-    color: '#5F5D5C',
+    color: colorScheme === 'dark' ? '#ffffff' : '#5F5D5C',
   },
   pickerComponent: {
     width: 350,
   },
   borderMargin: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     borderWidth: 1,
-    borderColor: 'grey',
+    borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
     marginBottom: 15,
     borderRadius: 7,
   },
@@ -308,3 +311,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+

@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, Button, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { useColorScheme, StyleSheet, Text, Button, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import Modal from 'react-native-modal';
 
 import { AuthContext } from '../../Context/AuthContext';
 
 export default function ListarFaturas({ navigation }) {
+  const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme);
+
   const [loading, setLoading] = useState(true);
   const { getFaturas, enviarEmail, finalizarFatura, removerFatura } = useContext(AuthContext);
   const [faturas, setFaturas] = useState([]);
@@ -105,14 +108,14 @@ export default function ListarFaturas({ navigation }) {
   // Loading indicator
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#d0933f" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff' }}>
+        <ActivityIndicator size="large" color={colorScheme === 'dark' ? '#ffffff' : '#d0933f'} />
       </View>
     );
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <Text style={styles.titleSelect}></Text>
       <FlatList
         data={faturas}
@@ -159,19 +162,20 @@ export default function ListarFaturas({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme) => StyleSheet.create({
   // General styles
   button: {
     marginBottom: 10,
+    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
   },
   input: {
     height: 40,
     marginTop: 10,
     marginBottom: 15,
     width: 250,
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#fff',
     borderWidth: 1,
-    borderColor: 'grey',
+    borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
     borderRadius: 7,
   },
   overlay: {
@@ -181,20 +185,25 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 
+  container: {
+    flex: 1,
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
+  },
   // Text styles
   titleSelect: {
     fontSize: 20,
     margin: 10,
     fontWeight: "bold",
-    color: "#5F5D5C",
+    color: colorScheme === 'dark' ? '#ffffff' : '#5F5D5C',
   },
   modalText: {
     marginBottom: 15,
     textAlign: "center",
+    color: colorScheme === 'dark' ? '#ffffff' : 'black',
   },
   textInFaturaContainer: {
     marginLeft: 10,
-    color: '#444444',
+    color: colorScheme === 'dark' ? '#ffffff' : '#444444',
   },
 
   // Container styles
@@ -205,9 +214,9 @@ const styles = StyleSheet.create({
   },
   faturaContainer: {
     borderWidth: 1,
-    borderColor: '#BE6E31',
+    borderColor: colorScheme === 'dark' ? '#ffffff' : '#BE6E31',
     width: 350,
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#fff',
     borderRadius: 10,
     marginBottom: 50,
     marginLeft: 20,
@@ -221,7 +230,7 @@ const styles = StyleSheet.create({
     width: 300,
     height: 250,
     margin: 20,
-    backgroundColor: "white",
+    backgroundColor: colorScheme === 'dark' ? '#333333' : 'white',
     borderRadius: 20,
     padding: 35,
     alignItems: "center",

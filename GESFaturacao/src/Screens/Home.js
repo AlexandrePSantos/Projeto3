@@ -1,9 +1,11 @@
 import React, { useContext} from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { AuthContext } from '../Context/AuthContext';
-import styles from './HomeStyles';
+import { View, Text, TouchableOpacity, useColorScheme } from 'react-native';
+import getStyles from './HomeStyles';
+
 
 export default function Home({navigation}) {
+  const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme);
 
   return (
     <View style={styles.outerContainer}>

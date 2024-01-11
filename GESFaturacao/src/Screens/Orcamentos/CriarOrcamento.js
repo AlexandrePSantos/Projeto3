@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ToastAndroid,
+  useColorScheme,
 } from 'react-native';
 import { AuthContext } from '../../Context/AuthContext';
 import { Picker } from '@react-native-picker/picker';
@@ -32,6 +33,8 @@ function Item({ item, onPress }) {
 }
 
 export default function CriarOrcamento({ navigation }) {
+  const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme);
   // VARIAVEIS PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   // SÃO USADOS PARA CARREGAR ARRAYS DOS PICKERS
   const { CriarOrcamento } = useContext(AuthContext);
@@ -469,10 +472,10 @@ export default function CriarOrcamento({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
@@ -483,23 +486,19 @@ const styles = StyleSheet.create({
     width: 300,
     padding: 10,
   },
-  textfont: {
-    color: '#ffffff',
-    fontSize: 16
-  },
   titleSelect: {
     fontSize: 20,
     margin: 10,
     fontWeight: 'bold',
-    color: '#5F5D5C',
+    color: colorScheme === 'dark' ? '#ffffff' : '#5F5D5C',
   },
   pickerComponent: {
     width: 350,
   },
   borderMargin: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     borderWidth: 1,
-    borderColor: 'grey',
+    borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
     marginBottom: 15,
     borderRadius: 7,
   },

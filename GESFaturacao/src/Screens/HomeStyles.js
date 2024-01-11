@@ -1,27 +1,27 @@
 import { StyleSheet } from 'react-native';
 import { Dimensions } from 'react-native';
+import { useColorScheme } from 'react-native';
 
 const buttonSize = Dimensions.get('window').width / 2 - 30; // 30 is the total horizontal padding (15 on each side)
 
-export default StyleSheet.create({
-
+const getStyles = (colorScheme) => StyleSheet.create({
   titles: {
     fontSize: 25,
     fontWeight: "bold",
-    color:'#000000',
+    color: colorScheme === 'dark' ? '#ffffff' : '#000000',
     textAlign: 'center',
   },
   outerContainer: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
   },
   container: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
   },
   menuButton: {
     width: buttonSize,
@@ -49,7 +49,7 @@ export default StyleSheet.create({
     color:'#ffffff',
   },
   header: {
-    backgroundColor: '#e5e9ec',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#e5e9ec',
     padding: 12,
     alignItems: 'center',
     flexDirection: 'row',
@@ -61,6 +61,7 @@ export default StyleSheet.create({
   },
   headerText: {
     fontSize: 20,
+    color: colorScheme === 'dark' ? '#ffffff' : '#000000',
   },
   button: {
     marginTop: 50,
@@ -80,5 +81,8 @@ export default StyleSheet.create({
     paddingTop: 10,
     fontSize: 20,
     fontWeight: "bold",
+    color: colorScheme === 'dark' ? '#ffffff' : '#000000',
   }
 });
+
+export default getStyles;

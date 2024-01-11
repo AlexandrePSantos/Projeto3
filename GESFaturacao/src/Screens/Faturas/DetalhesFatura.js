@@ -10,20 +10,23 @@ import {
   ScrollView,
   ActivityIndicator,
   ToastAndroid,
+  useColorScheme,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
+import Modal from 'react-native-modal';
 import { AuthContext } from '../../Context/AuthContext';
 
 function Item({ item, onPress, isEditing }) {
   return (
+    <TouchableOpacity onPress={onPress}>
     <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, borderBottomWidth: 1, borderColor: '#000'}}>
       <Text style={{flex: 1}}>
         {"ID: " + item.id + "\n" +
         "Artigo: " + item.description + "\n" +
         "Preço Un.: " + Number(item.price) + " €\n" +
-        "QTD.: " + item.quantity + "\n" +
+        "QTD.: " + parseInt(item.quantity) + "\n" +
         "Total: " + Number(item.price) * Number(item.quantity) + " €"}
       </Text>
       {isEditing && (
@@ -32,10 +35,13 @@ function Item({ item, onPress, isEditing }) {
         </>
       )}
     </View>
+    </TouchableOpacity>
   );
 }
 
 export default function DetalhesFatura({ route, navigation }) {
+  const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme);
   // Add a new state for loading
   const [loading, setLoading] = useState(true);
   const { faturaId } = route.params;
@@ -51,6 +57,9 @@ export default function DetalhesFatura({ route, navigation }) {
   const [dadosArtigos, setDadosArtigos] = useState([]);
   const [dadosMoedas, setDadosMoedas] = useState([]);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
   // VARIAVEIS PARA GUARDAR OS IDS DOS CLIENTES, SERIES, ARTIGOS E METODOS SELECIONADOS NOS PICKERS
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   const [selectedIdSerie, setSelectedIdSerie] = useState(null);
@@ -59,7 +68,7 @@ export default function DetalhesFatura({ route, navigation }) {
   const [selectedMoeda, setSelectedIdMoeda] = useState(null);
 
   const [artigo, setArtigo] = useState();
-  const [quantidade, setQuantidade] = useState('Quantidade');
+  const [quantidade, setQuantidade] = useState();
   const [listKey, setListKey] = useState(0);
 
   // VARIAVEIS PARA GUARDAR OS DADOS DA FATURA
@@ -225,14 +234,14 @@ export default function DetalhesFatura({ route, navigation }) {
   // Loading indicator
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#d0933f" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff' }}>
+        <ActivityIndicator size="large" color={colorScheme === 'dark' ? '#ffffff' : '#d0933f'} />
       </View>
     );
   }
 
   return (
-    <ScrollView pointerEvents={isEditing ? 'auto' : 'none'}>
+    <ScrollView>
     <View style={styles.container}>
     {finalizarDoc === '0' && (
       <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
@@ -243,7 +252,7 @@ export default function DetalhesFatura({ route, navigation }) {
         />
       </View>
       )}
-      <View style={{marginTop: 10}}>
+      <View pointerEvents={isEditing ? 'auto' : 'none'} style={{marginTop: 10}}>
 
         {/* Cliente - DONE */}
         <Text style={styles.titleSelect}>Client</Text>
@@ -454,7 +463,7 @@ export default function DetalhesFatura({ route, navigation }) {
             style={{flex: 2, marginRight: 10}} // Add margin to the right of the Picker
             placeholder="Selecione um Artigo"
             selectedValue={artigo} 
-            onValueChange={(itemValue, itemIndex) => {
+            onValueChange={(itemValue) => {
               setArtigo(itemValue);
               setSelectedIdArtigo(itemValue);
               setQuantidade('1');
@@ -520,11 +529,67 @@ export default function DetalhesFatura({ route, navigation }) {
             <Text>Sem artigos selecionados</Text>
           ) : (
             LinhasC.map((item, index) => (
-              <Item key={index} item={item} onPress={() => removeItem(index)} isEditing={isEditing} />
+              <Item key={index} item={item} onPress={() => {setSelectedItem(item); setModalVisible(true);}} isEditing={isEditing} />
             ))
           )}
         </View>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.titleSelect}>Change Quantity</Text>
+            <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              onChangeText={setQuantidade}
+              value={quantidade}
+              placeholder="Quantidade"
+              keyboardType="numeric"
+            />
+            </View>
+            <View style={styles.buttonModal}>
+              <Button 
+                color={'gray'}
+                title="Confirm" 
+                onPress={() => {
+                  // Find the selected item in the LinhasC array
+                  const existingItemIndex = LinhasC.findIndex(item => item.id === selectedItem.id);
+
+                  if (existingItemIndex >= 0) {
+                    // If the selected item exists, update its quantity
+                    LinhasC[existingItemIndex].quantity = quantidade;
+                  }
+
+                  // Update the LinhasC state
+                  setLinhas([...LinhasC]);
+
+                  // Reset the selected item and quantity
+                  setSelectedItem(null);
+                  setQuantidade('');
+
+                  // Close the modal
+                  setModalVisible(false);
+                }}
+              />
+              </View>
+              <View style={styles.buttonModal}>
+              <Button 
+                color={'gray'}
+                title="Cancel" 
+                onPress={() => setModalVisible(false)}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
       
       {isEditing && (
           <>
@@ -546,16 +611,45 @@ export default function DetalhesFatura({ route, navigation }) {
 }
 
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme) => StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    width: 300,
+    height: 250,
+    margin: 20,
+    backgroundColor: colorScheme === 'dark' ? '#333333' : 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    color: colorScheme === 'dark' ? '#ffffff' : 'black',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
   button: {
     alignItems: 'center',
-    backgroundColor: '#d0933f',
+    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
     marginTop: 16,
     width: 300,
     padding: 10,
@@ -564,15 +658,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     margin: 10,
     fontWeight: 'bold',
-    color: '#5F5D5C',
+    color: colorScheme === 'dark' ? '#ffffff' : '#5F5D5C',
   },
   pickerComponent: {
     width: 350,
   },
   borderMargin: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     borderWidth: 1,
-    borderColor: 'grey',
+    borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
     marginBottom: 15,
     borderRadius: 7,
   },
@@ -589,4 +683,8 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: 'transparent',
   },
+  buttonModal: {
+    marginBottom: 10,
+    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
+  }
 });

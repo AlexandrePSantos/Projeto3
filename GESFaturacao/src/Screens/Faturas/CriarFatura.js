@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ToastAndroid,
+  useColorScheme,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
@@ -31,6 +32,9 @@ function Item({ item, onPress }) {
 }
 
 export default function CriarFatura({ navigation }) {
+  const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme);
+
   // VARIAVEIS PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   // SÃO USADOS PARA CARREGAR ARRAYS DOS PICKERS
   const { CriarFatura } = useContext(AuthContext);
@@ -508,10 +512,10 @@ export default function CriarFatura({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
@@ -526,15 +530,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     margin: 10,
     fontWeight: 'bold',
-    color: '#5F5D5C',
+    color: colorScheme === 'dark' ? '#ffffff' : '#5F5D5C',
   },
   pickerComponent: {
     width: 350,
   },
   borderMargin: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     borderWidth: 1,
-    borderColor: 'grey',
+    borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
     marginBottom: 15,
     borderRadius: 7,
   },

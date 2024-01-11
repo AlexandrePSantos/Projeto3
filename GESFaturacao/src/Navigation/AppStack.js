@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Text, StyleSheet, Button, View, StatusBar } from 'react-native';
+import { Text, StyleSheet, Button, View, StatusBar, useColorScheme } from 'react-native';
 import { AuthContext } from '../Context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import * as Keychain from 'react-native-keychain';
 import LinearGradient from 'react-native-linear-gradient';
+import { Appearance } from 'react-native';
 
 import Login from '../Screens/Login';
 import Home from '../Screens/Home';
@@ -16,7 +17,7 @@ import ListarOrcamentos from '../Screens/Orcamentos/ListarOrcamentos';
 import CriarArtigo from '../Screens/Artigos/CriarArtigo';
 import ListarArtigos from '../Screens/Artigos/ListarArtigos';
 
-
+const colorScheme = Appearance.getColorScheme();
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => {
@@ -43,6 +44,7 @@ const screens = [
 
 const AppStack = () => {
   const { logout } = useContext(AuthContext);
+  const colorScheme = useColorScheme();
 
   const handleLogout = async () => {
     await Keychain.resetGenericPassword();
