@@ -783,6 +783,7 @@ export const AuthProvider = ({children}) => {
     const finalizarFatura = async (id) => {
         try {
             var token = await this.getToken();
+            console.log('ID da fatura a finalizar (Authcontext): ', id);
 
             let data = qs.stringify({ 
                 'finalizeDocument': id

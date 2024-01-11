@@ -31,7 +31,8 @@ export default function ListarFaturas({ navigation }) {
   const handleFinalizarFatura = async (fatura) => {
     try {
       await finalizarFatura(fatura.id);
-      console.log('Fatura finalizada com sucesso');
+      console.log('Fatura finalizada com sucesso', fatura.id);
+      await carregarFaturas();
     } catch (error) {
       console.error('Erro ao finalizar fatura:', error);
     }
@@ -80,6 +81,7 @@ export default function ListarFaturas({ navigation }) {
           <Text style={styles.textInFaturaContainer}>Estado: {fatura.status}</Text>
         </View>
       </TouchableOpacity>
+      {fatura.status !== 'ANULADO' && (
       <View style={styles.buttonContainer}>
         <Button
           color={'gray'}
@@ -94,6 +96,7 @@ export default function ListarFaturas({ navigation }) {
           />
         )}
       </View>
+      )}
     </View>
   );
 
