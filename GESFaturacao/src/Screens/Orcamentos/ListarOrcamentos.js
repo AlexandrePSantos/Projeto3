@@ -1,44 +1,177 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, ScrollView,Button, View } from 'react-native';
+import { StyleSheet, Text, Button, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { AuthContext } from '../../Context/AuthContext';
 
 export default function ListarOrcamentos({navigation, route}) {
 
-const { getOrcamentos } = useContext(AuthContext);
-const [orcamentos, setOrcamentos] = useState([]);
+  const[loading, setLoading] = useState(true);
+  const { getOrcamentos, enviarEmail, finalizarOrcamento, removerOrcamento } = useContext(AuthContext);
+  const [orcamentos, setOrcamentos] = useState([]);
+  const[modalVisible, setModalVisible] = useState(false);
+  const[selectedOrcamento, setSelectedOrcamento] = useState(null);
+  const[email, setEmail] = useState('');
 
-useEffect(() => {
-    const carregarOrcamentos = async () => {
-      try {
-        const response = await getOrcamentos();
-        if (response.data) {
-          setOrcamentos(response.data);
+  useEffect(() => {
+      const carregarOrcamentos = async () => {
+        try {
+          const response = await getOrcamentos();
+          if (response.data) {
+            setOrcamentos(response.data);
+          }
+        } catch (error) {
+          console.error('Erro ao carregar Orçamentos:', error);
         }
-      } catch (error) {
-        console.error('Erro ao carregar Orçamentos:', error);
-      }
-    };
-carregarOrcamentos();
-  }, []); 
+      };
+  carregarOrcamentos();
+    }, []);
 
-return (
-    <ScrollView>
-      <Text style={styles.titleSelect}>Lista de Orçamentos</Text>
-      {orcamentos.map((orcamento, index) => (
-        <View key={index} style={styles.orcamentoContainer}>
-          <Text style={styles.textInOrcamentoContainer}>ID: {orcamento.id}</Text>
-          <Text style={styles.textInOrcamentoContainer}>Cliente: {orcamento.name}</Text>
-          <Text style={styles.textInOrcamentoContainer}>Estado: {orcamento.status}</Text>
-          <Text style={styles.textInOrcamentoContainer}>Data: {orcamento.dateFormatted}</Text>
-          <Text style={styles.textInOrcamentoContainer}>Data de expiração: {orcamento.expirationFormatted}</Text>
-          {/*<Button
-            title="Ver Detalhes"
-            onPress={() => navigation.navigate('DetalhesFatura', { id: fatura.id })}
-          />*/}
+  const handleFinalizarOrcamento = async (orcamento) => {
+    try {
+      await finalizarOrcamento(orcamento.id);
+      console.log('Orçamento finalizada com sucesso', orcamento.id);
+      await carregarOrcamentos();
+    } catch (error) {
+      console.error('Erro ao finalizar Orçamento:', error);
+    }
+  };
+
+  const handleRemoverOrcamento = async (orcamento) => {
+    try {
+      await removerOrcamento(orcamento.id);
+      console.log('Orçamento removida com sucesso', orcamento.id);
+    } catch (error) {
+      console.error('Erro ao remover Orçamento:', error);
+    }
+  };
+
+  const handleEnviarEmail = async () => {
+    try {
+      await enviarEmail(email, "FT", selectedOrcamento.id);
+      console.log('Email sent successfully');
+      setEmail('');
+      setModalVisible(false);
+    } catch (error) {
+      console.error('Failed to send email:', error);
+    }
+  };
+
+  
+  const handlePress = (orcamento) => {
+    if (orcamento.status === 'Aberto') {
+      setSelectedOrcamento(orcamento);
+      setModalVisible(true);
+    } else {
+      handleFinalizarOrcamento(orcamento);
+    }
+  };
+
+  const renderItem =({item: orcamento}) => (
+    <View style={styles.orcamentoContainer}>
+      <TouchableOpacity onPress={() => navigation.navigate('Detalhes Orçamento', {orcamentoId: orcamento.id})}>
+        <View>
+            <Text style={styles.textInOrcamentoContainer}>ID: {orcamento.id}</Text>
+            <Text style={styles.textInOrcamentoContainer}>Cliente: {orcamento.name}</Text>
+            <Text style={styles.textInOrcamentoContainer}>Estado: {orcamento.status}</Text>
+            <Text style={styles.textInOrcamentoContainer}>Data: {orcamento.dateFormatted}</Text>
+            <Text style={styles.textInOrcamentoContainer}>Data de expiração: {orcamento.expirationFormatted}</Text>
         </View>
-      ))}
-    </ScrollView>
+      </TouchableOpacity>
+      {orcamento.status !== 'ANULADO' && (
+        <View style={styles.buttonContainer}>
+          <Button
+            color={'gray'}
+            title={orcamento.status === 'Aberto' ? 'Enviar' : 'Finalizar'}
+            onPress={() => handlePress(orcamento)}
+          />
+          {orcamento.status === 'Rascunho' && (
+          <Button
+              color={'gray'}
+              title="Remover"
+              onPress={() => handleRemoverOrcamento(orcamento)}
+            />
+          )}
+        </View>
+
+      )}
+    </View>
   );
+
+  const keyExtractor = (item) => item.id.toString();
+
+  if(loading){
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#d0933f" />
+      </View>
+    );
+  }
+
+  return (
+    <View>
+      <Text style={styles.titleSelect}>Lista de Orçamentos</Text>
+      <FlatList
+        data={orcamento}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+      />
+
+      <Modal
+        isVisible={modalVisible}
+        onBackdropPress={() => setModalVisible(false)}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Enter email:</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={setEmail}
+              value={email}
+              placeholder="Enter email"
+              keyboardType="email-address"
+            />
+            <View style={styles.button}>
+              <Button
+                color={'gray'}
+                title="Enviar"
+                onPress={handleEnviarEmail}
+              />
+            </View>
+            <View style={styles.button}>
+              <Button
+                color={'gray'}
+                title="Cancel"
+                onPress={() => {
+                  setEmail('');
+                  setModalVisible(false);
+                }}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+    </View>
+  );
+  /* 
+  return (
+      <ScrollView>
+        <Text style={styles.titleSelect}>Lista de Orçamentos</Text>
+        {orcamentos.map((orcamento, index) => (
+          <View key={index} style={styles.orcamentoContainer}>
+            <Text style={styles.textInOrcamentoContainer}>ID: {orcamento.id}</Text>
+            <Text style={styles.textInOrcamentoContainer}>Cliente: {orcamento.name}</Text>
+            <Text style={styles.textInOrcamentoContainer}>Estado: {orcamento.status}</Text>
+            <Text style={styles.textInOrcamentoContainer}>Data: {orcamento.dateFormatted}</Text>
+            <Text style={styles.textInOrcamentoContainer}>Data de expiração: {orcamento.expirationFormatted}</Text>
+            {/*<Button
+              title="Ver Detalhes"
+              onPress={() => navigation.navigate('DetalhesFatura', { id: fatura.id })}
+            />}
+          </View>
+        ))}
+      </ScrollView>
+    );
+    */
 }
 
 const styles = StyleSheet.create({
@@ -129,5 +262,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     padding: 10,
     fontWeight: 'bold'
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
 });

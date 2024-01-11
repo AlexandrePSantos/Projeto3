@@ -742,8 +742,58 @@ export const AuthProvider = ({children}) => {
     
     }
 
-    const EditarOrcamento = async () => {
+    const EditarOrcamento = async (clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, linhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
+
+        const linhas = JSON.stringify(linhasC);
+        let data = qs.stringify({
+            'client': clienteC,
+            'serie': serieC,
+            'number': numeroC,
+            'date': dataC,
+            'expiration': validadeC,
+            'reference': referenciaC,
+            'dueDate': dueDateC,
+            'coin': moedaC,
+            'discount': descontoC,
+            'observations': observacoesC,
+            'finalize': finalizarDocumentoC,
+            'lines': linhas
+        });
+    
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/budgets`,
+            headers: { 
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'Authorization': token, 
+            },
+            data : data
+        };
+    
+        return axios.request(config)
+            .then((response) => {
+                // console.log(JSON.stringify(response.data));
+                return response.data;
+            })
+            .catch((error) => {
+                if (error.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    console.error('Server responded with an error status:', error.response.status);
+                    console.error('Error details:', error.response.data);
+                    console.error('Error details:', error.message);
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    console.error('No response received from the server');
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    console.error('Error setting up the request:', error.message);
+                }
+            
+                throw error; // Rethrow the error if needed for further handling
+            });
     
     }
 
