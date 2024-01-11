@@ -81,7 +81,7 @@ export default function ListarFaturas({ navigation }) {
           <Text style={styles.textInFaturaContainer}>Estado: {fatura.status}</Text>
         </View>
       </TouchableOpacity>
-      {fatura.status !== 'ANULADO' && (
+      {fatura.status !== 'Anulado' && (
       <View style={styles.buttonContainer}>
         <Button
           color={'gray'}
@@ -113,7 +113,7 @@ export default function ListarFaturas({ navigation }) {
 
   return (
     <View>
-      <Text style={styles.titleSelect}>Lista de Faturas</Text>
+      <Text style={styles.titleSelect}></Text>
       <FlatList
         data={faturas}
         renderItem={renderItem}

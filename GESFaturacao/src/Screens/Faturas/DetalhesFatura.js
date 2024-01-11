@@ -16,7 +16,7 @@ import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 import { AuthContext } from '../../Context/AuthContext';
 
-function Item({ item, onPress }) {
+function Item({ item, onPress, isEditing }) {
   return (
     <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, borderBottomWidth: 1, borderColor: '#000'}}>
       <Text style={{flex: 1}}>
@@ -26,7 +26,11 @@ function Item({ item, onPress }) {
         "QTD.: " + item.quantity + "\n" +
         "Total: " + Number(item.price) * Number(item.quantity) + " €"}
       </Text>
-      <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onPress} /></View>
+      {isEditing && (
+        <>
+          <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onPress} /></View>
+        </>
+      )}
     </View>
   );
 }
@@ -36,6 +40,8 @@ export default function DetalhesFatura({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const { faturaId } = route.params;
   const { EditarFatura, enviarEmail, getFaturasById, getClientes, getSeries, getArtigos, getMetodos, getMoedas} = useContext(AuthContext);
+
+  const [isEditing, setIsEditing] = useState(false);
 
   // ARRAYS PARA GUARDAR OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   // SÃO MOSTRADOS NOS PICKERS
@@ -114,7 +120,7 @@ export default function DetalhesFatura({ route, navigation }) {
               description: line.article.name,
               quantity: line.quantity.value,
               price: line.price.value,
-              discount: line.percentageDiscount.value, // changed from line.discount.value
+              discount: line.percentageDiscount.value,
               tax: line.tax.id.toString(),
               exemption: line.exemption.id ? line.exemption.id.toString() : null,
               retention: line.retention.value
@@ -195,12 +201,6 @@ export default function DetalhesFatura({ route, navigation }) {
     });
   };
 
-  const handleEditavel = () => {
-    // TODO - Apenas são editáveis documentos com estado 0 "rascunho"
-    // TODO - Botão que quando premido faz com que quando premido torna os campos editáveis e muda o texto do botão para "Cancelar"
-    // TODO - Cancelar torna os campos não editáveis outra vez com os valores por defeito da API 
-  };
-
   const calculateExpirationDate = (startDate, paymentCondition) => {
     const daysToAdd = {
       '1': 0,   
@@ -232,21 +232,24 @@ export default function DetalhesFatura({ route, navigation }) {
   }
 
   return (
-    <ScrollView>
+    <ScrollView pointerEvents={isEditing ? 'auto' : 'none'}>
     <View style={styles.container}>
+    {finalizarDoc === '0' && (
       <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
         <Button
-          title="Editar"
+          title={isEditing ? "Cancelar" : "Editar"}
           color="#d0933f"
-          onPress={() => handleEditavel()}
+          onPress={() => setIsEditing(!isEditing)}
         />
       </View>
+      )}
       <View style={{marginTop: 10}}>
 
         {/* Cliente - DONE */}
         <Text style={styles.titleSelect}>Client</Text>
         <View style={styles.borderMargin}>
-          <Picker
+          <Picker 
+            editable={isEditing}
             key={selectedIdCliente}
             style={styles.pickerComponent}
             selectedValue={selectedIdCliente}
@@ -441,6 +444,8 @@ export default function DetalhesFatura({ route, navigation }) {
           </Picker>
         </View>
 
+        {isEditing && (
+          <>
         {/* lines/artigos */}
         {/* Deve permitir selecionar vários artigos e as quantidades de cada */}
         <Text style={styles.titleSelect}>Artigo e Quantidade</Text>
@@ -506,6 +511,8 @@ export default function DetalhesFatura({ route, navigation }) {
               }
             }}
           />
+          </>
+          )}
 
         <Text style={styles.titleSelect}>Linha de Artigos</Text>
         <View style={styles.borderMargin}>
@@ -513,12 +520,14 @@ export default function DetalhesFatura({ route, navigation }) {
             <Text>Sem artigos selecionados</Text>
           ) : (
             LinhasC.map((item, index) => (
-              <Item key={index} item={item} onPress={() => removeItem(index)} />
+              <Item key={index} item={item} onPress={() => removeItem(index)} isEditing={isEditing} />
             ))
           )}
         </View>
       </View>
       
+      {isEditing && (
+          <>
       <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
         <Button
           title="Confirmar"
@@ -526,6 +535,11 @@ export default function DetalhesFatura({ route, navigation }) {
           onPress={() => handleConfirmarEditar()}
         />
       </View>
+      </>
+      )}
+    
+      <View style={styles.overlay} pointerEvents="none" />
+    
     </View>
     </ScrollView>
   );
@@ -566,5 +580,13 @@ const styles = StyleSheet.create({
     width: 350,
     height: 55,
     justifyContent: 'center',
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'transparent',
   },
 });
