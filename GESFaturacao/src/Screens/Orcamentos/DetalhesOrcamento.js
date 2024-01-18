@@ -8,52 +8,65 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
   ToastAndroid,
+  useColorScheme,
+  Modal,
 } from 'react-native';
-import { AuthContext } from '../../Context/AuthContext';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
-import { ActivityIndicator } from 'react-native-paper';
+import { AuthContext } from '../../Context/AuthContext';
 
-function Item({ item, onPress }) {
+function Item({ item, onPress, onDelete, isEditing }) {
   return (
-    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8}}>
-      <Text style={{flex: 1}}>
+    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, borderBottomWidth: 1, borderColor: '#000'}}>
+    <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}}>
+      <TouchableOpacity onPress={onPress}>
+         <Text style={{flex: 1}}>
         {"ID: " + item.id + "\n" +
         "Artigo: " + item.description + "\n" +
         "Preço Un.: " + Number(item.price) + " €\n" +
-        "QTD.: " + item.quantity + "\n" +
-        "Total: " + Number(item.price) * Number(item.quantity) + " €" +
-        "\n-------------------------"}
+        "QTD.: " + parseInt(item.quantity) + "\n" +
+        "Total: " + Number(item.price) * Number(item.quantity) + " €"}
       </Text>
-      <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onPress} /></View>
+      </TouchableOpacity>
+        <View style={{marginLeft: 10}}>
+        {isEditing && (
+        <>
+          <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onDelete} /></View>
+        </>
+        )}        
+        </View>
+    </View>
     </View>
   );
 }
 
 export default function CriarOrcamento({ route, navigation }) {
+  const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme);
 
   const [loading, setLoading] = useState(true);
   const { orcamentoId} = route.params;
-  const { EditarOrcamento, enviarEmail, getOrcamentoById, getClientes, getSeries, getArtigos, getMetodos, getMoedas } = useContext(AuthContext); 
-  // VARIAVEIS PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
-  // SÃO USADOS PARA CARREGAR ARRAYS DOS PICKERS
+  const { EditarOrcamento, enviarEmail, getOrcamentoById, getClientes, getSeries, getArtigos, getMoedas } = useContext(AuthContext); 
 
+  const [isEditing, setIsEditing] = useState(false);
 
   // ARRAYS PARA GUARDAR OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   // SÃO MOSTRADOS NOS PICKERS
   const [dadosClientes, setDadosClientes] = useState([]);
   const [dadosSeries, setDadosSeries] = useState([]);
   const [dadosArtigos, setDadosArtigos] = useState([]);
-  const [dadosMetodo, setDadosMetodo] = useState([]);
   const [dadosMoedas, setDadosMoedas] = useState([]);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   // VARIAVEIS PARA GUARDAR OS IDS DOS CLIENTES, SERIES, ARTIGOS E METODOS SELECIONADOS NOS PICKERS
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   const [selectedIdSerie, setSelectedIdSerie] = useState(null);
   const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
-  const [selectedMetodo, setSelectedIdMetodo] = useState(null);
   const [selectedMoeda, setSelectedIdMoeda] = useState(null);
 
   const [artigo, setArtigo] = useState();
@@ -72,7 +85,6 @@ export default function CriarOrcamento({ route, navigation }) {
   const [dataIni, setDataIni] = useState(moment().format('DD/MM/YYYY'));
   const [dataVal, setDataVal] = useState(moment().format('DD/MM/YYYY'));
   const [vencimento, setVencimento] = useState();
-  const [metodo, setMetodo] = useState();
   const [LinhasC, setLinhas] = useState([]);
 
   const [email, setEmail] = useState(''); // Email para enviar a fatura
@@ -86,15 +98,6 @@ export default function CriarOrcamento({ route, navigation }) {
             const simplifiedOrcamento = fetchOrcamento.data;
 
             try{
-                const metodosResponse = await getMetodos();
-                if (metodosResponse.data){
-                    setDadosMetodo(metodosResponse.data);
-                }
-                
-                const metodoPagamento = fetchOrcamento.result.metodoPagamento;
-                const selectedMethod = metodosResponse.data.find(method => method.name === metodoPagamento);
-                const selectedValue = selectedMethod ? selectedMethod.id.toString() : null;
-
                 setSelectedIdCliente(simplifiedOrcamento.client.id.toString());
                 setCliente(simplifiedOrcamento.client.id.toString());
                 setSelectedIdSerie(simplifiedOrcamento.serie.id.toString());
@@ -109,8 +112,6 @@ export default function CriarOrcamento({ route, navigation }) {
                 setDataIni(simplifiedOrcamento.date);
                 setDataVal(simplifiedOrcamento.expiration);
                 setVencimento(simplifiedOrcamento.dueDate.toString());
-                setSelectedIdMetodo(selectedValue);
-                setMetodo(selectedValue);
                 setFinalizarDocumento(simplifiedOrcamento.status === 'Aberto' ? '1' : '0');
 
                 const transformedLines = simplifiedOrcamento. lines.map(line => ({
@@ -121,8 +122,6 @@ export default function CriarOrcamento({ route, navigation }) {
                     discount: line.percentageDiscount.value,
                     tax: line.tax.id.toString(),
                     exemption: line.exemption.id ? line.exemption.id.toString() : null,
-                    retention: line.retention.value
-
                 }));
                 setLinhas(transformedLines);
 
@@ -156,30 +155,6 @@ export default function CriarOrcamento({ route, navigation }) {
     .catch(error => {
         console.error('Error getting Orçamento: ', error);
     });
-    /* 
-    const fetchData = async () => {
-      try {
-        const clientesResponse = await getClientes();
-        const seriesResponse = await getSeries();
-        const artigosResponse = await getArtigos();
-
-        if (clientesResponse.data) {
-          setDadosClientes(clientesResponse.data);
-        }
-
-        if (seriesResponse.data) {
-          setDadosSeries(seriesResponse.data);
-        }
-
-        if (artigosResponse.data) {
-          setDadosArtigos(artigosResponse.data);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchData();
-    */
   }, [orcamentoId]);
 
   const removeItem = (index) => {
@@ -188,7 +163,6 @@ export default function CriarOrcamento({ route, navigation }) {
 
   const handleConfirmarEditar = () => {
     console.log('LinhasC: ', LinhasC);
-    // Validation checks  
     EditarOrcamento(
       orcamentoId,
       cliente,
@@ -201,7 +175,6 @@ export default function CriarOrcamento({ route, navigation }) {
       moeda,
       desc,
       obs,
-      metodo,
       LinhasC,
       finalizarDoc,
     ).then(response => {
@@ -223,11 +196,6 @@ export default function CriarOrcamento({ route, navigation }) {
     });
   };
   
-  const handleEditavel = () => {
-    // TODO - Apenas são editáveis documentos com estado 0 "rascunho"
-    // TODO - Botão que quando premido faz com que quando premido torna os campos editáveis e muda o texto do botão para "Cancelar"
-    // TODO - Cancelar torna os campos não editáveis outra vez com os valores por defeito da API 
-  }
   const calculateExpirationDate = (startDate, paymentCondition) => {
     const daysToAdd = {
       '1': 0,   
@@ -245,24 +213,34 @@ export default function CriarOrcamento({ route, navigation }) {
     return expirationDate.format('DD/MM/YYYY');
   };
 
-  if(loading){
-    return(
-        <View style = {{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <ActivityIndicator size="large" color="#d0933f" />
-        </View>
-    )
+  function handleDeleteItem(index) {
+    const newLinhasC = [...LinhasC];
+    newLinhasC.splice(index, 1);
+    setLinhas(newLinhasC);
   }
+
+  // Loading indicator
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff' }}>
+        <ActivityIndicator size="large" color={colorScheme === 'dark' ? '#ffffff' : '#d0933f'} />
+      </View>
+    );
+  }
+
   return (
     <ScrollView>
-      <View style={styles.container}>
-        <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-            <Button
-            title="Editar"
-            color="#d0933f"
-            onPress={() => handleEditavel()}
-            />
-        </View>
-        <View style={{marginTop: 10}}>
+    <View style={styles.container}>
+    {finalizarDoc === '0' && (
+      <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+        <Button
+          title={isEditing ? "Cancelar" : "Editar"}
+          color="#d0933f"
+          onPress={() => setIsEditing(!isEditing)}
+        />
+      </View>
+      )}
+      <View pointerEvents={isEditing ? 'auto' : 'none'} style={{marginTop: 10}}>
 
           {/* Cliente - DONE */}
           <Text style={styles.titleSelect}>Client</Text>
@@ -308,43 +286,26 @@ export default function CriarOrcamento({ route, navigation }) {
             </Picker>
           </View>
 
-          {/* date - DONE */}
-          <Text style={styles.titleSelect}>Data</Text>
-          <View style={styles.borderMargin}>
-            <TouchableOpacity onPress={() => setopenc(true)} style={styles.touchableO}>
-              <DatePicker
-                modal 
-                mode="date"
-                open={openc}
-                date={new Date(moment(dataIni, 'DD/MM/YYYY').format())}
-                onConfirm={date => {
-                  setopenc(false);
-                  // Validar se a data de início é antes da data de validade
-                  
-                    setDataIni(moment(date).format('DD/MM/YYYY'));
-
-                    // Verificar a condição de pagamento e atualizar a data de validade
-                    const daysToAdd = {
-                      '1': 0,   // Pago a Pronto
-                      '2': 10,  // 10 Dias Após Emissão
-                      '3': 20,  // 20 Dias Após Emissão
-                      '4': 30,  // Add more conditions as needed
-                      '5': 60,
-                      '6': 75,
-                      '7': 90,
-                      '8': 120,
-                      '9': 180,
-                    }[vencimento];
-
-                    const expirationDate = moment(date).add(daysToAdd, 'days');
-                    setDataVal(expirationDate.format('DD/MM/YYYY'));
-                  
-                }}
-                onCancel={() => setopenc(false)}
-              />
-              <Text style={styles.textDate}> {' '} {dataIni}</Text>
-            </TouchableOpacity>
-          </View>
+        {/* date - DONE */}
+        <Text style={styles.titleSelect}>Data</Text>
+        <View style={styles.borderMargin}>
+          <TouchableOpacity onPress={() => setopenc(true)} style={styles.touchableO}>
+            <DatePicker
+              modal 
+              mode="date"
+              open={openc}
+              date={new Date(moment(dataIni, 'DD/MM/YYYY').format())}
+              onConfirm={date => {
+                setopenc(false);
+                setDataIni(moment(date).format('DD/MM/YYYY'));
+                const expirationDate = calculateExpirationDate(date, vencimento);
+                setDataVal(expirationDate);
+              }}
+              onCancel={() => setopenc(false)}
+            />
+            <Text style={styles.textDate}> {' '} {dataIni}</Text>
+          </TouchableOpacity>
+        </View>
 
           {/* expiration - DONE */}
           <Text style={styles.titleSelect}>Validade</Text>
@@ -354,46 +315,29 @@ export default function CriarOrcamento({ route, navigation }) {
             </View>
           </View>
 
-          {/* condicoes - DONE */}
-          <Text style={styles.titleSelect}>Condições de Pagamento</Text>
-          <View style={styles.borderMargin}>
-            <Picker
-              style={styles.pickerComponent}
-              selectedValue={vencimento}
-              onValueChange={itemValue => {
-                setVencimento(itemValue);
-                const daysToAdd = {
-                  '1': 0,   // Pago a Pronto
-                  '2': 10,  // 10 Dias Após Emissão
-                  '3': 20,  // 20 Dias Após Emissão
-                  '4': 30,  // Add more conditions as needed
-                  '5': 60,
-                  '6': 75,
-                  '7': 90,
-                  '8': 120,
-                  '9': 180,
-                }[itemValue];
-
-                const expirationDate = moment(dataIni, 'DD/MM/YYYY').add(daysToAdd, 'days');
-                setDataVal(expirationDate.format('DD/MM/YYYY'));
-              }}
-            >
-              <Picker.Item label="Pago a Pronto" value="1" />
-              <Picker.Item label="10 Dias Após Emissão" value="2" />
-              <Picker.Item label="20 Dias Após Emissão" value="3" />
-              <Picker.Item label="30 Dias Após Emissão" value="4" />
-              <Picker.Item label="60 Dias Após Emissão" value="5" />
-              <Picker.Item label="75 Dias Após Emissão" value="6" />
-              <Picker.Item label="90 Dias Após Emissão" value="7" />
-              <Picker.Item label="120 Dias Após Emissão" value="8" />
-              <Picker.Item label="180 Dias Após Emissão" value="9" />
-              {/* Add more conditions of payment as needed */}
-            </Picker>
-          </View>
-
-
-
-
+        {/* condicoes - DONE */}
+        <Text style={styles.titleSelect}>Condições de Pagamento</Text>
+        <View style={styles.borderMargin}>
+          <Picker
+            style={styles.pickerComponent}
+            selectedValue={vencimento}
+            onValueChange={itemValue => {
+              setVencimento(itemValue);
+              const expirationDate = calculateExpirationDate(dataIni, itemValue);
+              setDataVal(expirationDate);
+            }}
+          >
+            <Picker.Item label="Pago a Pronto" value="1" />
+            <Picker.Item label="10 Dias Após Emissão" value="2" />
+            <Picker.Item label="20 Dias Após Emissão" value="3" />
+            <Picker.Item label="30 Dias Após Emissão" value="4" />
+            <Picker.Item label="60 Dias Após Emissão" value="5" />
+            <Picker.Item label="75 Dias Após Emissão" value="6" />
+            <Picker.Item label="90 Dias Após Emissão" value="7" />
+            <Picker.Item label="120 Dias Após Emissão" value="8" />
+            <Picker.Item label="180 Dias Após Emissão" value="9" />
+          </Picker>
+        </View>
 
           {/* reference - DONE */}
           <Text style={styles.titleSelect}>Referencia</Text>
@@ -406,21 +350,26 @@ export default function CriarOrcamento({ route, navigation }) {
             />
           </View>
 
-          {/* Coin - DONE */}
-          <Text style={styles.titleSelect}>Moeda</Text>
-          <View style={styles.borderMargin}>
-            <Picker
-              selectedValue={moeda}
-              onValueChange={itemValue => setMoeda(itemValue)}
-              style={styles.pickerComponent}
-            >
-              <Picker.Item label="Euro (€)" value="1" />
-              <Picker.Item label="Libra ING (GBP)" value="2" />
-              <Picker.Item label="Dólar USA ($)" value="3" />
-              <Picker.Item label="Real Br. (R$)" value="4" />
-              <Picker.Item label="Fr. Suiço (CHF)" value="5" />
-            </Picker>
-          </View>
+        {/* Coin - DONE */}
+        <Text style={styles.titleSelect}>Moeda</Text>
+        <View style={styles.borderMargin}>
+          <Picker
+            selectedValue={selectedMoeda}
+            onValueChange={itemValue => {
+              setSelectedIdMoeda(itemValue);
+              setMoeda(itemValue);
+            }}
+            style={styles.pickerComponent}
+          >
+            {dadosMoedas.map((moeda, i) => (
+              <Picker.Item
+                label={moeda.description}
+                value={moeda.id.toString()}
+                key={i}
+              />
+            ))}
+          </Picker>
+        </View>
 
           {/* discount - DONE */}
           <Text style={styles.titleSelect}>Desconto</Text>
@@ -471,6 +420,8 @@ export default function CriarOrcamento({ route, navigation }) {
           </View>
           )}
 
+          {isEditing && (
+          <>
           {/* lines/artigos */}
           {/* Deve permitir selecionar vários artigos e as quantidades de cada */}
           <Text style={styles.titleSelect}>Artigo e Quantidade</Text>
@@ -479,8 +430,7 @@ export default function CriarOrcamento({ route, navigation }) {
               style={{flex: 2, marginRight: 10}} // Add margin to the right of the Picker
               placeholder="Selecione um Artigo"
               selectedValue={artigo} 
-              onValueChange={(itemValue, itemIndex) => {
-                // console.log('Selected item:', itemValue);
+              onValueChange={(itemValue) => {
                 setArtigo(itemValue);
                 setSelectedIdArtigo(itemValue);
                 setQuantidade('1');
@@ -539,62 +489,158 @@ export default function CriarOrcamento({ route, navigation }) {
                 }
               }}
             />
+          </>
+          )}
 
-          <Text style={styles.titleSelect}>Linha de Artigos</Text>
-          <View style={styles.borderMargin}>
-            {LinhasC.length === 0 ? (
-              <Text>Sem artigos selecionados</Text>
-            ) : (
-              LinhasC.map((item, index) => (
-                <Item key={index} item={item} onPress={() => removeItem(index)} />
-              ))
-            )}
+        <Text style={styles.titleSelect}>Linha de Artigos</Text>
+        <View style={styles.borderMargin}>
+          {LinhasC.length === 0 ? (
+            <Text>Sem artigos selecionados</Text>
+          ) : (
+            LinhasC.map((item, index) => (
+              <Item 
+                key={index} 
+                item={item} 
+                onPress={() => {setSelectedItem(item); setModalVisible(true);}} 
+                onDelete={() => handleDeleteItem(index)}
+                isEditing={isEditing}
+              />
+            ))
+          )}
+        </View>
+      </View>
+        
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.titleSelect}>Change Quantity</Text>
+            <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              onChangeText={setQuantidade}
+              value={quantidade}
+              placeholder="Quantidade"
+              keyboardType="numeric"
+            />
+            </View>
+            <View style={styles.buttonModal}>
+              <Button 
+                color={'gray'}
+                title="Confirm" 
+                onPress={() => {
+                  // Find the selected item in the LinhasC array
+                  const existingItemIndex = LinhasC.findIndex(item => item.id === selectedItem.id);
+
+                  if (existingItemIndex >= 0) {
+                    // If the selected item exists, update its quantity
+                    LinhasC[existingItemIndex].quantity = quantidade;
+                  }
+
+                  // Update the LinhasC state
+                  setLinhas([...LinhasC]);
+
+                  // Reset the selected item and quantity
+                  setSelectedItem(null);
+                  setQuantidade('');
+
+                  // Close the modal
+                  setModalVisible(false);
+                }}
+              />
+              </View>
+              <View style={styles.buttonModal}>
+              <Button 
+                color={'gray'}
+                title="Cancel" 
+                onPress={() => setModalVisible(false)}
+              />
+            </View>
           </View>
         </View>
-        
-        <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-          <Button
-            title="Confirmar"
-            color="#d0933f"
-            onPress={() => handleConfirmarEditar()}
-          />
-        </View>
+      </Modal>
+
+      {isEditing && (
+          <>
+      <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+        <Button
+          title="Confirmar"
+          color="#d0933f"
+          onPress={() => handleConfirmarEditar()}
+        />
+      </View>
+      </>
+      )}
+    
+      <View style={styles.overlay} pointerEvents="none" />
+
       </View>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme) => StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Add this line
+  },
+  modalView: {
+    width: 300,
+    height: 250,
+    margin: 20,
+    backgroundColor: colorScheme === 'dark' ? '#333333' : 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    color: colorScheme === 'dark' ? '#ffffff' : 'black',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
   button: {
     alignItems: 'center',
-    backgroundColor: '#d0933f',
+    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
     marginTop: 16,
     width: 300,
     padding: 10,
-  },
-  textfont: {
-    color: '#ffffff',
-    fontSize: 16
   },
   titleSelect: {
     fontSize: 20,
     margin: 10,
     fontWeight: 'bold',
-    color: '#5F5D5C',
+    color: colorScheme === 'dark' ? '#ffffff' : '#5F5D5C',
   },
   pickerComponent: {
     width: 350,
   },
   borderMargin: {
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     borderWidth: 1,
-    borderColor: 'grey',
+    borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
     marginBottom: 15,
     borderRadius: 7,
   },
@@ -603,4 +649,16 @@ const styles = StyleSheet.create({
     height: 55,
     justifyContent: 'center',
   },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'transparent',
+  },
+  buttonModal: {
+    marginBottom: 10,
+    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
+  }
 });

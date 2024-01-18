@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, Button, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { useColorScheme, StyleSheet, Text, Button, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import Modal from 'react-native-modal';
+
 import { AuthContext } from '../../Context/AuthContext';
 
-export default function ListarOrcamentos({navigation, route}) {
+export default function ListarOrcamentos({navigation}) {
+  const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme);
 
   const[loading, setLoading] = useState(true);
   const { getOrcamentos, enviarEmail, finalizarOrcamento, removerOrcamento } = useContext(AuthContext);
@@ -11,19 +15,22 @@ export default function ListarOrcamentos({navigation, route}) {
   const[selectedOrcamento, setSelectedOrcamento] = useState(null);
   const[email, setEmail] = useState('');
 
+  const carregarOrcamentos = async () => {
+    try {
+      const response = await getOrcamentos();
+      if (response.data) {
+        const sortedOrcamentos = response.data.sort((a, b) => b.id - a.id);
+        setOrcamentos(sortedOrcamentos);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar Orçamentos:', error);
+    }
+  };
+
   useEffect(() => {
-      const carregarOrcamentos = async () => {
-        try {
-          const response = await getOrcamentos();
-          if (response.data) {
-            setOrcamentos(response.data);
-          }
-        } catch (error) {
-          console.error('Erro ao carregar Orçamentos:', error);
-        }
-      };
-  carregarOrcamentos();
-    }, []);
+    carregarOrcamentos();
+  }, []);  
 
   const handleFinalizarOrcamento = async (orcamento) => {
     try {
@@ -39,6 +46,7 @@ export default function ListarOrcamentos({navigation, route}) {
     try {
       await removerOrcamento(orcamento.id);
       console.log('Orçamento removida com sucesso', orcamento.id);
+      await carregarOrcamentos();
     } catch (error) {
       console.error('Erro ao remover Orçamento:', error);
     }
@@ -46,7 +54,7 @@ export default function ListarOrcamentos({navigation, route}) {
 
   const handleEnviarEmail = async () => {
     try {
-      await enviarEmail(email, "FT", selectedOrcamento.id);
+      await enviarEmail(email, "OR", selectedOrcamento.id);
       console.log('Email sent successfully');
       setEmail('');
       setModalVisible(false);
@@ -69,11 +77,13 @@ export default function ListarOrcamentos({navigation, route}) {
     <View style={styles.orcamentoContainer}>
       <TouchableOpacity onPress={() => navigation.navigate('Detalhes Orçamento', {orcamentoId: orcamento.id})}>
         <View>
-            <Text style={styles.textInOrcamentoContainer}>ID: {orcamento.id}</Text>
+            <Text style={styles.textInOrcamentoContainer}>Número: {orcamento.title}</Text>
             <Text style={styles.textInOrcamentoContainer}>Cliente: {orcamento.name}</Text>
-            <Text style={styles.textInOrcamentoContainer}>Estado: {orcamento.status}</Text>
+            <Text style={styles.textInOrcamentoContainer}>NIF: {orcamento.vatNumber} </Text>
             <Text style={styles.textInOrcamentoContainer}>Data: {orcamento.dateFormatted}</Text>
-            <Text style={styles.textInOrcamentoContainer}>Data de expiração: {orcamento.expirationFormatted}</Text>
+            <Text style={styles.textInOrcamentoContainer}>Data Venc.: {orcamento.expirationFormatted}</Text>
+            <Text style={styles.textInOrcamentoContainer}>Total: {parseFloat(orcamento.total).toFixed(2)} €</Text>
+            <Text style={styles.textInOrcamentoContainer}>Estado: {orcamento.status}</Text>
         </View>
       </TouchableOpacity>
       {orcamento.status !== 'ANULADO' && (
@@ -98,19 +108,20 @@ export default function ListarOrcamentos({navigation, route}) {
 
   const keyExtractor = (item) => item.id.toString();
 
-  if(loading){
+  // Loading indicator
+  if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#d0933f" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff' }}>
+        <ActivityIndicator size="large" color={colorScheme === 'dark' ? '#ffffff' : '#d0933f'} />
       </View>
     );
   }
 
   return (
     <View>
-      <Text style={styles.titleSelect}>Lista de Orçamentos</Text>
+      <Text style={styles.titleSelect}></Text>
       <FlatList
-        data={orcamento}
+        data={orcamentos}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
       />
@@ -152,120 +163,88 @@ export default function ListarOrcamentos({navigation, route}) {
 
     </View>
   );
-  /* 
-  return (
-      <ScrollView>
-        <Text style={styles.titleSelect}>Lista de Orçamentos</Text>
-        {orcamentos.map((orcamento, index) => (
-          <View key={index} style={styles.orcamentoContainer}>
-            <Text style={styles.textInOrcamentoContainer}>ID: {orcamento.id}</Text>
-            <Text style={styles.textInOrcamentoContainer}>Cliente: {orcamento.name}</Text>
-            <Text style={styles.textInOrcamentoContainer}>Estado: {orcamento.status}</Text>
-            <Text style={styles.textInOrcamentoContainer}>Data: {orcamento.dateFormatted}</Text>
-            <Text style={styles.textInOrcamentoContainer}>Data de expiração: {orcamento.expirationFormatted}</Text>
-            {/*<Button
-              title="Ver Detalhes"
-              onPress={() => navigation.navigate('DetalhesFatura', { id: fatura.id })}
-            />}
-          </View>
-        ))}
-      </ScrollView>
-    );
-    */
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colorScheme) => StyleSheet.create({  
+  // General styles
+  button: {
+    marginBottom: 10,
+    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
+  },
+  input: {
+    height: 40,
+    marginTop: 10,
+    marginBottom: 15,
+    width: 250,
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#fff',
+    borderWidth: 1,
+    borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
+    borderRadius: 7,
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+
   container: {
     flex: 1,
-    backgroundColor: '#e5e9ec',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    marginBottom: 20,
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
   },
-  touch: {
-    padding: 10,
-    flexDirection:'row',
-    justifyContent: 'space-between',
-    margin: 10,
-    borderColor: 'grey',
-    borderWidth: 1,
-    backgroundColor: '#fff',
-  },
-  button: {
-    margin: 10,
-    alignItems: 'center',
-  },
-  icon: {
-    position: 'absolute',
-    left: 10,
-  },
-  textfont: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: '#5F5D5C',
-  },
+  // Text styles
   titleSelect: {
     fontSize: 20,
     margin: 10,
     fontWeight: "bold",
-    color: "#5F5D5C",
+    color: colorScheme === 'dark' ? '#ffffff' : '#5F5D5C',
   },
-  borderMargin: {
-    borderWidth: 1,
-    borderColor: 'grey',
-    marginLeft:10,
-    marginRight:10,
-    height:50,
-    justifyContent: 'center',
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    color: colorScheme === 'dark' ? '#ffffff' : 'black',
   },
-  dateComponent: {
-    width: 350
+  textInOrcamentoContainer: {
+    marginLeft: 10,
+    color: colorScheme === 'dark' ? '#ffffff' : '#444444',
   },
-  touchableO: {
-    width: 350,
-    height: 55
-  },
-  textDate: {
-    marginLeft:15,
-    marginTop:15,
-    fontSize: 16,
-    color:"#000000"
-  },
-  marginTOPButton: {
-    margin: 20
-  },
-  marginTOPButton2: {
-    marginLeft: 20,
-    marginRight: 20,
-    marginBottom: 7
+
+  // Container styles
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
   orcamentoContainer: {
     borderWidth: 1,
-    borderColor: '#BE6E31',
+    borderColor: colorScheme === 'dark' ? '#ffffff' : '#BE6E31',
     width: 350,
-    height: 100,
-    backgroundColor: '#fff',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#fff',
     borderRadius: 10,
-    marginBottom: 15,
-    marginLeft:20,
+    marginBottom: 50,
+    marginLeft: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 8,
   },
-  textInOrcamentoContainer: {
-    marginLeft: 10,
-    color: '#444444'
-  },
-  textSelect: {
-    fontSize: 20,
-    padding: 10,
-    fontWeight: 'bold'
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
+  modalView: {
+    width: 300,
+    height: 250,
+    margin: 20,
+    backgroundColor: colorScheme === 'dark' ? '#333333' : 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
   },
 });

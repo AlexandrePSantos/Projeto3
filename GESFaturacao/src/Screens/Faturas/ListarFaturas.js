@@ -15,21 +15,22 @@ export default function ListarFaturas({ navigation }) {
   const [selectedFatura, setSelectedFatura] = useState(null);
   const [email, setEmail] = useState('');
 
-  useEffect(() => {
-    const carregarFaturas = async () => {
-      try {
-        const response = await getFaturas();
-        if (response.data) {
-          const sortedFaturas = response.data.sort((a, b) => b.id - a.id);
-          setFaturas(sortedFaturas);
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error('Erro ao carregar faturas:', error);
+  const carregarFaturas = async () => {
+    try {
+      const response = await getFaturas();
+      if (response.data) {
+        const sortedFaturas = response.data.sort((a, b) => b.id - a.id);
+        setFaturas(sortedFaturas);
+        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('Erro ao carregar faturas:', error);
+    }
+  };
+
+  useEffect(() => {
     carregarFaturas();
-  }, []);
+  }, []);  
 
   const handleFinalizarFatura = async (fatura) => {
     try {
@@ -45,6 +46,7 @@ export default function ListarFaturas({ navigation }) {
     try {
       await removerFatura(fatura.id);
       console.log('Fatura removida com sucesso', fatura.id);
+      await carregarFaturas();
     } catch (error) {
       console.error('Erro ao remover fatura:', error);
     }

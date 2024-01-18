@@ -595,6 +595,28 @@ export const AuthProvider = ({children}) => {
         });
     }
 
+    const getOrcamentoById = async (id) => {
+        var token = await this.getToken();
+
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/budgets?id=${id}`,
+            headers: { 
+                'Authorization': token
+            }
+        };
+
+        return axios.request(config)
+        .then((response) => {
+        // console.log(JSON.stringify(response.data));
+        return response.data;
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
     const getClientesById = async (id) => {
         var token = await this.getToken();
 
@@ -804,32 +826,47 @@ export const AuthProvider = ({children}) => {
     // TODO - Finalizar orcamento
     // !!! Retorna erro 400 !!!
     const finalizarOrcamento = async (id) => {
-        var token = await this.getToken();
+        try {
+            var token = await this.getToken();
+            console.log('ID do orçamento a finalizar (Authcontext): ', id);
 
-        let data = qs.stringify({ 
-            'finalizeDocument': id 
-        });
-        let config = {
-            method: 'put',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/budgets`,
-            headers: { 
-              'Authorization': token
-            },
-            data : data
-          };
-    
-        return axios.request(config)
-            .then((response) => {
-            return response.data; 
-            })
-            .catch((error) => {
-            console.log(error);
-        });
+            let data = qs.stringify({ 
+                'finalizeDocument': id
+            });
+
+            let config = {
+                method: 'put',
+                maxBodyLength: Infinity,
+                url: `${BASE_URL}/budgets`,
+                headers: { 
+                    'Content-Type': 'application/x-www-form-urlencoded', 
+                    'Authorization': token
+                },
+                data: data
+            };
+
+            const response = await axios.request(config);
+            console.log(response.data);
+            return response.data;
+        } catch (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.error('Server responded with an error status:', error.response.status);
+                console.error('Error details:', error.response.data);
+                console.log(id);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.error('No response received from the server');
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.error('Error setting up the request:', error.message);
+            }
+
+            throw error; // Rethrow the error if needed for further handling
+        }
     }
     
-    // TODO - Finalizar fatura
-    // !!! Retorna erro 400 !!!
     const finalizarFatura = async (id) => {
         try {
             var token = await this.getToken();
@@ -875,7 +912,6 @@ export const AuthProvider = ({children}) => {
     // ------!-------
     //     DELETE
     // ------!-------
-    // TODO - Remover fatura - Apenas funciona com faturas finalizadas
     const removerFatura = async (id) => {
         try {
         var token = await this.getToken();
@@ -915,29 +951,40 @@ export const AuthProvider = ({children}) => {
 
     // TODO - Remover orcamento - Apenas funciona com orcamentos finalizados
     const removerOrcamento = async (id) => {
-        var token = await this.getToken();
-
-        let data = qs.stringify({
-            'id': id
-        });
-        let config = {
-            method: 'delete',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/budgets`,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': token
-            },
-            data: data
-        };
-
-        return axios.request(config)
-            .then((response) => {
+        try {
+            var token = await this.getToken();
+    
+            let data = qs.stringify({ 'id': id });
+            let config = {
+                method: 'delete',
+                maxBodyLength: Infinity,
+                url: `${BASE_URL}/budgets`,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': token
+                },
+                data: data
+            };
+    
+            const response = await axios.request(config);
+                console.log(response.data);
                 return response.data;
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+            } catch (error) {
+                if (error.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    console.error('Server responded with an error status:', error.response.status);
+                    console.error('Error details:', error.response.data);
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    console.error('No response received from the server');
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    console.error('Error setting up the request:', error.message);
+                }
+    
+                throw error; // Rethrow the error if needed for further handling
+            }
     }
 
     // TODO - Remover artigo
@@ -989,6 +1036,7 @@ export const AuthProvider = ({children}) => {
                 getCategoriasByPosto,
                 getArtigoID,
                 getFaturasById,
+                getOrcamentoById,
                 getClientesById,
                 getClienteCodInterno,
                 getClientByNif,

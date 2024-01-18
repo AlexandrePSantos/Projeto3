@@ -5,7 +5,6 @@ import { AuthContext } from '../Context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import * as Keychain from 'react-native-keychain';
 import LinearGradient from 'react-native-linear-gradient';
-import { Appearance } from 'react-native';
 
 import Login from '../Screens/Login';
 import Home from '../Screens/Home';
@@ -14,10 +13,10 @@ import ListarFaturas from '../Screens/Faturas/ListarFaturas';
 import DetalhesFatura from '../Screens/Faturas/DetalhesFatura';
 import CriarOrcamentos from '../Screens/Orcamentos/CriarOrcamento';
 import ListarOrcamentos from '../Screens/Orcamentos/ListarOrcamentos';
+import DetalhesOrcamento from '../Screens/Orcamentos/DetalhesOrcamento';
 import CriarArtigo from '../Screens/Artigos/CriarArtigo';
 import ListarArtigos from '../Screens/Artigos/ListarArtigos';
 
-const colorScheme = Appearance.getColorScheme();
 const Stack = createNativeStackNavigator();
 
 const AuthStack = () => {
@@ -38,13 +37,13 @@ const screens = [
   { name: 'Detalhes Fatura', component: DetalhesFatura},
   { name: 'Criar Orçamento', component: CriarOrcamentos },
   { name: 'Listar Orçamentos', component: ListarOrcamentos},
+  { name: 'Detalhes Orçamento', component: DetalhesOrcamento},
   { name: 'Criar Artigo', component: CriarArtigo },
   { name: 'Listar Artigos', component: ListarArtigos },
 ];
 
 const AppStack = () => {
   const { logout } = useContext(AuthContext);
-  const colorScheme = useColorScheme();
 
   const handleLogout = async () => {
     await Keychain.resetGenericPassword();

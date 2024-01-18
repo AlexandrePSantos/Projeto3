@@ -11,11 +11,11 @@ import {
   ActivityIndicator,
   ToastAndroid,
   useColorScheme,
+  Modal,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
-import Modal from 'react-native-modal';
 import { AuthContext } from '../../Context/AuthContext';
 
 function Item({ item, onPress, onDelete, isEditing }) {

@@ -128,10 +128,6 @@ export default function CriarFatura({ navigation }) {
     fetchData();
   }, []);
 
-  const removeItem = (index) => {
-    setLinhas(LinhasC.filter((_, i) => i !== index));
-  }
-
   // METODO EXECUTADO QUANDO O BOTÃO DE CRIAR FATURA É PRESSIONADO
   // ENVIA OS DADOS PARA A API
   const handleCreateFatura = () => {
@@ -146,6 +142,7 @@ export default function CriarFatura({ navigation }) {
       Alert.alert('Campos Obrigatórios', errorMessage);
       return;
     }
+    
     // Define the variables here
     const clienteC = cliente;
     const serieC = serie;
@@ -441,7 +438,7 @@ export default function CriarFatura({ navigation }) {
               style={{flex: 2, marginRight: 10}} // Add margin to the right of the Picker
               placeholder="Selecione um Artigo"
               selectedValue={artigo} 
-              onValueChange={(itemValue, itemIndex) => {
+              onValueChange={(itemValue) => {
                 // console.log('Selected item:', itemValue);
                 setArtigo(itemValue);
                 setSelectedIdArtigo(itemValue);

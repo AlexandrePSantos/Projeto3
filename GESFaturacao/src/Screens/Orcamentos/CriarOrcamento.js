@@ -10,24 +10,30 @@ import {
   ScrollView,
   ToastAndroid,
   useColorScheme,
+  Modal,
 } from 'react-native';
 import { AuthContext } from '../../Context/AuthContext';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 
-function Item({ item, onPress }) {
+function Item({ item, onPress, onDelete }) {
   return (
-    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8}}>
-      <Text style={{flex: 1}}>
-        {"ID: " + item.id + "\n" +
-        "Artigo: " + item.description + "\n" +
-        "Preço Un.: " + Number(item.price) + " €\n" +
-        "QTD.: " + item.quantity + "\n" +
-        "Total: " + Number(item.price) * Number(item.quantity) + " €" +
-        "\n-------------------------"}
-      </Text>
-      <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onPress} /></View>
+    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, borderBottomWidth: 1, borderColor: '#000'}}>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}}>
+        <TouchableOpacity onPress={onPress}>
+          <Text>
+            {"ID: " + item.id + "\n" +
+            "Artigo: " + item.description + "\n" +
+            "Preço Un.: " + Number(item.price) + " €\n" +
+            "QTD.: " + parseInt(item.quantity) + "\n" +
+            "Total: " + Number(item.price) * Number(item.quantity) + " €"}
+          </Text>
+        </TouchableOpacity>
+        <View style={{marginLeft: 10}}>
+          <Button title="x" color="#bf4346" onPress={onDelete} />
+        </View>
+      </View>
     </View>
   );
 }
@@ -35,6 +41,7 @@ function Item({ item, onPress }) {
 export default function CriarOrcamento({ navigation }) {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
+
   // VARIAVEIS PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   // SÃO USADOS PARA CARREGAR ARRAYS DOS PICKERS
   const { CriarOrcamento } = useContext(AuthContext);
@@ -42,17 +49,23 @@ export default function CriarOrcamento({ navigation }) {
   const { getClientes } = useContext(AuthContext);
   const { getSeries } = useContext(AuthContext);
   const { getArtigos } = useContext(AuthContext);
+  const { getMoedas } = useContext(AuthContext);
 
   // ARRAYS PARA GUARDAR OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   // SÃO MOSTRADOS NOS PICKERS
   const [dadosClientes, setDadosClientes] = useState([]);
   const [dadosSeries, setDadosSeries] = useState([]);
   const [dadosArtigos, setDadosArtigos] = useState([]);
+  const [dadosMoedas, setDadosMoedas] = useState([]);
 
   // VARIAVEIS PARA GUARDAR OS IDS DOS CLIENTES, SERIES, ARTIGOS E METODOS SELECIONADOS NOS PICKERS
   const [selectedIdCliente, setSelectedIdCliente] = useState(null);
   const [selectedIdSerie, setSelectedIdSerie] = useState(null);
   const [selectedIdArtigo, setSelectedIdArtigo] = useState(null);
+  const [selectedMoeda, setSelectedIdMoeda] = useState(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const [artigo, setArtigo] = useState();
   const [quantidade, setQuantidade] = useState('Quantidade');
@@ -75,7 +88,6 @@ export default function CriarOrcamento({ navigation }) {
   const [email, setEmail] = useState(''); // Email para enviar a fatura
 
   const [openc, setopenc] = useState(false);
-  const [openv, setopenv] = useState(false);
 
   // METODO PARA OBTER OS DADOS DOS CLIENTES, SERIES, ARTIGOS E METODOS
   useEffect(() => {
@@ -84,6 +96,7 @@ export default function CriarOrcamento({ navigation }) {
         const clientesResponse = await getClientes();
         const seriesResponse = await getSeries();
         const artigosResponse = await getArtigos();
+        const moedasResponse = await getMoedas();
 
         if (clientesResponse.data) {
           setDadosClientes(clientesResponse.data);
@@ -96,16 +109,15 @@ export default function CriarOrcamento({ navigation }) {
         if (artigosResponse.data) {
           setDadosArtigos(artigosResponse.data);
         }
+        if (moedasResponse.data) {
+          setDadosMoedas(moedasResponse.data);
+        }
       } catch (error) {
         console.error(error);
       }
     };
     fetchData();
   }, []);
-
-  const removeItem = (index) => {
-    setLinhas(LinhasC.filter((_, i) => i !== index));
-  }
 
   const handleCreateOrcamento = () => {
     // Validation checks
@@ -166,12 +178,16 @@ export default function CriarOrcamento({ navigation }) {
     });
   };
   
+  function handleDeleteItem(index) {
+    const newLinhasC = [...LinhasC];
+    newLinhasC.splice(index, 1);
+    setLinhas(newLinhasC);
+  }
 
   return (
     <ScrollView>
       <View style={styles.container}>
         <View style={{marginTop: 10}}>
-
           {/* Cliente - DONE */}
           <Text style={styles.titleSelect}>Client</Text>
           <View style={styles.borderMargin}>
@@ -316,19 +332,24 @@ export default function CriarOrcamento({ navigation }) {
 
           {/* Coin - DONE */}
           <Text style={styles.titleSelect}>Moeda</Text>
-          <View style={styles.borderMargin}>
-            <Picker
-              selectedValue={moeda}
-              onValueChange={itemValue => setMoeda(itemValue)}
-              style={styles.pickerComponent}
-            >
-              <Picker.Item label="Euro (€)" value="1" />
-              <Picker.Item label="Libra ING (GBP)" value="2" />
-              <Picker.Item label="Dólar USA ($)" value="3" />
-              <Picker.Item label="Real Br. (R$)" value="4" />
-              <Picker.Item label="Fr. Suiço (CHF)" value="5" />
-            </Picker>
-          </View>
+        <View style={styles.borderMargin}>
+          <Picker
+            selectedValue={selectedMoeda}
+            onValueChange={itemValue => {
+              setSelectedIdMoeda(itemValue);
+              setMoeda(itemValue);
+            }}
+            style={styles.pickerComponent}
+          >
+            {dadosMoedas.map((moeda, i) => (
+              <Picker.Item
+                label={moeda.description}
+                value={moeda.id.toString()}
+                key={i}
+              />
+            ))}
+          </Picker>
+        </View>
 
           {/* discount - DONE */}
           <Text style={styles.titleSelect}>Desconto</Text>
@@ -387,7 +408,7 @@ export default function CriarOrcamento({ navigation }) {
               style={{flex: 2, marginRight: 10}} // Add margin to the right of the Picker
               placeholder="Selecione um Artigo"
               selectedValue={artigo} 
-              onValueChange={(itemValue, itemIndex) => {
+              onValueChange={(itemValue) => {
                 // console.log('Selected item:', itemValue);
                 setArtigo(itemValue);
                 setSelectedIdArtigo(itemValue);
@@ -454,12 +475,73 @@ export default function CriarOrcamento({ navigation }) {
               <Text>Sem artigos selecionados</Text>
             ) : (
               LinhasC.map((item, index) => (
-                <Item key={index} item={item} onPress={() => removeItem(index)} />
+                <Item 
+                  key={index} 
+                  item={item} 
+                  onPress={() => {setSelectedItem(item); setModalVisible(true);}} 
+                  onDelete={() => handleDeleteItem(index)}
+                />
               ))
             )}
           </View>
         </View>
         
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.titleSelect}>Change Quantity</Text>
+            <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              onChangeText={setQuantidade}
+              value={quantidade}
+              placeholder="Quantidade"
+              keyboardType="numeric"
+            />
+            </View>
+            <View style={styles.buttonModal}>
+              <Button 
+                color={'gray'}
+                title="Confirm" 
+                onPress={() => {
+                  // Find the selected item in the LinhasC array
+                  const existingItemIndex = LinhasC.findIndex(item => item.id === selectedItem.id);
+
+                  if (existingItemIndex >= 0) {
+                    // If the selected item exists, update its quantity
+                    LinhasC[existingItemIndex].quantity = quantidade;
+                  }
+
+                  // Update the LinhasC state
+                  setLinhas([...LinhasC]);
+
+                  // Reset the selected item and quantity
+                  setSelectedItem(null);
+                  setQuantidade('');
+
+                  // Close the modal
+                  setModalVisible(false);
+                }}
+              />
+              </View>
+              <View style={styles.buttonModal}>
+              <Button 
+                color={'gray'}
+                title="Cancel" 
+                onPress={() => setModalVisible(false)}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
         <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
           <Button
             title="Criar Orçamento"
@@ -506,5 +588,38 @@ const getStyles = (colorScheme) => StyleSheet.create({
     width: 350,
     height: 55,
     justifyContent: 'center',
+  },
+  buttonModal: {
+    marginBottom: 10,
+    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
+  },
+  modalView: {
+    width: 300,
+    height: 250,
+    margin: 20,
+    backgroundColor: colorScheme === 'dark' ? '#333333' : 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    color: colorScheme === 'dark' ? '#ffffff' : 'black',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Add this line
   },
 });
