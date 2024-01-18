@@ -10,23 +10,30 @@ import {
   ScrollView,
   ToastAndroid,
   useColorScheme,
+  Modal,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 import { AuthContext } from '../../Context/AuthContext';
 
-function Item({ item, onPress }) {
+function Item({ item, onPress, onDelete }) {
   return (
     <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, borderBottomWidth: 1, borderColor: '#000'}}>
-      <Text style={{flex: 1}}>
-        {"ID: " + item.id + "\n" +
-        "Artigo: " + item.description + "\n" +
-        "Preço Un.: " + Number(item.price) + " €\n" +
-        "QTD.: " + item.quantity + "\n" +
-        "Total: " + Number(item.price) * Number(item.quantity) + " €"}
-      </Text>
-      <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onPress} /></View>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}}>
+        <TouchableOpacity onPress={onPress}>
+          <Text>
+            {"ID: " + item.id + "\n" +
+            "Artigo: " + item.description + "\n" +
+            "Preço Un.: " + Number(item.price) + " €\n" +
+            "QTD.: " + parseInt(item.quantity) + "\n" +
+            "Total: " + Number(item.price) * Number(item.quantity) + " €"}
+          </Text>
+        </TouchableOpacity>
+        <View style={{marginLeft: 10}}>
+          <Button title="x" color="#bf4346" onPress={onDelete} />
+        </View>
+      </View>
     </View>
   );
 }
@@ -60,7 +67,8 @@ export default function CriarFatura({ navigation }) {
   const [selectedMetodo, setSelectedIdMetodo] = useState(null);
   const [selectedMoeda, setSelectedIdMoeda] = useState(null);
   
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const [artigo, setArtigo] = useState();
   const [quantidade, setQuantidade] = useState('Quantidade');
@@ -185,6 +193,12 @@ export default function CriarFatura({ navigation }) {
       ToastAndroid.show('Error creating invoice', ToastAndroid.SHORT);
     });
   };
+
+  function handleDeleteItem(index) {
+    const newLinhasC = [...LinhasC];
+    newLinhasC.splice(index, 1);
+    setLinhas(newLinhasC);
+  }
 
   return (
     <ScrollView>
@@ -481,24 +495,84 @@ export default function CriarFatura({ navigation }) {
 
                   setLinhas([...LinhasC]);
                   setListKey(listKey + 1);
-                  // console.log(LinhasC);
                   setArtigo(null); // Reset artigo
                   setQuantidade(''); // Reset quantidade
                 }
               }}
             />
 
-          <Text style={styles.titleSelect}>Linha de Artigos</Text>
-          <View style={styles.borderMargin}>
-            {LinhasC.length === 0 ? (
-              <Text>Sem artigos selecionados</Text>
-            ) : (
-              LinhasC.map((item, index) => (
-                <Item key={index} item={item} onPress={() => removeItem(index)} />
-              ))
-            )}
+        <Text style={styles.titleSelect}>Linha de Artigos</Text>
+        <View style={styles.borderMargin}>
+          {LinhasC.length === 0 ? (
+            <Text>Sem artigos selecionados</Text>
+          ) : (
+            LinhasC.map((item, index) => (
+              <Item 
+                key={index} 
+                item={item} 
+                onPress={() => {setSelectedItem(item); setModalVisible(true);}} 
+                onDelete={() => handleDeleteItem(index)}
+              />
+            ))
+          )}
+        </View>
+      </View>
+
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.titleSelect}>Change Quantity</Text>
+            <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              onChangeText={setQuantidade}
+              value={quantidade}
+              placeholder="Quantidade"
+              keyboardType="numeric"
+            />
+            </View>
+            <View style={styles.buttonModal}>
+              <Button 
+                color={'gray'}
+                title="Confirm" 
+                onPress={() => {
+                  // Find the selected item in the LinhasC array
+                  const existingItemIndex = LinhasC.findIndex(item => item.id === selectedItem.id);
+
+                  if (existingItemIndex >= 0) {
+                    // If the selected item exists, update its quantity
+                    LinhasC[existingItemIndex].quantity = quantidade;
+                  }
+
+                  // Update the LinhasC state
+                  setLinhas([...LinhasC]);
+
+                  // Reset the selected item and quantity
+                  setSelectedItem(null);
+                  setQuantidade('');
+
+                  // Close the modal
+                  setModalVisible(false);
+                }}
+              />
+              </View>
+              <View style={styles.buttonModal}>
+              <Button 
+                color={'gray'}
+                title="Cancel" 
+                onPress={() => setModalVisible(false)}
+              />
+            </View>
           </View>
         </View>
+      </Modal>
         
         <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
           <Button
@@ -546,5 +620,38 @@ const getStyles = (colorScheme) => StyleSheet.create({
     width: 350,
     height: 55,
     justifyContent: 'center',
+  },
+  buttonModal: {
+    marginBottom: 10,
+    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
+  },
+  modalView: {
+    width: 300,
+    height: 250,
+    margin: 20,
+    backgroundColor: colorScheme === 'dark' ? '#333333' : 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    color: colorScheme === 'dark' ? '#ffffff' : 'black',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Add this line
   },
 });

@@ -18,24 +18,28 @@ import moment from 'moment/moment';
 import Modal from 'react-native-modal';
 import { AuthContext } from '../../Context/AuthContext';
 
-function Item({ item, onPress, isEditing }) {
+function Item({ item, onPress, onDelete, isEditing }) {
   return (
-    <TouchableOpacity onPress={onPress}>
     <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, borderBottomWidth: 1, borderColor: '#000'}}>
-      <Text style={{flex: 1}}>
+    <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}}>
+      <TouchableOpacity onPress={onPress}>
+         <Text style={{flex: 1}}>
         {"ID: " + item.id + "\n" +
         "Artigo: " + item.description + "\n" +
         "Preço Un.: " + Number(item.price) + " €\n" +
         "QTD.: " + parseInt(item.quantity) + "\n" +
         "Total: " + Number(item.price) * Number(item.quantity) + " €"}
       </Text>
-      {isEditing && (
+      </TouchableOpacity>
+        <View style={{marginLeft: 10}}>
+        {isEditing && (
         <>
-          <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onPress} /></View>
+          <View style={{marginLeft: 10}}><Button title="x" color="#bf4346" onPress={onDelete} /></View>
         </>
-      )}
+        )}        
+        </View>
     </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -227,9 +231,11 @@ export default function DetalhesFatura({ route, navigation }) {
     return expirationDate.format('DD/MM/YYYY');
   };
 
-  const removeItem = (index) => {
-    setLinhas(LinhasC.filter((_, i) => i !== index));
-  };
+  function handleDeleteItem(index) {
+    const newLinhasC = [...LinhasC];
+    newLinhasC.splice(index, 1);
+    setLinhas(newLinhasC);
+  }
 
   // Loading indicator
   if (loading) {
@@ -529,7 +535,13 @@ export default function DetalhesFatura({ route, navigation }) {
             <Text>Sem artigos selecionados</Text>
           ) : (
             LinhasC.map((item, index) => (
-              <Item key={index} item={item} onPress={() => {setSelectedItem(item); setModalVisible(true);}} isEditing={isEditing} />
+              <Item 
+                key={index} 
+                item={item} 
+                onPress={() => {setSelectedItem(item); setModalVisible(true);}} 
+                onDelete={() => handleDeleteItem(index)}
+                isEditing={isEditing}
+              />
             ))
           )}
         </View>
@@ -616,7 +628,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Add this line
   },
   modalView: {
     width: 300,
