@@ -737,13 +737,10 @@ export const AuthProvider = ({children}) => {
     
         return axios.request(config)
             .then((response) => {
-                // console.log(JSON.stringify(response.data));
                 return response.data;
             })
             .catch((error) => {
                 if (error.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
                     console.error('Server responded with an error status:', error.response.status);
                     console.error('Error details:', error.response.data);
                     console.error('Error details:', error.message);
@@ -764,11 +761,13 @@ export const AuthProvider = ({children}) => {
     
     }
 
-    const EditarOrcamento = async (clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, linhasC, finalizarDocumentoC) => {
+    const EditarOrcamento = async (id, clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, linhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
 
         const linhas = JSON.stringify(linhasC);
+        console.log('linha: ' + linhas);
         let data = qs.stringify({
+            'id': id,
             'client': clienteC,
             'serie': serieC,
             'number': numeroC,

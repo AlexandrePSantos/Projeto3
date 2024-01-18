@@ -122,6 +122,7 @@ export default function CriarOrcamento({ route, navigation }) {
                     discount: line.percentageDiscount.value,
                     tax: line.tax.id.toString(),
                     exemption: line.exemption.id ? line.exemption.id.toString() : null,
+                    retencao: line.retencao || "0.000000",  // Add this line
                 }));
                 setLinhas(transformedLines);
 
@@ -162,7 +163,8 @@ export default function CriarOrcamento({ route, navigation }) {
   }
 
   const handleConfirmarEditar = () => {
-    console.log('LinhasC: ', LinhasC);
+    console.log('Orcamento Cliente: ', cliente);
+    console.log('Orcamento Serie: ', serie);
     EditarOrcamento(
       orcamentoId,
       cliente,
