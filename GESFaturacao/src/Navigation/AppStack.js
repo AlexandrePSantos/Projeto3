@@ -16,6 +16,7 @@ import ListarOrcamentos from '../Screens/Orcamentos/ListarOrcamentos';
 import DetalhesOrcamento from '../Screens/Orcamentos/DetalhesOrcamento';
 import CriarArtigo from '../Screens/Artigos/CriarArtigo';
 import ListarArtigos from '../Screens/Artigos/ListarArtigos';
+import DetalhesArtigo from '../Screens/Artigos/DetalhesArtigo';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +41,7 @@ const screens = [
   { name: 'Detalhes Orçamento', component: DetalhesOrcamento},
   { name: 'Criar Artigo', component: CriarArtigo },
   { name: 'Listar Artigos', component: ListarArtigos },
+  { name: 'Detalhes Artigo', component: DetalhesArtigo},
 ];
 
 const AppStack = () => {

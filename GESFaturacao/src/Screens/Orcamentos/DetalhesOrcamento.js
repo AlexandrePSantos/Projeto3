@@ -70,7 +70,7 @@ export default function CriarOrcamento({ route, navigation }) {
   const [selectedMoeda, setSelectedIdMoeda] = useState(null);
 
   const [artigo, setArtigo] = useState();
-  const [quantidade, setQuantidade] = useState('Quantidade');
+  const [quantidade, setQuantidade] = useState();
   const [listKey, setListKey] = useState(0);
 
   // VARIAVEIS PARA GUARDAR OS DADOS DA FATURA
@@ -122,11 +122,9 @@ export default function CriarOrcamento({ route, navigation }) {
                     discount: line.percentageDiscount.value,
                     tax: line.tax.id.toString(),
                     exemption: line.exemption.id ? line.exemption.id.toString() : null,
-                    retencao: line.retencao || "0.000000",  // Add this line
+                    retention: line.retencao || "0.000000",  // Add this line
                 }));
                 setLinhas(transformedLines);
-
-                console.log('transformedLines: ', transformedLines);
 
                 const clientesResponse = await getClientes();
                 const seriesResponse = await getSeries();
@@ -163,8 +161,6 @@ export default function CriarOrcamento({ route, navigation }) {
   }
 
   const handleConfirmarEditar = () => {
-    console.log('Orcamento Cliente: ', cliente);
-    console.log('Orcamento Serie: ', serie);
     EditarOrcamento(
       orcamentoId,
       cliente,
@@ -181,7 +177,7 @@ export default function CriarOrcamento({ route, navigation }) {
       finalizarDoc,
     ).then(response => {
       navigation.navigate('Dashboard');
-      ToastAndroid.show("Orçamento Criada ", ToastAndroid.SHORT);
+      ToastAndroid.show("Orçamento Editado ", ToastAndroid.SHORT);
       if (finalizarDoc == 1) {
         const documentId = response.orcamento;
         enviarEmail(email, "OR", documentId)

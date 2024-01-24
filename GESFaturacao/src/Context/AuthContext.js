@@ -172,8 +172,9 @@ export const AuthProvider = ({children}) => {
 
     const CriarOrcamento  = async (clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, linhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
-    
+        
         const linhas = JSON.stringify(linhasC);
+        
         let data = qs.stringify({
             'client': clienteC,
             'serie': serieC,
@@ -756,16 +757,50 @@ export const AuthProvider = ({children}) => {
             });
     }
     
-    const EditarArtigo = async () => {
+    const EditarArtigo = async (id, code, name, type, unit, qtdStock, qtdStockMin, stockMin, pvp, precoUnit, precoIni, iva, category) => {
         var token = await this.getToken();
-    
+
+        let data = qs.stringify({
+            'id': id,   
+            'code': code,
+            'name': name,
+            'category': category,
+            'type': type,
+            'stock': qtdStock,
+            'minStock': qtdStockMin,
+            'stockAlert': stockMin,
+            'unity': unit,
+            'pvp': pvp,
+            'tax': iva,
+            'price': precoUnit,
+            'initialPrice': precoIni
+        });
+
+        let config = {
+            method: 'put',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/products`,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': token,
+            },
+            data : data
+        };
+
+        return axios.request(config)
+            .then((response) => {
+                console.log(JSON.stringify(response.data));
+            })
+            .catch((error) => {
+                console.log(error + ' Erro Faturas');
+            });
     }
 
     const EditarOrcamento = async (id, clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, linhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
 
         const linhas = JSON.stringify(linhasC);
-        console.log('linha: ' + linhas);
+        console.log('Linhas: ', linhas);
         let data = qs.stringify({
             'id': id,
             'client': clienteC,
@@ -820,10 +855,10 @@ export const AuthProvider = ({children}) => {
 
     const EditarCliente = async () => {
         var token = await this.getToken();
+
+        
     }
 
-    // TODO - Finalizar orcamento
-    // !!! Retorna erro 400 !!!
     const finalizarOrcamento = async (id) => {
         try {
             var token = await this.getToken();
@@ -906,7 +941,7 @@ export const AuthProvider = ({children}) => {
 
             throw error; // Rethrow the error if needed for further handling
         }
-    };
+    }
 
     // ------!-------
     //     DELETE
@@ -946,9 +981,8 @@ export const AuthProvider = ({children}) => {
 
             throw error; // Rethrow the error if needed for further handling
         }
-    };
+    }
 
-    // TODO - Remover orcamento - Apenas funciona com orcamentos finalizados
     const removerOrcamento = async (id) => {
         try {
             var token = await this.getToken();
@@ -968,38 +1002,104 @@ export const AuthProvider = ({children}) => {
             const response = await axios.request(config);
                 console.log(response.data);
                 return response.data;
-            } catch (error) {
-                if (error.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
-                    console.error('Server responded with an error status:', error.response.status);
-                    console.error('Error details:', error.response.data);
-                } else if (error.request) {
-                    // The request was made but no response was received
-                    console.error('No response received from the server');
-                } else {
-                    // Something happened in setting up the request that triggered an Error
-                    console.error('Error setting up the request:', error.message);
-                }
-    
-                throw error; // Rethrow the error if needed for further handling
+        } catch (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.error('Server responded with an error status:', error.response.status);
+                console.error('Error details:', error.response.data);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.error('No response received from the server');
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.error('Error setting up the request:', error.message);
             }
+
+            throw error; // Rethrow the error if needed for further handling
+        }
     }
 
     // TODO - Remover artigo
     const removerArtigo = async (id) => {
-        var token = await this.getToken();
+        try {
+            var token = await this.getToken();
+
+            let data = qs.stringify({ 'id': id });
+            let config = {
+                method: 'delete',
+                maxBodyLength: Infinity,
+                url: `${BASE_URL}/products`,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': token
+                },
+                data: data
+            };
+
+            const response = await axios.request(config);
+            console.log(response.data);
+            return response.data;
+        } catch (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.error('Server responded with an error status:', error.response.status);
+                console.error('Error details:', error.response.data);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.error('No response received from the server');
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.error('Error setting up the request:', error.message);
+            }
+
+            throw error; // Rethrow the error if needed for further handling
+        }
     }
 
     // TODO - Remover cliente
     const removerCliente = async (id) => {
-        var token = await this.getToken();
+        try {
+            var token = await this.getToken();
+
+            let data = qs.stringify({ 'id': id });
+            let config = {
+                method: 'delete',
+                maxBodyLength: Infinity,
+                url: `${BASE_URL}/clients`,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': token
+                },
+                data: data
+            };
+
+        const response = await axios.request(config);
+        console.log(response.data);
+        return response.data;
+        } catch (error) {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.error('Server responded with an error status:', error.response.status);
+                console.error('Error details:', error.response.data);
+            } else if (error.request) {
+                // The request was made but no response was received
+                console.error('No response received from the server');
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.error('Error setting up the request:', error.message);
+            }
+
+            throw error; // Rethrow the error if needed for further handling
+        }
     }
 
     // ------!-------
     // Return Values
     // ------!-------
-    return(
+    return (
         <AuthContext.Provider 
             value={{
                 //LOGIN & LOGOUT
@@ -1044,9 +1144,6 @@ export const AuthProvider = ({children}) => {
                 EditarOrcamento,
                 finalizarOrcamento,
                 EditarArtigo,
-                removerArtigo,
-                removerCliente,
-                removerCliente,
                 EditarCliente,
                 EditarFatura,
                 finalizarFatura,
@@ -1055,6 +1152,7 @@ export const AuthProvider = ({children}) => {
                 removerOrcamento,
                 removerFatura,
                 removerArtigo,
+                removerCliente,
 
                 //OUTROS
                 isLoading
