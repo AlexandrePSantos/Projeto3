@@ -1,4 +1,4 @@
-import React, { useContext} from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, useColorScheme } from 'react-native';
 import getStyles from './HomeStyles';
 
@@ -57,6 +57,23 @@ export default function Home({navigation}) {
           style={[styles.menuButton, styles.shadow]}
           onPress={() => navigation.navigate("Listar Artigos")}>
           <Text style={styles.menuText}>Listar Artigos</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Container Clientes */}
+      <Text style={styles.titles}>Clientes</Text>
+      <View style={styles.container}>
+        {/* Botão criar Cliente */}
+        <TouchableOpacity
+          style={[styles.menuButton, styles.shadow]}
+          onPress={() => navigation.navigate("Criar Cliente")}>
+          <Text style={styles.menuText}>Criar Cliente</Text>
+        </TouchableOpacity>
+        {/* Botão listar Clientes */}
+        <TouchableOpacity
+          style={[styles.menuButton, styles.shadow]}
+          onPress={() => navigation.navigate("Listar Clientes")}>
+          <Text style={styles.menuText}>Listar Clientes</Text>
         </TouchableOpacity>
       </View>
     </View>

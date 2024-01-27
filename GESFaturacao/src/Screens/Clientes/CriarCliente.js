@@ -15,32 +15,33 @@ import CheckBox from '@react-native-community/checkbox';
 import { Picker } from '@react-native-picker/picker';
 import {AuthContext} from '../../Context/AuthContext';
 
-export default function CriarArtigo({navigation}) {
-  const colorScheme = useColorScheme();
-  const styles = getStyles(colorScheme);
+export default function CriarCliente({navigation}) {
+    const colorScheme = useColorScheme();
+    const styles = getStyles(colorScheme);
 
-  const {CriarArtigo} = useContext(AuthContext);
+    const {CriarCliente, getCidade, getRegiao} = useContext(AuthContext);
 
-  const {getCategorias} = useContext(AuthContext);
-  const [dadosCategorias, setDadosCategorias] = useState([]);
-  const [selectedIdCategory, setSelectedIdCategory] = useState(null);
-  const [category, setCategory] = useState(null);
-
-  const {getIVA} = useContext(AuthContext);
-  const [dadosIvas, setDadosIvas] = useState([]);
-  const [selectedIdIva, setSelectedIdIva] = useState(null);
-  const [iva, setIva] = useState(null);
-
-  const [code, setCode] = useState();
-  const [name, setName] = useState();
-  const [type, setType] = useState();
-  const [unit, setUnit] = useState();
-  const [qtdStock, setQtdStock] = useState();
-  const [qtdStockMin, setQtdStockMin] = useState();
-  const [pvp, setPvp] = useState();
-  const [precoUnit, setPrecoUnit] = useState();
-  const [precoIni, setPrecoIni] = useState();
-  const [stockMin, setStockMin] = useState(false);
+    const [name, setName] = useState(); // textinput
+    const [vat, setVat] = useState(); // textinput
+    const [country, setCountry] = useState(); // picker
+    const [address, setAddress] = useState(); // textinput
+    const [postalCode, setPostalCode] = useState(); // textinput
+    const [region, setRegion] = useState(); // picker
+    const [city, setCity] = useState(); // picker
+    const [email, setEmail] = useState(); // textinput
+    const [website, setWebsite] = useState(); // textinput
+    const [mobile, setMobile] = useState(); // textinput numeric
+    const [telephone, setTelephone] = useState(); // textinput numeric
+    const [fax, setFax] = useState(); // textinput numeric
+    const [representativeName, setRepresentativeName] = useState(); // textinput
+    const [representativeEmail, setRepresentativeEmail] = useState(); // textinput
+    const [representativeMobile, setRepresentativeMobile] = useState(); // textinput numeric
+    const [representativeTelephone, setRepresentativeTelephone] = useState(); // textinput numeric
+    const [paymentMethod, setPaymentMethod] = useState(); // picker
+    const [paymentCondition, setPaymentCondition] = useState(); // picker (dias)
+    const [discount, setDiscount] = useState(); // textinput numeric
+    const [accountType, setAccountType] = useState(); // radio unico (geral ou propria)
+    const [internalCode, setInternalCode] = useState(); // textinput numeric
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,7 +55,6 @@ export default function CriarArtigo({navigation}) {
       if (ivaResponse.data) {
         setDadosIvas(ivaResponse.data);
       }
-
     } catch (error) {
       console.error(error);
     }
@@ -62,54 +62,35 @@ export default function CriarArtigo({navigation}) {
   fetchData();
   }, []);
 
-  const handleCreateArtigo = async () => {
-    // Validation checks
-    if (!code || !name || !type || !unit || !pvp || !iva) {
-      let errorMessage = "Os seguintes campos são obrigatórios:\n";
-      if (!code) errorMessage += "- Code\n";
-      if (!name) errorMessage += "- Name\n";
-      if (!type) errorMessage += "- Type\n";
-      if (!unit) errorMessage += "- Unit\n";
-      if (!pvp) errorMessage += "- Pvp\n";
-      if (!iva) errorMessage += "- Iva\n";
-  
-      Alert.alert('Campos Obrigatórios', errorMessage);
-      return;
-    }
-  
-    // If all required fields are filled, proceed with creating the budget
-    const codeC = code;
-    const nameC = name;
-    const typeC = type;
-    const unitC = unit;
-    const qtdStockC = qtdStock;
-    const qtdStockMinC = qtdStockMin;
-    const stockMinC = stockMin;
-    const pvpC = pvp;
-    const precoUnitC = precoUnit;
-    const precoIniC = precoIni;
-    const ivaC = iva; //ver melhor este
-    const categoryC = category; //ver melhor este
-  
-    CriarArtigo(
-      codeC,
-      nameC,
-      typeC,
-      unitC,
-      qtdStockC,
-      qtdStockMinC,
-      stockMinC,
-      pvpC,
-      precoUnitC,
-      precoIniC,
-      ivaC,
-      categoryC,
+  const handleCreateCliente = async () => {
+    CriarCliente(
+        name, 
+        vat, 
+        country, 
+        address,
+        postalCode,
+        region,
+        city,
+        email,
+        website,
+        mobile,
+        telephone,
+        fax,
+        representativeName,
+        representativeEmail,
+        representativeMobile,
+        representativeTelephone,
+        paymentMethod,
+        paymentCondition,
+        discount,
+        accountType,
+        internalCode
     ).then(response => {
       navigation.navigate('Dashboard');
-      ToastAndroid.show("Artigo Criada ", ToastAndroid.SHORT);
+      ToastAndroid.show("Cliente Criado ", ToastAndroid.SHORT);
     }).catch(error => {
-      console.error('Erro ao criar Artigo:', error);
-      ToastAndroid.show('Erro ao criar Artigo', ToastAndroid.SHORT);
+      console.error('Erro ao criar Cliente:', error);
+      ToastAndroid.show('Erro ao criar Cliente', ToastAndroid.SHORT);
     }); 
   }
 
@@ -117,14 +98,15 @@ export default function CriarArtigo({navigation}) {
     <ScrollView>
       <View style={styles.container}>
       <View style={{marginTop: 10}}>
+
         {/* Código - Obrigatório - TextInput */}
-        <Text style={styles.titleSelect}>Código</Text>
+        <Text style={styles.titleSelect}>Código Interno</Text>
           <View style={styles.borderMargin}>
             <TextInput
               style={styles.input}
-              value={code}
-              onChangeText={text => setCode(text)}
-              placeholder="Código"
+              value={internalCode}
+              onChangeText={text => setInternalCode(text)}
+              placeholder="Código Interno"
             />
           </View>
         
@@ -139,7 +121,18 @@ export default function CriarArtigo({navigation}) {
             />
           </View>
 
-        {/* Categoria - Opcional - Picker (getCategorias) */}
+        {/* VAT - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Vat</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={vat}
+              onChangeText={text => setVat(text)}
+              placeholder="vat"
+            />
+          </View>
+
+        {/* Country - Picker (getPaises) */}
         <Text style={styles.titleSelect}>Categoria</Text>
           <View style={styles.borderMargin}>
             <Picker
@@ -265,9 +258,9 @@ export default function CriarArtigo({navigation}) {
       </View>
       <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
           <Button
-            title="Criar Artigo"
+            title="Criar Cliente"
             color="#d0933f"
-            onPress={() => handleCreateArtigo()}
+            onPress={() => handleCreateCliente()}
           />
         </View>
       </View>

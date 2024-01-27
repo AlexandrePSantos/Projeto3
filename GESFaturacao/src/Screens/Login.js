@@ -143,7 +143,7 @@ const Login = ({navigation}) => {
     >
     <LinearGradient colors={['#9A531B', '#BE6E31', '#E59450']} style={styles.navbar} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} >
       <Image 
-        source={require('./assets/logo_old.png')}
+        source={require('./assets/logotipoW.png')}
         style={styles.logo} 
       />
     </LinearGradient>

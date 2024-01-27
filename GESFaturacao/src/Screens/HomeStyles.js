@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native';
 import { Dimensions } from 'react-native';
-import { useColorScheme } from 'react-native';
 
 const buttonSize = Dimensions.get('window').width / 2 - 30; // 30 is the total horizontal padding (15 on each side)
 
@@ -9,7 +8,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     color: colorScheme === 'dark' ? '#ffffff' : '#000000',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   outerContainer: {
     flex: 1,
@@ -25,7 +24,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
   },
   menuButton: {
     width: buttonSize,
-    height: buttonSize,
+    height: 100,
     padding: 10,
     backgroundColor: '#BE6E31',
     marginVertical: 10,

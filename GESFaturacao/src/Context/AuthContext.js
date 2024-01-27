@@ -211,8 +211,73 @@ export const AuthProvider = ({children}) => {
             });
     }
 
-    const CriarCliente = async () => {
+    const CriarCliente = async (
+        name, 
+        vat, 
+        country, 
+        address,
+        postalCode,
+        region,
+        city,
+        email,
+        website,
+        mobile,
+        telephone,
+        fax,
+        representativeName,
+        representativeEmail,
+        representativeMobile,
+        representativeTelephone,
+        paymentMethod,
+        paymentCondition,
+        discount,
+        accountType,
+        internalCode
+        ) => {
         var token = await this.getToken();
+        
+        let data = qs.stringify({
+            'name': name,
+            'vatNumber': vat,
+            'country': country,
+            'address': address,
+            'postalCode': postalCode,
+            'region': region,
+            'city': city,
+            'email': email,
+            'website': website,
+            'mobile': mobile,
+            'telephone': telephone,
+            'fax': fax,
+            'representativeName': representativeName,
+            'representativeEmail': representativeEmail,
+            'representativeMobile': representativeMobile,
+            'representativeTelephone': representativeTelephone,
+            'paymentMethod': paymentMethod,
+            'paymentCondition': paymentCondition,
+            'discount': discount,
+            'accountType': accountType,
+            'internalCode': internalCode 
+        });
+    
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/clients`,
+            headers: { 
+                'Content-Type': 'application/x-www-form-urlencoded', 
+                'Authorization': token, 
+            },
+            data : data
+        };
+    
+        return axios.request(config)
+            .then((response) => {
+                return response.data;
+            })
+            .catch((error) => {
+                console.log(error + ' Erro Orçamentos');
+            });
     }
 
     const enviarEmail = async (email, type, docId) => {
@@ -316,7 +381,7 @@ export const AuthProvider = ({children}) => {
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: `${BASE_URL}/categories`,
+            url: `${BASE_URL}/categories?all=1`,
             headers: { 
                 'Authorization': token
             }
@@ -506,6 +571,28 @@ export const AuthProvider = ({children}) => {
         });
     }
 
+    const getRegioes = async () => {
+        var token = await this.getToken();
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/regions`,
+            headers: { 
+                'Authorization': token
+              },
+              data : data
+            };
+      
+          return axios.request(config)
+          .then((response) => {
+          return response.data; 
+          })
+          .catch((error) => {
+          console.log(error);
+          });
+      }
+
     const getMoedas = async () => {
         var token = await this.getToken();
         let data = qs.stringify({ });
@@ -534,10 +621,11 @@ export const AuthProvider = ({children}) => {
     // ------!-------
     const getArtigoID = async (id) =>{
         var token = await this.getToken();
+
         let config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: `${BASE_URL}/products/${id}`,
+            url: `${BASE_URL}/products?id=${id}`,
             headers: { 
                 'Authorization': token
             }
@@ -549,7 +637,7 @@ export const AuthProvider = ({children}) => {
         return response.data; 
         })
         .catch((error) => {
-        console.log(error);
+            console.log("Erro no authcontext: " + error);
         });
     }
 
@@ -581,7 +669,7 @@ export const AuthProvider = ({children}) => {
             method: 'get',
             maxBodyLength: Infinity,
             url: `${BASE_URL}/invoices?id=${id}`,
-            headers: { 
+            headers: {
                 'Authorization': token
             }
         };
@@ -757,44 +845,76 @@ export const AuthProvider = ({children}) => {
             });
     }
     
-    const EditarArtigo = async (id, code, name, type, unit, qtdStock, qtdStockMin, stockMin, pvp, precoUnit, precoIni, iva, category) => {
+    const EditarArtigo = async (
+        id,
+        code,
+        name,
+        category,
+        type,
+        qtdStock,
+        qtdStockMin,
+        stockMin,
+        unit,
+        pvp,
+        iva,
+        precoUnit,
+        serialNumber,
+        retentionValue,
+        retentionPercentage,
+        exemptionReason,
+        observations,
+        label,
+        calculateMarginUnitaryArticle,
+        profitMargin,
+        image,
+        precoIni
+      ) => {
         var token = await this.getToken();
-
+      
         let data = qs.stringify({
-            'id': id,   
-            'code': code,
-            'name': name,
-            'category': category,
-            'type': type,
-            'stock': qtdStock,
-            'minStock': qtdStockMin,
-            'stockAlert': stockMin,
-            'unity': unit,
-            'pvp': pvp,
-            'tax': iva,
-            'price': precoUnit,
-            'initialPrice': precoIni
+          'id': id,
+          'code': code,
+          'name': name,
+          'category': category,
+          'type': type,
+          'stock': qtdStock,
+          'minStock': qtdStockMin,
+          'stockAlert': stockMin,
+          'unity': unit,
+          'pvp': pvp,
+          'tax': iva,
+          'price': precoUnit,
+          'serialNumber': serialNumber,
+          'retention': retentionValue,
+          'retentionPercentage': retentionPercentage,
+          'calculateMarginUnitaryArticle': calculateMarginUnitaryArticle,
+          'profitMargin': profitMargin,
+          'exemptionReason': exemptionReason,
+          'observations': observations,
+          'label': label,
+          'image': image,
+          'initialPrice': precoIni,
         });
-
+      
         let config = {
-            method: 'put',
-            maxBodyLength: Infinity,
-            url: `${BASE_URL}/products`,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': token,
-            },
-            data : data
+          method: 'put',
+          maxBodyLength: Infinity,
+          url: `${BASE_URL}/products`,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': token,
+          },
+          data : data
         };
-
+      
         return axios.request(config)
-            .then((response) => {
-                console.log(JSON.stringify(response.data));
-            })
-            .catch((error) => {
-                console.log(error + ' Erro Faturas');
-            });
-    }
+          .then((response) => {
+            console.log(JSON.stringify(response.data));
+          })
+          .catch((error) => {
+            console.log(error + ' Erro Faturas');
+          });
+      }
 
     const EditarOrcamento = async (id, clienteC, serieC, numeroC, dataC, validadeC, dueDateC, referenciaC, moedaC, descontoC, observacoesC, linhasC, finalizarDocumentoC) => {
         var token = await this.getToken();
@@ -1130,6 +1250,7 @@ export const AuthProvider = ({children}) => {
                 getCategorias,
                 getCidades,
                 getMoedas,
+                getRegioes,
 
                 //GET BY VALUE
                 getCategoriasByPosto,
