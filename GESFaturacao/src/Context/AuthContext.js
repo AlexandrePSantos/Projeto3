@@ -257,8 +257,10 @@ export const AuthProvider = ({children}) => {
             'paymentCondition': paymentCondition,
             'discount': discount,
             'accountType': accountType,
-            'internalCode': internalCode 
+            'internalCode': internalCode
         });
+
+        console.log(JSON.stringify(data));
     
         let config = {
             method: 'post',
@@ -273,10 +275,24 @@ export const AuthProvider = ({children}) => {
     
         return axios.request(config)
             .then((response) => {
+                // console.log(JSON.stringify(response.data));
                 return response.data;
             })
             .catch((error) => {
-                console.log(error + ' Erro Orçamentos');
+                if (error.response) {
+                    // The request was made and the server responded with a status code
+                    // that falls out of the range of 2xx
+                    console.error('Server responded with an error status:', error.response.status);
+                    console.error('Error details:', error.response.data);
+                } else if (error.request) {
+                    // The request was made but no response was received
+                    console.error('No response received from the server');
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    console.error('Error setting up the request:', error.message);
+                }
+            
+                throw error; // Rethrow the error if needed for further handling
             });
     }
 
@@ -591,7 +607,29 @@ export const AuthProvider = ({children}) => {
           .catch((error) => {
           console.log(error);
           });
-      }
+    }
+
+    const getPaises = async () => {
+        var token = await this.getToken();
+        let data = qs.stringify({ });
+        let config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${BASE_URL}/countries`,
+            headers: { 
+                'Authorization': token
+              },
+              data : data
+            };
+      
+          return axios.request(config)
+          .then((response) => {
+          return response.data; 
+          })
+          .catch((error) => {
+          console.log(error);
+          });
+    }  
 
     const getMoedas = async () => {
         var token = await this.getToken();
@@ -1251,6 +1289,7 @@ export const AuthProvider = ({children}) => {
                 getCidades,
                 getMoedas,
                 getRegioes,
+                getPaises,
 
                 //GET BY VALUE
                 getCategoriasByPosto,

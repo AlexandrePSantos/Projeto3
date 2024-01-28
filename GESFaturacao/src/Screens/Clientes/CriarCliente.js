@@ -19,15 +19,23 @@ export default function CriarCliente({navigation}) {
     const colorScheme = useColorScheme();
     const styles = getStyles(colorScheme);
 
-    const {CriarCliente, getCidade, getRegiao} = useContext(AuthContext);
+    const {CriarCliente, getCidades, getRegioes, getMetodos, getPaises} = useContext(AuthContext);
+
+    const [dadosCidades, setDadosCidades] = useState([]);
+    const [dadosRegioes, setDadosRegioes] = useState([]);
+    const [dadosMetodosPagamento, setDadosMetodosPagamento] = useState([]);
+    const [dadosPaises, setDadosPaises] = useState([]);
 
     const [name, setName] = useState(); // textinput
     const [vat, setVat] = useState(); // textinput
     const [country, setCountry] = useState(); // picker
+    const [selectedIdCountry, setSelectedIdCountry] = useState('PT');
     const [address, setAddress] = useState(); // textinput
     const [postalCode, setPostalCode] = useState(); // textinput
     const [region, setRegion] = useState(); // picker
+    const [selectedIdRegion, setSelectedIdRegion] = useState(); // picker
     const [city, setCity] = useState(); // picker
+    const [selectedIdCity, setSelectedIdCity] = useState(); // picker
     const [email, setEmail] = useState(); // textinput
     const [website, setWebsite] = useState(); // textinput
     const [mobile, setMobile] = useState(); // textinput numeric
@@ -38,6 +46,7 @@ export default function CriarCliente({navigation}) {
     const [representativeMobile, setRepresentativeMobile] = useState(); // textinput numeric
     const [representativeTelephone, setRepresentativeTelephone] = useState(); // textinput numeric
     const [paymentMethod, setPaymentMethod] = useState(); // picker
+    const [selectedIdPaymentMethod, setSelectedIdPaymentMethod] = useState(); // picker
     const [paymentCondition, setPaymentCondition] = useState(); // picker (dias)
     const [discount, setDiscount] = useState(); // textinput numeric
     const [accountType, setAccountType] = useState(); // radio unico (geral ou propria)
@@ -46,15 +55,14 @@ export default function CriarCliente({navigation}) {
   useEffect(() => {
     const fetchData = async () => {
     try {
-      const categoryResponse = await getCategorias();
-      const ivaResponse = await getIVA();
-
-      if (categoryResponse.data) {
-        setDadosCategorias(categoryResponse.data);
-      }
-      if (ivaResponse.data) {
-        setDadosIvas(ivaResponse.data);
-      }
+      const responseCidades = await getCidades();
+      setDadosCidades(responseCidades.data);
+      const responseRegioes = await getRegioes();
+      setDadosRegioes(responseRegioes.data);
+      const responseMetodosPagamento = await getMetodos();
+      setDadosMetodosPagamento(responseMetodosPagamento.data);
+      const responsePaises = await getPaises();
+      setDadosPaises(responsePaises.data);
     } catch (error) {
       console.error(error);
     }
@@ -64,27 +72,27 @@ export default function CriarCliente({navigation}) {
 
   const handleCreateCliente = async () => {
     CriarCliente(
-        name, 
-        vat, 
-        country, 
-        address,
-        postalCode,
-        region,
-        city,
-        email,
-        website,
-        mobile,
-        telephone,
-        fax,
-        representativeName,
-        representativeEmail,
-        representativeMobile,
-        representativeTelephone,
-        paymentMethod,
-        paymentCondition,
-        discount,
-        accountType,
-        internalCode
+      name, 
+      vat, 
+      country, 
+      address,
+      postalCode,
+      region,
+      city,
+      email,
+      website,
+      mobile,
+      telephone,
+      fax,
+      representativeName,
+      representativeEmail,
+      representativeMobile,
+      representativeTelephone,
+      paymentMethod,
+      paymentCondition,
+      discount,
+      accountType,
+      internalCode
     ).then(response => {
       navigation.navigate('Dashboard');
       ToastAndroid.show("Cliente Criado ", ToastAndroid.SHORT);
@@ -121,142 +129,275 @@ export default function CriarCliente({navigation}) {
             />
           </View>
 
-        {/* VAT - Obrigatório - TextInput */}
-        <Text style={styles.titleSelect}>Vat</Text>
+        {/* NIF - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>NIF</Text>
           <View style={styles.borderMargin}>
             <TextInput
               style={styles.input}
               value={vat}
               onChangeText={text => setVat(text)}
-              placeholder="vat"
+              placeholder="NIF"
             />
           </View>
-
+          
         {/* Country - Picker (getPaises) */}
-        <Text style={styles.titleSelect}>Categoria</Text>
+        <Text style={styles.titleSelect}>País</Text>
           <View style={styles.borderMargin}>
             <Picker
               style={styles.pickerComponent}
-              selectedValue={selectedIdCategory}
-              onValueChange={itemValue => { setSelectedIdCategory(itemValue); setCategory(itemValue); }} >
-              <Picker.Item label="Selecione uma categoria" value={null} />
-                  {dadosCategorias.map((categoria, i) => (
-                    <Picker.Item label={categoria.name} value={categoria.id.toString()} key={i} />
+              selectedValue={selectedIdCountry}
+              onValueChange={itemValue => { setSelectedIdCountry(itemValue); setCountry(itemValue); }} >
+              <Picker.Item label="Selecione um país" value={null} />
+                  {Object.values(dadosPaises).map((pais, i) => (
+                    <Picker.Item label={pais.description} value={pais.id} key={i} />
                   ))}
             </Picker>
           </View>
 
-        {/* Tipo - Obrigatório - Picker */}
-        <Text style={styles.titleSelect}>Tipo</Text>
+        {/* Address - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Localidade</Text>
           <View style={styles.borderMargin}>
-            <Picker selectedValue={type} onValueChange={itemValue => setType(itemValue)} style={styles.pickerComponent} >
-              <Picker.Item label="Selecione um tipo" value={null} />
-              <Picker.Item label="Produto" value="P" />
-              <Picker.Item label="Serviço" value="S" />
+            <TextInput
+              style={styles.input}
+              value={address}
+              onChangeText={text => setAddress(text)}
+              placeholder="Localidade"
+            />
+          </View>
+
+        {/* Postal Code - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Código Postal</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={postalCode}
+              onChangeText={text => {
+                // Check if the new text matches the required format or is an empty string
+                if (/^\d{4}-\d{3}$/.test(text) || text === '') {
+                  setPostalCode(text);
+                }
+              }}
+              placeholder="xxxx-xxx"
+            />
+          </View>
+
+        {/* City - Obrigatório - Picker */}
+        <Text style={styles.titleSelect}>Cidade</Text>
+          <View style={styles.borderMargin}>
+            <Picker
+              style={styles.pickerComponent}
+              selectedValue={selectedIdCity}
+              onValueChange={itemValue => {
+                setSelectedIdCity(itemValue);
+                setCity(itemValue);
+                const selectedCity = Object.values(dadosCidades).find(cidade => cidade.id.toString() === itemValue);
+                if (selectedCity) {
+                  setSelectedIdRegion(selectedCity.id_region.toString());
+                  setRegion(selectedCity.id_region.toString());
+                }
+              }}
+            >
+              <Picker.Item label="Selecione uma cidade" value={null} />
+                  {Object.values(dadosCidades).map((cidade, i) => (
+                    <Picker.Item label={cidade.description} value={cidade.id.toString()} key={i} />
+                  ))}
             </Picker>
           </View>
 
-        {/* Un. medida - Obrigatório - Picker */}
-        <Text style={styles.titleSelect}>Unidade de medida</Text>
+        {/* Region - Obrigatório - Picker */}
+        <Text style={styles.titleSelect}>Região</Text>
           <View style={styles.borderMargin}>
-            <Picker selectedValue={unit} onValueChange={itemValue => setUnit(itemValue)} style={styles.pickerComponent} >
-              <Picker.Item label="Selecione uma unidade de medida" value="0" />
-              <Picker.Item label="KG" value="1" />
-              <Picker.Item label="Metro" value="2" />
-              <Picker.Item label="Metro Quadrado" value="3" />
-              <Picker.Item label="Litro" value="4" />
+            <Picker
+              style={styles.pickerComponent}
+              selectedValue={selectedIdRegion}
+              onValueChange={itemValue => { setSelectedIdRegion(itemValue); setRegion(itemValue); }} >
+              <Picker.Item label="Selecione uma região" value={null} />
+                  {Object.values(dadosRegioes).map((regiao, i) => (
+                    <Picker.Item label={regiao.description} value={regiao.id.toString()} key={i} />
+                  ))}
             </Picker>
           </View>
-        {/* Qtd. Stock - Opcional - TextInput Numeric */}
-        <Text style={styles.titleSelect}>QTD. Stock</Text>
-        <View style={styles.borderMargin}>
-          <TextInput
-            style={styles.input}
-            value={qtdStock}
-            onChangeText={text => setQtdStock(text)}
-            placeholder="QTD. Stock"
-            keyboardType="numeric"
-          />
-        </View>
 
-        {/* Stock Min.? - Opcional (Checkbox) */}
-        <Text style={styles.titleSelect}>Stock Mínimo?</Text>
-        <View>
-          <CheckBox
-            value={stockMin === 1}
-            onValueChange={newValue => setStockMin(newValue ? 1 : 0)}
-          />
-        </View>
+        {/* Email - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Email</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={text => setEmail(text)}
+              placeholder="Email"
+            />
+          </View>
 
-        {/* Qtd. Stock Min. - Opcional - TextInput Numeric */}
-        {stockMin === 1 && (
-          <View>
-            <Text style={styles.titleSelect}>QTD. Stock Min.</Text>
-            <View style={styles.borderMargin}>
-              <TextInput
-                style={styles.input}
-                value={qtdStockMin}
-                onChangeText={text => setQtdStockMin(text)}
-                placeholder="Quantidade Stock Min."
-                keyboardType="numeric"
-              />
+        {/* Website - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Website</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={website}
+              onChangeText={text => setWebsite(text)}
+              placeholder="Website"
+            />
+          </View>
+
+        {/* Mobile - Obrigatório - TextInput */}  
+        <Text style={styles.titleSelect}>Telemóvel</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={mobile}
+              onChangeText={text => setMobile(text)}
+              placeholder="Telemóvel"
+            />
+          </View>
+
+        {/* Telephone - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Telefone</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={telephone}
+              onChangeText={text => setTelephone(text)}
+              placeholder="Telefone"
+            />
+          </View>
+
+        {/* Fax - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Fax</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={fax}
+              onChangeText={text => setFax(text)}
+              placeholder="Fax"
+            />
+          </View>
+
+        {/* Representative Name - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Nome Representante</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={representativeName}
+              onChangeText={text => setRepresentativeName(text)}
+              placeholder="Nome Representante"
+            />
+          </View>
+
+        {/* Representative Email - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Email Representante</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={representativeEmail}
+              onChangeText={text => setRepresentativeEmail(text)}
+              placeholder="Email Representante"
+            />
+          </View>
+
+        {/* Representative Mobile - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Telemóvel Representante</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={representativeMobile}
+              onChangeText={text => setRepresentativeMobile(text)}
+              placeholder="Telemóvel Representante"
+            />
+          </View>
+
+        {/* Representative Telephone - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Telefone Representante</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={representativeTelephone}
+              onChangeText={text => setRepresentativeTelephone(text)}
+              placeholder="Telefone Representante"
+            />
+          </View>
+
+        {/* Payment Method - Obrigatório - Picker */}
+        <Text style={styles.titleSelect}>Método de Pagamento</Text>
+          <View style={styles.borderMargin}>
+            <Picker
+              style={styles.pickerComponent}
+              selectedValue={selectedIdPaymentMethod}
+              onValueChange={itemValue => { setSelectedIdPaymentMethod(itemValue); setPaymentMethod(itemValue); }} >
+              <Picker.Item label="Selecione um método de pagamento" value={null} />
+                  {dadosMetodosPagamento.map((metodo, i) => (
+                    <Picker.Item label={metodo.name} value={metodo.id.toString()} key={i} />
+                  ))}
+            </Picker>
+          </View>
+
+        {/* Payment Condition - Obrigatório - Picker */}
+        <Text style={styles.titleSelect}>Condições de Pagamento</Text>
+          <View style={styles.borderMargin}>
+            <Picker
+              style={styles.pickerComponent}
+              selectedValue={paymentCondition}
+              onValueChange={itemValue => {
+                setPaymentCondition(itemValue);}}
+            >
+              <Picker.Item label="Pronto Pagamento" value="1" />
+              <Picker.Item label="10 Dias Após Emissão" value="2" />
+              <Picker.Item label="20 Dias Após Emissão" value="3" />
+              <Picker.Item label="30 Dias Após Emissão" value="4" />
+              <Picker.Item label="60 Dias Após Emissão" value="5" />
+              <Picker.Item label="75 Dias Após Emissão" value="6" />
+              <Picker.Item label="90 Dias Após Emissão" value="7" />
+              <Picker.Item label="120 Dias Após Emissão" value="8" />
+              <Picker.Item label="180 Dias Após Emissão" value="9" />
+            </Picker>
+          </View>
+
+        {/* Discount - Obrigatório - TextInput */}
+        <Text style={styles.titleSelect}>Desconto (%)</Text>
+          <View style={styles.borderMargin}>
+            <TextInput
+              style={styles.input}
+              value={discount}
+              onChangeText={setDiscount}
+              placeholder="Desconto"
+              keyboardType="numeric"
+            />
+          </View>
+
+        {/* Account Type - Obrigatório - Radio Button */}
+        <Text style={styles.titleSelect}>Tipo de Conta Corrente</Text>
+          <View style={styles.borderMargin}>
+            <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+              <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                <CheckBox
+                  value={accountType === 1}
+                  onValueChange={(newValue) => {
+                    if (newValue) {
+                      setAccountType(1);
+                    }
+                  }}
+                  style={{alignSelf: 'center'}}
+                />
+                <Text style={{alignSelf: 'center'}}>Conta Geral</Text>
+              </View>
+              <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                <CheckBox
+                  value={accountType === 0}
+                  onValueChange={(newValue) => {
+                    if (newValue) {
+                      setAccountType(0);
+                    }
+                  }}
+                  style={{alignSelf: 'center'}}
+                />
+                <Text style={{alignSelf: 'center'}}>Conta Própria</Text>
+              </View>
             </View>
           </View>
-        )}
+        
 
-
-
-        {/* pvp - Obrigatório - TextInput Numeric */}
-        <Text style={styles.titleSelect}>PVP</Text>
-          <View style={styles.borderMargin}>
-          <TextInput
-              style={styles.input}
-              value={pvp}
-              onChangeText={text => setPvp(text)}
-              placeholder="Preço PVP"
-              keyboardType="numeric"
-            />
-          </View>
-
-        {/* iva - Obrigatório - TextInput Numeric */}
-        <Text style={styles.titleSelect}>IVA</Text>
-          <View style={styles.borderMargin}>
-            <Picker
-              style={styles.pickerComponent}
-              selectedValue={selectedIdIva}
-              onValueChange={itemValue => { setSelectedIdIva(itemValue); setIva(itemValue); }} >
-              <Picker.Item label="Selecione uma taxa" value={null} />
-                  {dadosIvas.map((tax, i) => (
-                    <Picker.Item label={`${tax.label}`} value={tax.id.toString()} key={i} />
-                  ))}
-            </Picker>
-          </View>
-
-        {/* Preço Unitário - Opcional - TextInput Numeric */}
-        <Text style={styles.titleSelect}>Preço Unit.</Text>
-          <View style={styles.borderMargin}>
-          <TextInput
-              style={styles.input}
-              value={precoUnit}
-              onChangeText={text => setPrecoUnit(text)}
-              placeholder="Preço Unitário"
-              keyboardType="numeric"
-            />
-          </View>
-
-        {/* Preço de custo inicial - Opcional - TextInput Numeric */}
-        <Text style={styles.titleSelect}>Preço de Custo Inicial</Text>
-          <View style={styles.borderMargin}>
-          <TextInput
-              style={styles.input}
-              value={precoIni}
-              onChangeText={text => setPrecoIni(text)}
-              placeholder="Preço de Custo Inicial"
-              keyboardType="numeric"
-            />
-          </View>
-      </View>
-      <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+    </View>
+        <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
           <Button
             title="Criar Cliente"
             color="#d0933f"
