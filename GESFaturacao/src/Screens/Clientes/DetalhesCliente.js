@@ -66,11 +66,12 @@ export default function DetalhesCliente({ route, navigation }) {
               setDadosCidades(responseCidades.data);
               const responseRegioes = await getRegioes();
               setDadosRegioes(responseRegioes.data);
-              const responseMetodosPagamento = await getMetodos();
-              setDadosMetodosPagamento(responseMetodosPagamento.data);
               const responsePaises = await getPaises();
               setDadosPaises(responsePaises.data);
-
+              const responseMetodos = await getMetodos();
+              setDadosMetodosPagamento(responseMetodos.data);
+            
+            console.log("Fetched Cliente: ", fetchedCliente.data)
               setName(fetchedCliente.data.name);
               setVat(fetchedCliente.data.vatNumber);
               setAddress(fetchedCliente.data.address);
@@ -84,22 +85,26 @@ export default function DetalhesCliente({ route, navigation }) {
               setRepresentativeEmail(fetchedCliente.data.representativeEmail);
               setRepresentativeMobile(fetchedCliente.data.representativeMobile);
               setRepresentativeTelephone(fetchedCliente.data.representativeTelephone);
-              setPaymentCondition(fetchedCliente.data.paymentCondition);
+              setSelectedIdPaymentMethod(fetchedCliente.data.paymentMethod.id);
+              setPaymentMethod(fetchedCliente.data.paymentMethod.name);
+              setPaymentCondition(fetchedCliente.data.paymentConditions ? fetchedCliente.data.paymentConditions.toString() : '');
               setDiscount(fetchedCliente.data.discount);
               setAccountType(fetchedCliente.data.accountType);
               setInternalCode(fetchedCliente.data.internalCode);
 
               setCountry(fetchedCliente.data.country.id);
               setSelectedIdCountry(fetchedCliente.data.country.id);
+              console.log("Country ID: ", fetchedCliente.data.country.id);
               setRegion(fetchedCliente.data.region.id);
-              setSelectedIdRegion(fetchedCliente.data.region.id);
-              setCity(fetchedCliente.data.city.id);
-              setSelectedIdCity(fetchedCliente.data.city.id);
+              setSelectedIdRegion(fetchedCliente.data.region?.id ? fetchedCliente.data.region.id.toString() : '');
+              console.log("Region ID: ", fetchedCliente.data.region?.id || '');
+              setCity(fetchedCliente.data.city.name);
+              setSelectedIdCity(fetchedCliente.data.city?.id ? fetchedCliente.data.city.id.toString() : '');
+              console.log("City ID: ", fetchedCliente.data.city?.id || '');
               setPaymentMethod(fetchedCliente.data.paymentMethod.id);
-              setSelectedIdPaymentMethod(fetchedCliente.data.paymentMethod.id);
-              
-
-              console.log(fetchedCliente.data);
+              setSelectedIdPaymentMethod(fetchedCliente.data.paymentMethod?.id ? fetchedCliente.data.paymentMethod.id.toString() : '');
+              console.log("Payment Method ID: ", fetchedCliente.data.paymentMethod?.id || '');
+              console.log("Payment Method: ", fetchedCliente.data.paymentMethod.name);
 
             } catch (error) {
               console.error(error);
@@ -456,21 +461,21 @@ export default function DetalhesCliente({ route, navigation }) {
           </View>
 
 
-                </View>
-                    {isEditing && (
-                        <>
-                            <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-                                <Button
-                                title="Confirmar"
-                                color="#d0933f"
-                                onPress={() => handleConfirmarEditar()}
-                                />
-                            </View>
-                        </>
-                    )}
-                <View style={styles.overlay} pointerEvents="none" />
             </View>
-        </ScrollView>
+                {isEditing && (
+                    <>
+                        <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+                            <Button
+                            title="Confirmar"
+                            color="#d0933f"
+                            onPress={() => handleConfirmarEditar()}
+                            />
+                        </View>
+                    </>
+                )}
+            <View style={styles.overlay} pointerEvents="none" />
+        </View>
+    </ScrollView>
     );
 }
 
