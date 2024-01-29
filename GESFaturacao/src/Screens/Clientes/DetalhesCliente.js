@@ -115,6 +115,7 @@ export default function DetalhesCliente({ route, navigation }) {
 
     const handleConfirmarEditar = async () => {    
         EditarCliente(
+          clienteId,
           name, 
           vat, 
           country, 
