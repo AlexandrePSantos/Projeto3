@@ -23,7 +23,6 @@ export default function DetalhesCliente({ route, navigation }) {
     const { clienteId } = route.params;
     const { EditarCliente, getCidades, getRegioes, getMetodos, getPaises, getClientesById } = useContext(AuthContext);
 
-    const [locked, setLocked] = useState();
     const [isEditing, setIsEditing] = useState(false);
 
     const [dadosCidades, setDadosCidades] = useState([]);
@@ -71,7 +70,6 @@ export default function DetalhesCliente({ route, navigation }) {
               const responseMetodos = await getMetodos();
               setDadosMetodosPagamento(responseMetodos.data);
             
-            console.log("Fetched Cliente: ", fetchedCliente.data)
               setName(fetchedCliente.data.name);
               setVat(fetchedCliente.data.vatNumber);
               setAddress(fetchedCliente.data.address);
@@ -94,17 +92,12 @@ export default function DetalhesCliente({ route, navigation }) {
 
               setCountry(fetchedCliente.data.country.id);
               setSelectedIdCountry(fetchedCliente.data.country.id);
-              console.log("Country ID: ", fetchedCliente.data.country.id);
               setRegion(fetchedCliente.data.region.id);
               setSelectedIdRegion(fetchedCliente.data.region?.id ? fetchedCliente.data.region.id.toString() : '');
-              console.log("Region ID: ", fetchedCliente.data.region?.id || '');
               setCity(fetchedCliente.data.city.name);
               setSelectedIdCity(fetchedCliente.data.city?.id ? fetchedCliente.data.city.id.toString() : '');
-              console.log("City ID: ", fetchedCliente.data.city?.id || '');
               setPaymentMethod(fetchedCliente.data.paymentMethod.id);
               setSelectedIdPaymentMethod(fetchedCliente.data.paymentMethod?.id ? fetchedCliente.data.paymentMethod.id.toString() : '');
-              console.log("Payment Method ID: ", fetchedCliente.data.paymentMethod?.id || '');
-              console.log("Payment Method: ", fetchedCliente.data.paymentMethod.name);
 
             } catch (error) {
               console.error(error);
