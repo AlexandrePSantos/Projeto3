@@ -28,7 +28,7 @@ export default function CriarCliente({navigation}) {
 
     const [name, setName] = useState(); // textinput
     const [vat, setVat] = useState(); // textinput
-    const [country, setCountry] = useState(); // picker
+    const [country, setCountry] = useState('PT'); // picker
     const [selectedIdCountry, setSelectedIdCountry] = useState('PT');
     const [address, setAddress] = useState(); // textinput
     const [postalCode, setPostalCode] = useState(); // textinput
