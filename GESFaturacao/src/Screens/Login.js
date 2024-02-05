@@ -15,10 +15,10 @@ import {
 } from 'react-native';
 import { AuthContext } from '../Context/AuthContext';
 import LinearGradient from 'react-native-linear-gradient';
-import * as Keychain from 'react-native-keychain'; // Add this line
+import * as Keychain from 'react-native-keychain';
 
 
-const Login = ({navigation}) => {
+const Login = ({}) => {
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -40,9 +40,9 @@ const Login = ({navigation}) => {
       marginBottom: 50,
     },
     logo: {
-      width: keyboardStatus ? '70%' : '80%', // 70% of the navbar's width when the keyboard is not visible
-      height: keyboardStatus ? '60%' : '70%', // 70% of the navbar's height when the keyboard is not visible
-      resizeMode: 'contain', // Keep the image's aspect ratio
+      width: keyboardStatus ? '70%' : '80%', 
+      height: keyboardStatus ? '60%' : '70%', 
+      resizeMode: 'contain',
       marginTop: 50,
     },
     background: {
@@ -55,7 +55,7 @@ const Login = ({navigation}) => {
       flex: 2,
       width: '90%',
       alignItems: 'center',
-      marginTop: keyboardStatus ? '0%' : '10%', // Less top margin when the keyboard is visible
+      marginTop: keyboardStatus ? '0%' : '10%',
     },
     input: {
       backgroundColor: colorScheme === 'dark' ? '#333333' : '#fff',
@@ -113,7 +113,7 @@ const Login = ({navigation}) => {
       if (credentials && !isLoggedIn) {
         setUsername(credentials.username);
         setPassword(credentials.password);
-        login(credentials.username, credentials.password); // Automatically log the user in
+        login(credentials.username, credentials.password); // log-in automático
       }
     };
     loadCredentials();
@@ -126,7 +126,7 @@ const Login = ({navigation}) => {
 
   const handleLogin = async () => {
     if (!username || !password) {
-      ToastAndroid.show('Please enter both username and password.', ToastAndroid.SHORT);
+      ToastAndroid.show('Nome de utilizador e palavra-passe são obrigatórios.', ToastAndroid.SHORT);
       return;
     }
     setIsLoading(true);
@@ -153,7 +153,7 @@ const Login = ({navigation}) => {
       value={username}
       autoCapitalize='none'
       onChangeText={text => setUsername(text)}
-      placeholder="Username"
+      placeholder="Nome de utilizador"
       placeholderTextColor={colorScheme === 'dark' ? '#fff' : '#000'} 
       accessibilityLabel="Username"
     />
@@ -164,14 +164,14 @@ const Login = ({navigation}) => {
         value={password}
         autoCapitalize='none'
         onChangeText={text => setPassword(text)}
-        placeholder="Password"
+        placeholder="Palavra-passe"
         placeholderTextColor={colorScheme === 'dark' ? '#fff' : '#000'}
         secureTextEntry={!showPassword}
         accessibilityLabel="Password"
       />
       <TouchableOpacity style={styles.showPasswordButton} onPress={() => setShowPassword(!showPassword)}>
       <Text style={{ color: colorScheme === 'dark' ? '#fff' : '#000' }}>
-        {showPassword ? 'Hide' : 'Show'}
+        {showPassword ? 'Esconder' : 'Mostrar'}
       </Text>
       </TouchableOpacity>
     </View>
@@ -183,10 +183,10 @@ const Login = ({navigation}) => {
         trackColor={{ false: "#767577", true: "#BE6E31" }} 
         thumbColor={rememberCredentials ? "#BE6E31" : "#f4f3f4"}
       />
-      <Text style={{ color: colorScheme === 'dark' ? '#fff' : '#000' }}>Remember credentials?</Text>
+      <Text style={{ color: colorScheme === 'dark' ? '#fff' : '#000' }}>Lembrar credênciais?</Text>
     </View>
     <TouchableOpacity style={styles.btnSignIn} onPress={handleLogin} disabled={isLoading}>
-      {isLoading ? <ActivityIndicator /> : <Text style={styles.textSignIn}>Sign-in</Text>}
+      {isLoading ? <ActivityIndicator /> : <Text style={styles.textSignIn}>Entrar</Text>}
     </TouchableOpacity>
   </View>
 </KeyboardAvoidingView>
