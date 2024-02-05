@@ -77,8 +77,8 @@ export default function CriarFatura({ navigation }) {
   // VARIAVEIS PARA GUARDAR OS DADOS DA FATURA
   // SÃO USADOS PARA ENVIAR PARA A API
   const [ref, setReferencia] = useState('');
-  const [moeda, setMoeda] = useState('1'); // Valor inicial '1' para 'Euro (€)'
-  const [desc, setDesconto] = useState('0'); // Valor inicial '0'
+  const [moeda, setMoeda] = useState('1'); 
+  const [desc, setDesconto] = useState('0'); 
   const [obs, setObservacao] = useState('');
   const [finalizarDoc, setFinalizarDocumento] = useState(0);
   const [cliente, setCliente] = useState();
@@ -89,7 +89,7 @@ export default function CriarFatura({ navigation }) {
   const [metodo, setMetodo] = useState('');
   const [LinhasC, setLinhas] = useState([]);
 
-  const [email, setEmail] = useState(''); // Email para enviar a fatura
+  const [email, setEmail] = useState(''); 
 
   const [openc, setopenc] = useState(false);
 
@@ -179,15 +179,15 @@ export default function CriarFatura({ navigation }) {
         const documentId = response.fatura;
         enviarEmail(email, "FT", documentId)
           .then(() => {
-            console.log('Email sent successfully');
+            console.log('Email enviado com sucesso!');
           })
           .catch(error => {
-            console.error('Failed to send email:', error);
+            console.error('Falha ao enviar email:', error);
           });
       }
     }).catch(error => {
       console.error('Error creating invoice:', error);
-      ToastAndroid.show('Error creating invoice', ToastAndroid.SHORT);
+      ToastAndroid.show('Erro ao criar fatura', ToastAndroid.SHORT);
     });
   };
 
@@ -202,7 +202,7 @@ export default function CriarFatura({ navigation }) {
       <View style={styles.container}>
         <View style={{marginTop: 10}}>
           {/* Cliente - DONE */}
-          <Text style={styles.titleSelect}>Client</Text>
+          <Text style={styles.titleSelect}>Cliente</Text>
           <View style={styles.borderMargin}>
             <Picker
               style={styles.pickerComponent}
@@ -255,11 +255,9 @@ export default function CriarFatura({ navigation }) {
                 date={new Date(moment(dataIni, 'DD/MM/YYYY').format())}
                 onConfirm={date => {
                   setopenc(false);
-                  // Validar se a data de início é antes da data de validade
                   
                     setDataIni(moment(date).format('DD/MM/YYYY'));
 
-                    // Verificar a condição de pagamento e atualizar a data de validade
                     const daysToAdd = {
                       '1': 0,   // Pago a Pronto
                       '2': 10,  // 10 Dias Após Emissão
@@ -299,10 +297,10 @@ export default function CriarFatura({ navigation }) {
               onValueChange={itemValue => {
                 setVencimento(itemValue);
                 const daysToAdd = {
-                  '1': 0,   // Pago a Pronto
-                  '2': 10,  // 10 Dias Após Emissão
-                  '3': 20,  // 20 Dias Após Emissão
-                  '4': 30,  // Add more conditions as needed
+                  '1': 0,   
+                  '2': 10,  
+                  '3': 20,  
+                  '4': 30,  
                   '5': 60,
                   '6': 75,
                   '7': 90,
@@ -323,7 +321,6 @@ export default function CriarFatura({ navigation }) {
               <Picker.Item label="90 Dias Após Emissão" value="7" />
               <Picker.Item label="120 Dias Após Emissão" value="8" />
               <Picker.Item label="180 Dias Após Emissão" value="9" />
-              {/* Add more conditions of payment as needed */}
             </Picker>
           </View>
 
@@ -383,7 +380,7 @@ export default function CriarFatura({ navigation }) {
           </View>
 
           {/* finalize - DONE */}
-          <Text style={styles.titleSelect}>Finalize</Text>
+          <Text style={styles.titleSelect}>Finalizar</Text>
           <View style={styles.borderMargin}>
             <Picker
               style={styles.pickerComponent}
@@ -430,21 +427,18 @@ export default function CriarFatura({ navigation }) {
             </Picker>
           </View>
 
-          {/* lines/artigos */}
-          {/* Deve permitir selecionar vários artigos e as quantidades de cada */}
           <Text style={styles.titleSelect}>Artigo e Quantidade</Text>
           <View style={{flexDirection: 'row', alignItems: 'center', ...styles.borderMargin}}>
             <Picker 
-              style={{flex: 2, marginRight: 10}} // Add margin to the right of the Picker
+              style={{flex: 2, marginRight: 10}}
               placeholder="Selecione um Artigo"
               selectedValue={artigo} 
               onValueChange={(itemValue) => {
-                // console.log('Selected item:', itemValue);
                 setArtigo(itemValue);
                 setSelectedIdArtigo(itemValue);
                 setQuantidade('1');
               }} >
-              <Picker.Item label="Selecione artigo" value={null} />
+              <Picker.Item label="Selecione um artigo" value={null} />
               {dadosArtigos.map(function (object, i) {
                 return <Picker.Item label={object.description} value={object} key={i} />;
               })}
@@ -468,15 +462,12 @@ export default function CriarFatura({ navigation }) {
                   Alert.alert('Erro', 'Indique a quantidade');
                   return;
                 } else {
-                  // Check if item already exists in LinhasC
                   const existingItemIndex = LinhasC.findIndex(item => item.id === artigo.id.toString());
 
                   if (existingItemIndex >= 0) {
-                    // If item exists, update its quantity and total
                     LinhasC[existingItemIndex].quantity = Number(LinhasC[existingItemIndex].quantity) + Number(quantidade);
                     LinhasC[existingItemIndex].price = Number(LinhasC[existingItemIndex].price) + Number(artigo.price);
                   } else {
-                    // If item doesn't exist, add it as a new item
                     const newItem = { 
                       id: artigo.id.toString(), 
                       description: artigo.description, 
@@ -525,7 +516,7 @@ export default function CriarFatura({ navigation }) {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.titleSelect}>Change Quantity</Text>
+            <Text style={styles.titleSelect}>Alterar quantidade</Text>
             <View style={styles.borderMargin}>
             <TextInput
               style={styles.input}
@@ -538,24 +529,19 @@ export default function CriarFatura({ navigation }) {
             <View style={styles.buttonModal}>
               <Button 
                 color={'gray'}
-                title="Confirm" 
+                title="Confirmar" 
                 onPress={() => {
-                  // Find the selected item in the LinhasC array
                   const existingItemIndex = LinhasC.findIndex(item => item.id === selectedItem.id);
 
                   if (existingItemIndex >= 0) {
-                    // If the selected item exists, update its quantity
                     LinhasC[existingItemIndex].quantity = quantidade;
                   }
 
-                  // Update the LinhasC state
                   setLinhas([...LinhasC]);
 
-                  // Reset the selected item and quantity
                   setSelectedItem(null);
                   setQuantidade('');
 
-                  // Close the modal
                   setModalVisible(false);
                 }}
               />
@@ -563,7 +549,7 @@ export default function CriarFatura({ navigation }) {
               <View style={styles.buttonModal}>
               <Button 
                 color={'gray'}
-                title="Cancel" 
+                title="Cancelar" 
                 onPress={() => setModalVisible(false)}
               />
             </View>

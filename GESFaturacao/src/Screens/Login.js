@@ -17,7 +17,6 @@ import { AuthContext } from '../Context/AuthContext';
 import LinearGradient from 'react-native-linear-gradient';
 import * as Keychain from 'react-native-keychain';
 
-
 const Login = ({}) => {
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);

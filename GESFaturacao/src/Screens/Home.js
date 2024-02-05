@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, useColorScheme, Dimensions, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, useColorScheme, Dimensions, StyleSheet, ScrollView } from 'react-native';
 
 const buttonSize = Dimensions.get('window').width / 2 - 30;
 
@@ -8,7 +8,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     color: colorScheme === 'dark' ? '#ffffff' : '#000000',
-    textAlign: 'left',
+    textAlign: 'center',
   },
   outerContainer: {
     flex: 1,
@@ -24,12 +24,13 @@ const getStyles = (colorScheme) => StyleSheet.create({
   },
   menuButton: {
     width: buttonSize,
-    height: 100,
+    height: 70,
     padding: 10,
     backgroundColor: '#BE6E31',
     marginVertical: 10,
     alignItems: "center",
-    borderRadius: 7,
+    borderRadius: 10,
+    marginBottom: 20,
   },
   menuText: {
     fontSize: 20,
@@ -84,80 +85,49 @@ const getStyles = (colorScheme) => StyleSheet.create({
   }
 });
 
+const Button = ({ title, onPress, styles }) => (
+  <TouchableOpacity style={[styles.menuButton, styles.shadow]} onPress={onPress}>
+    <Text style={styles.menuText}>{title}</Text>
+  </TouchableOpacity>
+);
+
+const Container = ({ title, children, styles }) => (
+  <View>
+    <Text style={styles.titles}>{title}</Text>
+    <View style={styles.container}>
+      {children}
+    </View>
+  </View>
+);
+
 export default function Home({navigation}) {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
 
   return (
+    <ScrollView style={styles.outerContainer}>
     <View style={styles.outerContainer}>
-      <Text style={styles.titles}>Faturas</Text>
-      {/* Container Faturas */}
-      <View style={styles.container}>
-      {/* Botão criar fatura */}
-        <TouchableOpacity
-          style={[styles.menuButton, styles.shadow]}
-          onPress={() => navigation.navigate("Criar Fatura")}>
-          <Text style={styles.menuText}>Criar</Text>
-        </TouchableOpacity>
-        {/* Botão listar faturas */}
-        <TouchableOpacity
-          style={[styles.menuButton, styles.shadow]}
-          onPress={() => navigation.navigate("Listar Faturas")}>
-          <Text style={styles.menuText}>Listar</Text>
-        </TouchableOpacity>
-      </View>
+      <Container title="Faturas" styles={styles}>
+        <Button title="Criar" onPress={() => navigation.navigate("Criar Fatura")} styles={styles} />
+        <Button title="Listar" onPress={() => navigation.navigate("Listar Faturas")} styles={styles} />
+      </Container>
 
-      {/* Container Orçamentos */}
-      <Text style={styles.titles}>Orçamentos</Text>
-      <View style={styles.container}>
-        {/* Botão criar Orçamento */}
-        <TouchableOpacity
-          style={[styles.menuButton, styles.shadow]}
-          onPress={() => navigation.navigate("Criar Orçamento")}>
-          <Text style={styles.menuText}>Criar</Text>
-        </TouchableOpacity>
-        {/* Botão listar Orçamentos */}
-        <TouchableOpacity
-          style={[styles.menuButton, styles.shadow]}
-          onPress={() => navigation.navigate("Listar Orçamentos")}>
-          <Text style={styles.menuText}>Listar</Text>
-        </TouchableOpacity>
-      </View>
+      <Container title="Orçamentos" styles={styles}>
+        <Button title="Criar" onPress={() => navigation.navigate("Criar Orçamento")} styles={styles} />
+        <Button title="Listar" onPress={() => navigation.navigate("Listar Orçamentos")} styles={styles} />
+      </Container>
 
-      {/* Container Artigos */}
-      <Text style={styles.titles}>Artigos</Text>
-      <View style={styles.container}>
-        {/* Botão criar Artigo */}
-        <TouchableOpacity
-          style={[styles.menuButton, styles.shadow]}
-          onPress={() => navigation.navigate("Criar Artigo")}>
-          <Text style={styles.menuText}>Criar</Text>
-        </TouchableOpacity>
-        {/* Botão listar Artigos */}
-        <TouchableOpacity
-          style={[styles.menuButton, styles.shadow]}
-          onPress={() => navigation.navigate("Listar Artigos")}>
-          <Text style={styles.menuText}>Listar</Text>
-        </TouchableOpacity>
-      </View>
+      <Container title="Artigos" styles={styles}>
+        <Button title="Criar" onPress={() => navigation.navigate("Criar Artigo")} styles={styles} />
+        <Button title="Listar" onPress={() => navigation.navigate("Listar Artigos")} styles={styles} />
+      </Container>
 
-      {/* Container Clientes */}
-      <Text style={styles.titles}>Clientes</Text>
-      <View style={styles.container}>
-        {/* Botão criar Cliente */}
-        <TouchableOpacity
-          style={[styles.menuButton, styles.shadow]}
-          onPress={() => navigation.navigate("Criar Cliente")}>
-          <Text style={styles.menuText}>Criar</Text>
-        </TouchableOpacity>
-        {/* Botão listar Clientes */}
-        <TouchableOpacity
-          style={[styles.menuButton, styles.shadow]}
-          onPress={() => navigation.navigate("Listar Clientes")}>
-          <Text style={styles.menuText}>Listar</Text>
-        </TouchableOpacity>
-      </View>
+      <Container title="Clientes" styles={styles}>
+        <Button title="Criar" onPress={() => navigation.navigate("Criar Cliente")} styles={styles} />
+        <Button title="Listar" onPress={() => navigation.navigate("Listar Clientes")} styles={styles} />
+      </Container>
     </View>
+    </ScrollView>
   );
 };
 

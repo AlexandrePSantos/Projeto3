@@ -30,35 +30,10 @@ export const AuthProvider = ({children}) => {
             setNome(username);
             await AsyncStorage.setItem('@userInfo', JSON.stringify(userInfo));
             await AsyncStorage.setItem('@userToken', userInfo._token);
-    
+
             ToastAndroid.show("Bem-vindo, " + username, ToastAndroid.SHORT);
-    
-            // Validate token
-            const tokenRes = await axios.post(`${BASE_URL}/validate-token`, {}, {
-                headers: {
-                    'Authorization': userInfo._token,
-                }
-            });
-    
-            // Prepare the data for the validate-version request
-            let data = qs.stringify({
-                'version': '6',
-                'os': 'android' 
-            });
-    
-            // Prepare the config for the validate-version request
-            let config = {
-                method: 'post',
-                maxBodyLength: Infinity,
-                url: 'https://licencas.gesfaturacao.pt/server/auto/validate-version',
-                headers: { 
-                    'Content-Type': 'application/x-www-form-urlencoded', 
-                    'Authorization': 'Basic UjBWVFJrRlVWVkpCUTBGUDpNWFk0T0dKaWQyZHJaWEkzYmpreWFXUTNNVGs9',
-                },
-                data : data
-            };           
         } catch(e) {
-            ToastAndroid.show('Incorrect username or password.', ToastAndroid.SHORT);
+            ToastAndroid.show('Nome de utilizador ou palavra-passe incorretos.', ToastAndroid.SHORT);
         } finally {
             setIsLoading(false);
         }
@@ -111,24 +86,18 @@ export const AuthProvider = ({children}) => {
     
         return axios.request(config)
             .then((response) => {
-                // console.log(JSON.stringify(response.data));
                 return response.data;
             })
             .catch((error) => {
                 if (error.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
                     console.error('Server responded with an error status:', error.response.status);
                     console.error('Error details:', error.response.data);
                 } else if (error.request) {
-                    // The request was made but no response was received
                     console.error('No response received from the server');
                 } else {
-                    // Something happened in setting up the request that triggered an Error
                     console.error('Error setting up the request:', error.message);
-                }
-            
-                throw error; // Rethrow the error if needed for further handling
+                }            
+                throw error;
             });
     }
 
@@ -275,24 +244,19 @@ export const AuthProvider = ({children}) => {
     
         return axios.request(config)
             .then((response) => {
-                // console.log(JSON.stringify(response.data));
                 return response.data;
             })
             .catch((error) => {
                 if (error.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
                     console.error('Server responded with an error status:', error.response.status);
                     console.error('Error details:', error.response.data);
                 } else if (error.request) {
-                    // The request was made but no response was received
                     console.error('No response received from the server');
                 } else {
-                    // Something happened in setting up the request that triggered an Error
                     console.error('Error setting up the request:', error.message);
                 }
             
-                throw error; // Rethrow the error if needed for further handling
+                throw error;
             });
     }
 
@@ -341,7 +305,6 @@ export const AuthProvider = ({children}) => {
           
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data; 
         })
         .catch((error) => {
@@ -384,7 +347,6 @@ export const AuthProvider = ({children}) => {
           
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data; 
         })
         .catch((error) => {
@@ -405,7 +367,6 @@ export const AuthProvider = ({children}) => {
           
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data; 
         })
         .catch((error) => {
@@ -426,7 +387,6 @@ export const AuthProvider = ({children}) => {
 
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data; 
         })
         .catch((error) => {
@@ -447,7 +407,6 @@ export const AuthProvider = ({children}) => {
           
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data; 
         })
         .catch((error) => {
@@ -671,7 +630,6 @@ export const AuthProvider = ({children}) => {
           
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data; 
         })
         .catch((error) => {
@@ -692,7 +650,6 @@ export const AuthProvider = ({children}) => {
           
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data; 
         })
         .catch((error) => {
@@ -714,7 +671,6 @@ export const AuthProvider = ({children}) => {
 
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data;
         })
         .catch((error) => {
@@ -736,7 +692,6 @@ export const AuthProvider = ({children}) => {
 
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data;
         })
         .catch((error) => {
@@ -758,7 +713,6 @@ export const AuthProvider = ({children}) => {
 
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data;
         })
         .catch((error) => {
@@ -780,7 +734,6 @@ export const AuthProvider = ({children}) => {
 
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data;
         })
         .catch((error) => {
@@ -802,7 +755,6 @@ export const AuthProvider = ({children}) => {
 
         return axios.request(config)
         .then((response) => {
-        // console.log(JSON.stringify(response.data));
         return response.data;
         })
         .catch((error) => {
@@ -872,14 +824,11 @@ export const AuthProvider = ({children}) => {
                     console.error('Error details:', error.response.data);
                     console.error('Error details:', error.message);
                 } else if (error.request) {
-                    // The request was made but no response was received
                     console.error('No response received from the server');
                 } else {
-                    // Something happened in setting up the request that triggered an Error
                     console.error('Error setting up the request:', error.message);
                 }
-            
-                throw error; // Rethrow the error if needed for further handling
+                throw error; 
             });
     }
     
@@ -988,25 +937,19 @@ export const AuthProvider = ({children}) => {
     
         return axios.request(config)
             .then((response) => {
-                // console.log(JSON.stringify(response.data));
                 return response.data;
             })
             .catch((error) => {
                 if (error.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
                     console.error('Server responded with an error status:', error.response.status);
                     console.error('Error details:', error.response.data);
                     console.error('Error details:', error.message);
                 } else if (error.request) {
-                    // The request was made but no response was received
                     console.error('No response received from the server');
                 } else {
-                    // Something happened in setting up the request that triggered an Error
                     console.error('Error setting up the request:', error.message);
                 }
-            
-                throw error; // Rethrow the error if needed for further handling
+                throw error; 
             });
     
     }
@@ -1077,25 +1020,19 @@ export const AuthProvider = ({children}) => {
 
         return axios.request(config)
             .then((response) => {
-                // console.log(JSON.stringify(response.data));
                 return response.data;
             })
             .catch((error) => {
                 if (error.response) {
-                    // The request was made and the server responded with a status code
-                    // that falls out of the range of 2xx
                     console.error('Server responded with an error status:', error.response.status);
                     console.error('Error details:', error.response.data);
                     console.error('Error details:', error.message);
                 } else if (error.request) {
-                    // The request was made but no response was received
                     console.error('No response received from the server');
                 } else {
-                    // Something happened in setting up the request that triggered an Error
                     console.error('Error setting up the request:', error.message);
                 }
-            
-                throw error; // Rethrow the error if needed for further handling
+                throw error;
             });
     
     }
@@ -1125,20 +1062,15 @@ export const AuthProvider = ({children}) => {
             return response.data;
         } catch (error) {
             if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
                 console.error('Server responded with an error status:', error.response.status);
                 console.error('Error details:', error.response.data);
                 console.log(id);
             } else if (error.request) {
-                // The request was made but no response was received
                 console.error('No response received from the server');
             } else {
-                // Something happened in setting up the request that triggered an Error
                 console.error('Error setting up the request:', error.message);
             }
-
-            throw error; // Rethrow the error if needed for further handling
+            throw error;
         }
     }
     
@@ -1167,20 +1099,16 @@ export const AuthProvider = ({children}) => {
             return response.data;
         } catch (error) {
             if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
                 console.error('Server responded with an error status:', error.response.status);
                 console.error('Error details:', error.response.data);
                 console.log(id);
             } else if (error.request) {
-                // The request was made but no response was received
                 console.error('No response received from the server');
             } else {
-                // Something happened in setting up the request that triggered an Error
                 console.error('Error setting up the request:', error.message);
             }
 
-            throw error; // Rethrow the error if needed for further handling
+            throw error;
         }
     }
 
@@ -1208,19 +1136,14 @@ export const AuthProvider = ({children}) => {
             return response.data;
         } catch (error) {
             if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
                 console.error('Server responded with an error status:', error.response.status);
                 console.error('Error details:', error.response.data);
             } else if (error.request) {
-                // The request was made but no response was received
                 console.error('No response received from the server');
             } else {
-                // Something happened in setting up the request that triggered an Error
                 console.error('Error setting up the request:', error.message);
             }
-
-            throw error; // Rethrow the error if needed for further handling
+            throw error;
         }
     }
 
@@ -1245,19 +1168,15 @@ export const AuthProvider = ({children}) => {
                 return response.data;
         } catch (error) {
             if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
                 console.error('Server responded with an error status:', error.response.status);
                 console.error('Error details:', error.response.data);
             } else if (error.request) {
-                // The request was made but no response was received
                 console.error('No response received from the server');
             } else {
-                // Something happened in setting up the request that triggered an Error
                 console.error('Error setting up the request:', error.message);
             }
 
-            throw error; // Rethrow the error if needed for further handling
+            throw error;
         }
     }
 
@@ -1283,19 +1202,15 @@ export const AuthProvider = ({children}) => {
             return response.data;
         } catch (error) {
             if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
                 console.error('Server responded with an error status:', error.response.status);
                 console.error('Error details:', error.response.data);
             } else if (error.request) {
-                // The request was made but no response was received
                 console.error('No response received from the server');
             } else {
-                // Something happened in setting up the request that triggered an Error
                 console.error('Error setting up the request:', error.message);
             }
 
-            throw error; // Rethrow the error if needed for further handling
+            throw error;
         }
     }
 
@@ -1321,19 +1236,14 @@ export const AuthProvider = ({children}) => {
         return response.data;
         } catch (error) {
             if (error.response) {
-                // The request was made and the server responded with a status code
-                // that falls out of the range of 2xx
                 console.error('Server responded with an error status:', error.response.status);
                 console.error('Error details:', error.response.data);
             } else if (error.request) {
-                // The request was made but no response was received
                 console.error('No response received from the server');
             } else {
-                // Something happened in setting up the request that triggered an Error
                 console.error('Error setting up the request:', error.message);
             }
-
-            throw error; // Rethrow the error if needed for further handling
+            throw error;
         }
     }
 

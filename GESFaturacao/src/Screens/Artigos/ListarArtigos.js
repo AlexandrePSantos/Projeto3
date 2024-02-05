@@ -54,7 +54,7 @@ export default function ListarArtigos({ navigation }) {
           <View style={styles.artigoInfo}>
             <Text style={styles.text}>ID: {artigo.id.toString()}</Text>
             <Text style={styles.text}>Preço: {parseFloat(artigo.price).toFixed(2)}</Text>
-            <Text style={styles.text}>Preço+Tax: {parseFloat(artigo.pricePvp).toFixed(2)}</Text>
+            <Text style={styles.text}>Preço+Tax: {parseFloat(artigo.pricePvp).toFixed(2)}€</Text>
             <Text style={styles.text}>Descrição: {artigo.description.toString()}</Text>
           </View>
           <Image source={{ uri: artigo.image.toString() }} style={styles.artigoImage} />
@@ -74,7 +74,7 @@ export default function ListarArtigos({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#444444', marginTop: 20, marginBottom: 20 }}></Text>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#444444' }}></Text>
       <FlatList
         data={artigos}
         renderItem={renderItem}
@@ -100,7 +100,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     marginBottom:15,
-    marginLeft:20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,

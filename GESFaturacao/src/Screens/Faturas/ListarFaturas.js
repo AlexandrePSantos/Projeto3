@@ -55,11 +55,11 @@ export default function ListarFaturas({ navigation }) {
   const handleEnviarEmail = async () => {
     try {
       await enviarEmail(email, "FT", selectedFatura.id);
-      console.log('Email sent successfully');
+      console.log('Email enviado com sucesso!');
       setEmail('');
       setModalVisible(false);
     } catch (error) {
-      console.error('Failed to send email:', error);
+      console.error('Falha ao enviar email:', error);
     }
   };
 
@@ -107,7 +107,6 @@ export default function ListarFaturas({ navigation }) {
 
   const keyExtractor = (item) => item.id.toString();
 
-  // Loading indicator
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff' }}>
@@ -131,12 +130,12 @@ export default function ListarFaturas({ navigation }) {
       >
         <View style={styles.overlay}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Enter email:</Text>
+            <Text style={styles.modalText}>Insira email:</Text>
             <TextInput
               style={styles.input}
               onChangeText={setEmail}
               value={email}
-              placeholder="Enter email"
+              placeholder="Email"
               keyboardType="email-address"
             />
             <View style={styles.button}>
@@ -149,7 +148,7 @@ export default function ListarFaturas({ navigation }) {
             <View style={styles.button}>
               <Button
                 color={'gray'}
-                title="Cancel"
+                title="Cancelar"
                 onPress={() => {
                   setEmail('');
                   setModalVisible(false);

@@ -66,10 +66,10 @@ export default function CriarArtigo({navigation}) {
     // Validation checks
     if (!code || !name || !type || !unit || !pvp || !iva) {
       let errorMessage = "Os seguintes campos são obrigatórios:\n";
-      if (!code) errorMessage += "- Code\n";
-      if (!name) errorMessage += "- Name\n";
-      if (!type) errorMessage += "- Type\n";
-      if (!unit) errorMessage += "- Unit\n";
+      if (!code) errorMessage += "- Código\n";
+      if (!name) errorMessage += "- Nome\n";
+      if (!type) errorMessage += "- Tipo\n";
+      if (!unit) errorMessage += "- Unidade\n";
       if (!pvp) errorMessage += "- Pvp\n";
       if (!iva) errorMessage += "- Iva\n";
   
@@ -77,7 +77,6 @@ export default function CriarArtigo({navigation}) {
       return;
     }
   
-    // If all required fields are filled, proceed with creating the budget
     const codeC = code;
     const nameC = name;
     const typeC = type;
@@ -88,8 +87,8 @@ export default function CriarArtigo({navigation}) {
     const pvpC = pvp;
     const precoUnitC = precoUnit;
     const precoIniC = precoIni;
-    const ivaC = iva; //ver melhor este
-    const categoryC = category; //ver melhor este
+    const ivaC = iva;
+    const categoryC = category; 
   
     CriarArtigo(
       codeC,

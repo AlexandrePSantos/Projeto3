@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Text, StyleSheet, Button, View, StatusBar, useColorScheme } from 'react-native';
-import { AuthContext } from '../Context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import { Text, StyleSheet, Button, View, StatusBar } from 'react-native';
+import { AuthContext } from '../Context/AuthContext';
 import * as Keychain from 'react-native-keychain';
 import LinearGradient from 'react-native-linear-gradient';
+
 
 import Login from '../Screens/Login';
 import Home from '../Screens/Home';
@@ -92,8 +93,8 @@ const CustomHeader = ({ title, showBackButton, showLogoutButton, onLogout }) => 
       style={styles.customHeader}
     >
       <View style={{ position: 'absolute', left: 10 }}>
-        {showBackButton && <Button title="Back" color="gray" onPress={() => navigation.goBack()} />}
-        {showLogoutButton && <Button title="Logout" color="gray" onPress={onLogout} />}
+        {showBackButton && <Button title="Voltar" color="gray" onPress={() => navigation.goBack()} />}
+        {showLogoutButton && <Button title="Sair" color="gray" onPress={onLogout} />}
       </View>
       <Text style={styles.headerText}>{title}</Text>
     </LinearGradient>

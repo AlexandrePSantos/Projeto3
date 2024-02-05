@@ -122,7 +122,7 @@ export default function CriarOrcamento({ route, navigation }) {
                     discount: line.percentageDiscount.value,
                     tax: line.tax.id.toString(),
                     exemption: line.exemption.id ? line.exemption.id.toString() : null,
-                    retention: line.retencao || "0.000000",  // Add this line
+                    retention: line.retencao || "0.000000",
                 }));
                 setLinhas(transformedLines);
 
@@ -393,7 +393,7 @@ export default function CriarOrcamento({ route, navigation }) {
           </View>
 
           {/* finalize - DONE */}
-          <Text style={styles.titleSelect}>Finalize</Text>
+          <Text style={styles.titleSelect}>Finalizar</Text>
           <View style={styles.borderMargin}>
             <Picker
               style={styles.pickerComponent}
@@ -433,7 +433,7 @@ export default function CriarOrcamento({ route, navigation }) {
                 setSelectedIdArtigo(itemValue);
                 setQuantidade('1');
               }} >
-              <Picker.Item label="Selecione artigo" value={null} />
+              <Picker.Item label="Selecione um artigo" value={null} />
               {dadosArtigos.map(function (object, i) {
                 return <Picker.Item label={object.description} value={object} key={i}  />;
               })}
@@ -518,7 +518,7 @@ export default function CriarOrcamento({ route, navigation }) {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.titleSelect}>Change Quantity</Text>
+            <Text style={styles.titleSelect}>Mudar quantidade</Text>
             <View style={styles.borderMargin}>
             <TextInput
               style={styles.input}
@@ -531,24 +531,19 @@ export default function CriarOrcamento({ route, navigation }) {
             <View style={styles.buttonModal}>
               <Button 
                 color={'gray'}
-                title="Confirm" 
+                title="Confirmar" 
                 onPress={() => {
-                  // Find the selected item in the LinhasC array
                   const existingItemIndex = LinhasC.findIndex(item => item.id === selectedItem.id);
 
                   if (existingItemIndex >= 0) {
-                    // If the selected item exists, update its quantity
                     LinhasC[existingItemIndex].quantity = quantidade;
                   }
 
-                  // Update the LinhasC state
                   setLinhas([...LinhasC]);
 
-                  // Reset the selected item and quantity
                   setSelectedItem(null);
                   setQuantidade('');
 
-                  // Close the modal
                   setModalVisible(false);
                 }}
               />
@@ -556,7 +551,7 @@ export default function CriarOrcamento({ route, navigation }) {
               <View style={styles.buttonModal}>
               <Button 
                 color={'gray'}
-                title="Cancel" 
+                title="Cancelar" 
                 onPress={() => setModalVisible(false)}
               />
             </View>
@@ -588,7 +583,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Add this line
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', 
   },
   modalView: {
     width: 300,

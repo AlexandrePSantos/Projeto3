@@ -55,11 +55,11 @@ export default function ListarOrcamentos({navigation}) {
   const handleEnviarEmail = async () => {
     try {
       await enviarEmail(email, "OR", selectedOrcamento.id);
-      console.log('Email sent successfully');
+      console.log('Email enviado com sucesso!');
       setEmail('');
       setModalVisible(false);
     } catch (error) {
-      console.error('Failed to send email:', error);
+      console.error('Falha ao enviar email:', error);
     }
   };
 
@@ -82,7 +82,7 @@ export default function ListarOrcamentos({navigation}) {
             <Text style={styles.textInOrcamentoContainer}>NIF: {orcamento.vatNumber} </Text>
             <Text style={styles.textInOrcamentoContainer}>Data: {orcamento.dateFormatted}</Text>
             <Text style={styles.textInOrcamentoContainer}>Data Venc.: {orcamento.expirationFormatted}</Text>
-            <Text style={styles.textInOrcamentoContainer}>Total: {parseFloat(orcamento.total).toFixed(2)} €</Text>
+            <Text style={styles.textInOrcamentoContainer}>Total: {parseFloat(orcamento.total).toFixed(2)}€</Text>
             <Text style={styles.textInOrcamentoContainer}>Estado: {orcamento.status}</Text>
         </View>
       </TouchableOpacity>
@@ -132,12 +132,12 @@ export default function ListarOrcamentos({navigation}) {
       >
         <View style={styles.overlay}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Enter email:</Text>
+            <Text style={styles.modalText}>Enter email: </Text>
             <TextInput
               style={styles.input}
               onChangeText={setEmail}
               value={email}
-              placeholder="Enter email"
+              placeholder="Insira o email"
               keyboardType="email-address"
             />
             <View style={styles.button}>
@@ -150,7 +150,7 @@ export default function ListarOrcamentos({navigation}) {
             <View style={styles.button}>
               <Button
                 color={'gray'}
-                title="Cancel"
+                title="Cancelar"
                 onPress={() => {
                   setEmail('');
                   setModalVisible(false);

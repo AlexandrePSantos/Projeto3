@@ -167,7 +167,6 @@ export default function DetalhesFatura({ route, navigation }) {
             console.error(error);
           }
   
-          // Set loading to false after the data is fetched and state is updated
           setLoading(false);
         } else {
           console.error('Fetched fatura is undefined or does not contain data');
@@ -202,15 +201,15 @@ export default function DetalhesFatura({ route, navigation }) {
         const documentId = response.fatura;
         enviarEmail(email, "FT", documentId)
           .then(() => {
-            console.log('Email sent successfully');
+            console.log('Email enviado com sucesso!');
           })
           .catch(error => {
-            console.error('Failed to send email:', error);
+            console.error('Falha ao enviar email:', error);
           });
       }
     }).catch(error => {
       console.error('Error editing invoice:', error);
-      ToastAndroid.show('Error editing invoice', ToastAndroid.SHORT);
+      ToastAndroid.show('Erro ao editar fatura', ToastAndroid.SHORT);
     });
   };
 
@@ -412,7 +411,7 @@ export default function DetalhesFatura({ route, navigation }) {
         </View>
 
         {/* finalize - DONE */}
-        <Text style={styles.titleSelect}>Finalize</Text>
+        <Text style={styles.titleSelect}>Finalizar</Text>
         <View style={styles.borderMargin}>
           <Picker
             style={styles.pickerComponent}
@@ -461,12 +460,10 @@ export default function DetalhesFatura({ route, navigation }) {
 
         {isEditing && (
           <>
-        {/* lines/artigos */}
-        {/* Deve permitir selecionar vários artigos e as quantidades de cada */}
         <Text style={styles.titleSelect}>Artigo e Quantidade</Text>
         <View style={{flexDirection: 'row', alignItems: 'center', ...styles.borderMargin}}>
           <Picker 
-            style={{flex: 2, marginRight: 10}} // Add margin to the right of the Picker
+            style={{flex: 2, marginRight: 10}} 
             placeholder="Selecione um Artigo"
             selectedValue={artigo} 
             onValueChange={(itemValue) => {
@@ -474,7 +471,7 @@ export default function DetalhesFatura({ route, navigation }) {
               setSelectedIdArtigo(itemValue);
               setQuantidade('1');
             }} >
-            <Picker.Item label="Selecione artigo" value={null} />
+            <Picker.Item label="Selecione um artigo" value={null} />
             {dadosArtigos.map(function (object, i) {
               return <Picker.Item label={object.description} value={object} key={i} />;
             })}
@@ -501,11 +498,9 @@ export default function DetalhesFatura({ route, navigation }) {
                 const existingItemIndex = LinhasC.findIndex(item => item.id === artigo.id.toString());
 
                 if (existingItemIndex >= 0) {
-                    // If item exists, update its quantity and total
                     LinhasC[existingItemIndex].quantity = Number(LinhasC[existingItemIndex].quantity) + Number(quantidade);
                     LinhasC[existingItemIndex].price = Number(LinhasC[existingItemIndex].price) + Number(artigo.price);
                   } else {
-                    // If item doesn't exist, add it as a new item
                     const newItem = { 
                       id: artigo.id.toString(), 
                       description: artigo.description, 
@@ -570,24 +565,19 @@ export default function DetalhesFatura({ route, navigation }) {
             <View style={styles.buttonModal}>
               <Button 
                 color={'gray'}
-                title="Confirm" 
+                title="Confirmar" 
                 onPress={() => {
-                  // Find the selected item in the LinhasC array
                   const existingItemIndex = LinhasC.findIndex(item => item.id === selectedItem.id);
 
                   if (existingItemIndex >= 0) {
-                    // If the selected item exists, update its quantity
                     LinhasC[existingItemIndex].quantity = quantidade;
                   }
 
-                  // Update the LinhasC state
                   setLinhas([...LinhasC]);
 
-                  // Reset the selected item and quantity
                   setSelectedItem(null);
                   setQuantidade('');
 
-                  // Close the modal
                   setModalVisible(false);
                 }}
               />
@@ -595,7 +585,7 @@ export default function DetalhesFatura({ route, navigation }) {
               <View style={styles.buttonModal}>
               <Button 
                 color={'gray'}
-                title="Cancel" 
+                title="Cancelar" 
                 onPress={() => setModalVisible(false)}
               />
             </View>
