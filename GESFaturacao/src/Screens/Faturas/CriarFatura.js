@@ -468,7 +468,7 @@ export default function CriarFatura({ navigation }) {
         <CustomButton 
           title="Adicionar" 
           styles={styles} 
-          gradientColors={['#4c669f', '#3b5998', '#192f6a']} 
+          gradientColors={['#ff8a2a', '#ffa500']} 
           onPress={() => {
             if (!artigo) {
               Alert.alert('Erro', 'Selecione um artigo');
@@ -502,8 +502,6 @@ export default function CriarFatura({ navigation }) {
               setQuantidade(''); // Reset quantidade
             }
           }}
-        
-          gradientColors={['#ff8a2a', '#ffa500']}
         />
 
 
