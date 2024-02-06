@@ -89,11 +89,13 @@ const CustomHeader = ({ title, showBackButton, showLogoutButton, onLogout }) => 
 
   return (
     <LinearGradient
-      colors={['rgba(154, 83, 27, 1)', 'rgba(154, 83, 27, 0.6)']}
+    colors={['#ff8a2a', '#ffa500']}  // Colors from Button component
       style={styles.customHeader}
     >
       <View style={{ position: 'absolute', left: 10 }}>
-        {showBackButton && <Button title="Voltar" color="gray" onPress={() => navigation.goBack()} />}
+        {showBackButton && (
+          <Button title="Voltar" color="gray" onPress={() => navigation.goBack()} />
+        )}
         {showLogoutButton && <Button title="Sair" color="gray" onPress={onLogout} />}
       </View>
       <Text style={styles.headerText}>{title}</Text>

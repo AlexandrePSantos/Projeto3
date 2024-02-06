@@ -27,7 +27,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
     width: buttonSize,
     height: 70,
     padding: 10,
-    backgroundColor: '#BE6E31',
+    backgroundColor: '#ffff',
     marginVertical: 10,
     alignItems: "center",
     borderRadius: 10,
