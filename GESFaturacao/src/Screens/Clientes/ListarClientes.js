@@ -75,7 +75,7 @@ export default function ListarClientes({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#444444', marginTop: 20, marginBottom: 20 }}></Text>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#444444' }}></Text>
       <FlatList
         data={clientes}
         renderItem={renderItem}
@@ -88,7 +88,7 @@ export default function ListarClientes({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e5e9ec',
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'flex-start',
     marginBottom: 20,
@@ -101,7 +101,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     marginBottom:15,
-    marginLeft:20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,

@@ -87,7 +87,7 @@ export default function ListarArtigos({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e5e9ec',
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'flex-start',
     marginBottom: 20,
