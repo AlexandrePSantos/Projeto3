@@ -252,7 +252,7 @@ export default function CriarOrcamento({ route, navigation }) {
               title="Cancelar"
               onPress={() => setIsEditing(false)}
               styles={styles} 
-              gradientColors={['#ff0000', '#ff7b00']}
+              gradientColors={['#ff0000', '#ffa500']}
             />
           ) : (
             // Botão "Editar" com gradiente original
