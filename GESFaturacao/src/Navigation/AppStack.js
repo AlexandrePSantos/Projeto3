@@ -61,7 +61,7 @@ const AppStack = () => {
 
   return (
     <>
-      <StatusBar backgroundColor="rgba(154, 83, 27, 1)" barStyle="light-content" />
+      <StatusBar backgroundColor="#ff8a2a" barStyle="light-content" />
       <Stack.Navigator>
         {screens.map((screen) => (
           <Stack.Screen 
