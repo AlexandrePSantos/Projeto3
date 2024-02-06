@@ -67,16 +67,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
   button: {
     marginTop: 50,
   },
-  shadow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 5,
-  },
+
   paddingBottom: {
     paddingBottom: 5,
     paddingTop: 10,
@@ -87,13 +78,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
 });
 
 const Button = ({ title, onPress, styles }) => (
-  <TouchableOpacity
-    onPress={onPress}
-    onPressOut={() => {
-      // Retorna o botão à cor normal
-      styles.menuButton.backgroundColor = '#BE6E31';
-    }}
-  >
+  <TouchableOpacity onPress={onPress}>
     <LinearGradient
       colors={['#ff8a2a', '#ffa500']} // Cores do gradiente from the image
       style={[styles.menuButton, styles.shadow]}
@@ -104,6 +89,7 @@ const Button = ({ title, onPress, styles }) => (
     </LinearGradient>
   </TouchableOpacity>
 );
+
 
 const Container = ({ title, children, styles }) => (
   <View>
