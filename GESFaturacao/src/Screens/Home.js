@@ -67,7 +67,6 @@ const getStyles = (colorScheme) => StyleSheet.create({
   button: {
     marginTop: 50,
   },
-
   paddingBottom: {
     paddingBottom: 5,
     paddingTop: 10,
@@ -86,7 +85,7 @@ const Button = ({ title, onPress, styles }) => (
   >
     <LinearGradient
       colors={['#ff8a2a', '#ffa500']} // Cores do gradiente from the image
-      style={[styles.menuButton, styles.shadow]}
+      style={[styles.menuButton]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
     >
