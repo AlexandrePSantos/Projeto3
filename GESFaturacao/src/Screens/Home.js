@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, useColorScheme, Dimensions, StyleSheet, ScrollView } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 const buttonSize = Dimensions.get('window').width / 2 - 30;
 
@@ -86,10 +87,18 @@ const getStyles = (colorScheme) => StyleSheet.create({
 });
 
 const Button = ({ title, onPress, styles }) => (
-  <TouchableOpacity style={[styles.menuButton, styles.shadow]} onPress={onPress}>
-    <Text style={styles.menuText}>{title}</Text>
+  <TouchableOpacity onPress={onPress}>
+    <LinearGradient
+      colors={['#ff8a2a', '#ffa500']} // Cores do gradiente from the image
+      style={[styles.menuButton, styles.shadow]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+    >
+      <Text style={styles.menuText}>{title}</Text>
+    </LinearGradient>
   </TouchableOpacity>
 );
+
 
 const Container = ({ title, children, styles }) => (
   <View>
