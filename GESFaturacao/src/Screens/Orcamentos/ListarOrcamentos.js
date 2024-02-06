@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useColorScheme, StyleSheet, Text, Button, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import Modal from 'react-native-modal';
+import LinearGradient from 'react-native-linear-gradient';
 
 import { AuthContext } from '../../Context/AuthContext';
 
@@ -8,12 +9,12 @@ export default function ListarOrcamentos({navigation}) {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
 
-  const[loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const { getOrcamentos, enviarEmail, finalizarOrcamento, removerOrcamento } = useContext(AuthContext);
   const [orcamentos, setOrcamentos] = useState([]);
-  const[modalVisible, setModalVisible] = useState(false);
-  const[selectedOrcamento, setSelectedOrcamento] = useState(null);
-  const[email, setEmail] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedOrcamento, setSelectedOrcamento] = useState(null);
+  const [email, setEmail] = useState('');
 
   const carregarOrcamentos = async () => {
     try {
@@ -88,17 +89,27 @@ export default function ListarOrcamentos({navigation}) {
       </TouchableOpacity>
       {orcamento.status !== 'ANULADO' && (
         <View style={styles.buttonContainer}>
-          <Button
-            color={'gray'}
-            title={orcamento.status === 'Aberto' ? 'Enviar' : 'Finalizar'}
-            onPress={() => handlePress(orcamento)}
-          />
+          <TouchableOpacity onPress={() => handlePress(orcamento)}>
+            <LinearGradient
+              colors={['#ff8a2a', '#ffa500']}
+              style={styles.button}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              <Text style={styles.buttonText}>{orcamento.status === 'Aberto' ? 'Enviar' : 'Finalizar'}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
           {orcamento.status === 'Rascunho' && (
-          <Button
-              color={'gray'}
-              title="Remover"
-              onPress={() => handleRemoverOrcamento(orcamento)}
-            />
+            <TouchableOpacity onPress={() => handleRemoverOrcamento(orcamento)}>
+              <LinearGradient
+                colors={['#ff0000', '#ffa500']}
+                style={styles.button}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Text style={styles.buttonText}>Remover</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           )}
         </View>
 
@@ -169,7 +180,18 @@ const getStyles = (colorScheme) => StyleSheet.create({
   // General styles
   button: {
     marginBottom: 10,
-    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 100, // Aqui estava o erro
+    height: 35,
+    marginRight: 10,
+    marginLeft:10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   input: {
     height: 40,
@@ -180,6 +202,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
     borderWidth: 1,
     borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
     borderRadius: 7,
+    paddingHorizontal: 10,
   },
   overlay: {
     flex: 1,

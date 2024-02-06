@@ -16,6 +16,7 @@ import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 import { AuthContext } from '../../Context/AuthContext';
+import LinearGradient from 'react-native-linear-gradient';
 
 function Item({ item, onPress, onDelete }) {
   return (
@@ -37,6 +38,18 @@ function Item({ item, onPress, onDelete }) {
     </View>
   );
 }
+const CustomButton = ({ title, onPress, styles, gradientColors }) => (
+  <TouchableOpacity onPress={onPress}>
+    <LinearGradient
+      colors={gradientColors}
+      style={[styles.button]} // Make sure to access the button style from styles object
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+    >
+      <Text style={styles.buttonText}>{title}</Text>
+    </LinearGradient>
+  </TouchableOpacity>
+);
 
 export default function CriarFatura({ navigation }) {
   const colorScheme = useColorScheme();
@@ -451,43 +464,46 @@ export default function CriarFatura({ navigation }) {
               keyboardType="numeric"
             />
             </View>
-            <Button 
-              title="Adicionar" 
-              color="#d0933f" 
-              onPress={() => {
-                if (!artigo) {
-                  Alert.alert('Erro', 'Selecione um artigo');
-                  return;
-                } else if (!quantidade || quantidade === '0') {
-                  Alert.alert('Erro', 'Indique a quantidade');
-                  return;
-                } else {
-                  const existingItemIndex = LinhasC.findIndex(item => item.id === artigo.id.toString());
+                    
+        <CustomButton 
+          title="Adicionar" 
+          onPress={() => {
+            if (!artigo) {
+              Alert.alert('Erro', 'Selecione um artigo');
+              return;
+            } else if (!quantidade || quantidade === '0') {
+              Alert.alert('Erro', 'Indique a quantidade');
+              return;
+            } else {
+              const existingItemIndex = LinhasC.findIndex(item => item.id === artigo.id.toString());
 
-                  if (existingItemIndex >= 0) {
-                    LinhasC[existingItemIndex].quantity = Number(LinhasC[existingItemIndex].quantity) + Number(quantidade);
-                    LinhasC[existingItemIndex].price = Number(LinhasC[existingItemIndex].price) + Number(artigo.price);
-                  } else {
-                    const newItem = { 
-                      id: artigo.id.toString(), 
-                      description: artigo.description, 
-                      quantity: quantidade, 
-                      price: artigo.price, 
-                      discount: '0', 
-                      tax: artigo.taxID, 
-                      exemption: artigo.exemptionID.toString(), 
-                      retention: 0 
-                    };
-                    LinhasC.push(newItem);
-                  }
+              if (existingItemIndex >= 0) {
+                LinhasC[existingItemIndex].quantity = Number(LinhasC[existingItemIndex].quantity) + Number(quantidade);
+                LinhasC[existingItemIndex].price = Number(LinhasC[existingItemIndex].price) + Number(artigo.price);
+              } else {
+                const newItem = { 
+                  id: artigo.id.toString(), 
+                  description: artigo.description, 
+                  quantity: quantidade, 
+                  price: artigo.price, 
+                  discount: '0', 
+                  tax: artigo.taxID, 
+                  exemption: artigo.exemptionID.toString(), 
+                  retention: 0 
+                };
+                LinhasC.push(newItem);
+              }
 
-                  setLinhas([...LinhasC]);
-                  setListKey(listKey + 1);
-                  setArtigo(null); // Reset artigo
-                  setQuantidade(''); // Reset quantidade
-                }
-              }}
-            />
+              setLinhas([...LinhasC]);
+              setListKey(listKey + 1);
+              setArtigo(null); // Reset artigo
+              setQuantidade(''); // Reset quantidade
+            }
+          }}
+        
+          gradientColors={['#ff8a2a', '#ffa500']}
+        />
+
 
         <Text style={styles.titleSelect}>Linha de Artigos</Text>
         <View style={styles.borderMargin}>
@@ -557,11 +573,12 @@ export default function CriarFatura({ navigation }) {
         </View>
       </Modal>
         
-        <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-          <Button
+      <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+          <CustomButton
             title="Criar Fatura"
-            color="#d0933f"
             onPress={() => handleCreateFatura()}
+            styles={styles}
+            gradientColors={['#ff8a2a', '#ffa500']}
           />
         </View>
       </View>
@@ -579,9 +596,15 @@ const getStyles = (colorScheme) => StyleSheet.create({
   button: {
     alignItems: 'center',
     backgroundColor: '#d0933f',
-    marginTop: 16,
-    width: 300,
+    width: 350,
     padding: 10,
+    borderRadius:10,
+  },
+    buttonText: {
+    color: '#ffffff', // Letras brancas
+    fontWeight: 'bold', // Negrito
+    textAlign: 'center', // Centralizado
+    fontSize: 20,
   },
   titleSelect: {
     fontSize: 20,
