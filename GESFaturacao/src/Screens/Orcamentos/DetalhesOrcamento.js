@@ -17,6 +17,8 @@ import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 import { AuthContext } from '../../Context/AuthContext';
+import LinearGradient from 'react-native-linear-gradient';
+
 
 function Item({ item, onPress, onDelete, isEditing }) {
   return (
@@ -226,17 +228,42 @@ export default function CriarOrcamento({ route, navigation }) {
     );
   }
 
+  const CustomButtonConfirm = ({ title, onPress, styles, gradientColors }) => (
+    <TouchableOpacity onPress={onPress}>
+      <LinearGradient
+        colors={gradientColors}
+        style={[styles.button]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
+        <Text style={styles.buttonText}>{title}</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+  
   return (
     <ScrollView>
     <View style={styles.container}>
-    {finalizarDoc === '0' && (
-      <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-        <Button
-          title={isEditing ? "Cancelar" : "Editar"}
-          color="#d0933f"
-          onPress={() => setIsEditing(!isEditing)}
-        />
-      </View>
+      {finalizarDoc === '0' && (
+        <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+          {isEditing ? (
+            // Botão "Cancelar" com gradiente em tons de vermelho
+            <CustomButtonConfirm
+              title="Cancelar"
+              onPress={() => setIsEditing(false)}
+              styles={styles} 
+              gradientColors={['#ff0000', '#ff7b00']}
+            />
+          ) : (
+            // Botão "Editar" com gradiente original
+            <CustomButtonConfirm
+              title="Editar"
+              onPress={() => setIsEditing(true)}
+              styles={styles} 
+              gradientColors={['#ff8a2a', '#ffa500']}
+            />
+          )}
+        </View>
       )}
       <View pointerEvents={isEditing ? 'auto' : 'none'} style={{marginTop: 10}}>
 
@@ -446,9 +473,9 @@ export default function CriarOrcamento({ route, navigation }) {
               keyboardType="numeric"
             />
             </View>
-            <Button 
+            <CustomButtonConfirm
               title="Adicionar" 
-              color="#d0933f" 
+              
               onPress={() => {
                 if (!artigo) {
                   Alert.alert('Erro', 'Selecione um artigo');
@@ -486,6 +513,8 @@ export default function CriarOrcamento({ route, navigation }) {
                   setQuantidade(''); // Reset quantidade
                 }
               }}
+              styles={styles}
+              gradientColors={['#ff8a2a', '#ffa500']}
             />
           </>
           )}
@@ -562,10 +591,12 @@ export default function CriarOrcamento({ route, navigation }) {
       {isEditing && (
           <>
       <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-        <Button
+        <CustomButtonConfirm
           title="Confirmar"
           color="#d0933f"
           onPress={() => handleConfirmarEditar()}
+          styles={styles}
+          gradientColors={['#ff8a2a', '#ffa500']}
         />
       </View>
       </>
@@ -579,6 +610,12 @@ export default function CriarOrcamento({ route, navigation }) {
 }
 
 const getStyles = (colorScheme) => StyleSheet.create({
+  buttonText: {
+    color: '#ffffff', // Letras brancas
+    fontWeight: 'bold', // Negrito
+    textAlign: 'center', // Centralizado
+    fontSize: 20,
+  },
   centeredView: {
     flex: 1,
     justifyContent: "center",
@@ -615,11 +652,12 @@ const getStyles = (colorScheme) => StyleSheet.create({
     justifyContent: 'flex-start',
   },
   button: {
+    
     alignItems: 'center',
-    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
-    marginTop: 16,
-    width: 300,
+    backgroundColor: '#d0933f',
+    width: 350,
     padding: 10,
+    borderRadius:10,
   },
   titleSelect: {
     fontSize: 20,

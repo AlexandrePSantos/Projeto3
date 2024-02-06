@@ -16,6 +16,7 @@ import { AuthContext } from '../../Context/AuthContext';
 import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
+import LinearGradient from 'react-native-linear-gradient';
 
 function Item({ item, onPress, onDelete }) {
   return (
@@ -37,7 +38,18 @@ function Item({ item, onPress, onDelete }) {
     </View>
   );
 }
-
+const CustomButton = ({ title, onPress, styles, gradientColors }) => (
+  <TouchableOpacity onPress={onPress}>
+    <LinearGradient
+      colors={gradientColors}
+      style={[styles.button]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+    >
+      <Text style={styles.buttonText}>{title}</Text>
+    </LinearGradient>
+  </TouchableOpacity>
+);
 export default function CriarOrcamento({ navigation }) {
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
@@ -425,7 +437,7 @@ export default function CriarOrcamento({ navigation }) {
               keyboardType="numeric"
             />
             </View>
-            <Button 
+            <CustomButton 
               title="Adicionar" 
               color="#d0933f" 
               onPress={() => {
@@ -461,6 +473,8 @@ export default function CriarOrcamento({ navigation }) {
                   setQuantidade('');
                 }
               }}
+              styles={styles} 
+              gradientColors={['#ff8a2a', '#ffa500']} // Cores do gradiente para o botão Adicionar
             />
 
           <Text style={styles.titleSelect}>Linha de Artigos</Text>
@@ -532,10 +546,12 @@ export default function CriarOrcamento({ navigation }) {
       </Modal>
 
         <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-          <Button
+          <CustomButton
             title="Criar Orçamento"
             color="#d0933f"
             onPress={() => handleCreateOrcamento()}
+            styles={styles}
+            gradientColors={['#ff8a2a', '#ffa500']} // Cores do gradiente para o botão Criar Orçamento
           />
         </View>
       </View>
@@ -553,9 +569,15 @@ const getStyles = (colorScheme) => StyleSheet.create({
   button: {
     alignItems: 'center',
     backgroundColor: '#d0933f',
-    marginTop: 16,
-    width: 300,
+    width: 350,
     padding: 10,
+    borderRadius:10,
+  },
+  buttonText: {
+    color: '#ffffff', // Letras brancas
+    fontWeight: 'bold', // Negrito
+    textAlign: 'center', // Centralizado
+    fontSize: 20,
   },
   titleSelect: {
     fontSize: 20,
