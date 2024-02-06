@@ -94,9 +94,9 @@ const CustomHeader = ({ title, showBackButton, showLogoutButton, onLogout }) => 
     >
       <View style={{ position: 'absolute', left: 10 }}>
         {showBackButton && (
-          <Button title="Voltar" color="gray" onPress={() => navigation.goBack()} />
+          <Button title="Voltar" color="#FFA500" onPress={() => navigation.goBack()} />
         )}
-        {showLogoutButton && <Button title="Sair" color="gray" onPress={onLogout} />}
+        {showLogoutButton && <Button title="Sair" color="#FFA500" onPress={onLogout} />}
       </View>
       <Text style={styles.headerText}>{title}</Text>
     </LinearGradient>
