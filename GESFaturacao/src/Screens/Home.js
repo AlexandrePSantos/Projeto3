@@ -78,7 +78,12 @@ const getStyles = (colorScheme) => StyleSheet.create({
 });
 
 const Button = ({ title, onPress, styles }) => (
-  <TouchableOpacity onPress={onPress}>
+  <TouchableOpacity
+    onPress={onPress}
+    onPressOut={() => {
+      // Código para retornar o botão ao estado normal
+    }}
+  >
     <LinearGradient
       colors={['#ff8a2a', '#ffa500']} // Cores do gradiente from the image
       style={[styles.menuButton, styles.shadow]}
@@ -89,7 +94,6 @@ const Button = ({ title, onPress, styles }) => (
     </LinearGradient>
   </TouchableOpacity>
 );
-
 
 const Container = ({ title, children, styles }) => (
   <View>
