@@ -35,7 +35,7 @@ const Login = ({}) => {
       alignItems: 'center',
       borderBottomLeftRadius: 30,
       borderBottomRightRadius: 30,
-      backgroundColor: '#BE6E31',
+      backgroundColor: '#ff8a2a',
       marginBottom: 50,
     },
     logo: {
@@ -63,7 +63,7 @@ const Login = ({}) => {
       marginBottom: 25,
       borderRadius: 7,
       borderBottomWidth: 1,
-      borderBottomColor: '#BE6E31',
+      borderBottomColor: '#ff8a2a',
     },
     inputWrapper: {
       flexDirection: 'row',
@@ -77,7 +77,7 @@ const Login = ({}) => {
       top: '21%',
     },
     btnSignIn: {
-      backgroundColor: '#BE6E31',
+      backgroundColor: '#ff8a2a',
       borderRadius: 7,
       marginTop: 15,
       marginBottom: 15,
@@ -140,7 +140,7 @@ const Login = ({}) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"} 
       style={styles.background}
     >
-    <LinearGradient colors={['#9A531B', '#BE6E31', '#E59450']} style={styles.navbar} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} >
+    <LinearGradient colors={['#ff8a2a', '#BE6E31', '#E59450']} style={styles.navbar} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} >
       <Image 
         source={require('./assets/logotipoW.png')}
         style={styles.logo} 
@@ -179,8 +179,8 @@ const Login = ({}) => {
       <Switch 
         value={rememberCredentials} 
         onValueChange={setRememberCredentials} 
-        trackColor={{ false: "#767577", true: "#BE6E31" }} 
-        thumbColor={rememberCredentials ? "#BE6E31" : "#f4f3f4"}
+        trackColor={{ false: "#767577", true: "#ff8a2a" }} 
+        thumbColor={rememberCredentials ? "#ff8a2a" : "#f4f3f4"}
       />
       <Text style={{ color: colorScheme === 'dark' ? '#fff' : '#000' }}>Lembrar credênciais?</Text>
     </View>
