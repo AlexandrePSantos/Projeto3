@@ -140,7 +140,7 @@ const Login = ({}) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"} 
       style={styles.background}
     >
-    <LinearGradient colors={['#ff8a2a', '#ffa500']} style={styles.navbar} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} >
+    <LinearGradient colors={['#ff8a2a', '#ffa65d']} style={styles.navbar} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} >
       <Image 
         source={require('./assets/logotipoW.png')}
         style={styles.logo} 
