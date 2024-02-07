@@ -564,7 +564,7 @@ export default function CriarOrcamento({ route, navigation }) {
             <Text style={styles.titleSelect}>Mudar quantidade</Text>
             <View style={styles.borderMargin}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { width: 100, textAlign: 'center' }]}
               onChangeText={setQuantidade}
               value={quantidade}
               placeholder="Quantidade"
@@ -654,7 +654,8 @@ const getStyles = (colorScheme) => StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
+    borderRadius:10,
   },
   modalText: {
     color: '#ffffff', // Letras brancas

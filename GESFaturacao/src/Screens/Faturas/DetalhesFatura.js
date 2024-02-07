@@ -19,6 +19,7 @@ import moment from 'moment/moment';
 import { AuthContext } from '../../Context/AuthContext';
 import LinearGradient from 'react-native-linear-gradient';
 
+
 function Item({ item, onPress, onDelete, isEditing }) {
   return (
     <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, borderBottomWidth: 1, borderColor: '#000'}}>
@@ -515,7 +516,7 @@ export default function DetalhesFatura({ route, navigation }) {
             })}
           </Picker>
           <TextInput
-            style={{flex: 1}}
+            style={[{flex: 1}]}
             onChangeText={(text) => setQuantidade(text)}
             value={quantidade}
             placeholder="Quantidade"
@@ -591,47 +592,47 @@ export default function DetalhesFatura({ route, navigation }) {
         }}
       >
         <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.titleSelect}>Change Quantity</Text>
-            <View style={styles.borderMargin}>
-            <TextInput
-              style={styles.input}
-              onChangeText={setQuantidade}
-              value={quantidade}
-              placeholder="Quantidade"
-              keyboardType="numeric"
-            />
-            </View>
-            <View style={styles.buttonModal}>
-              <CustomButtonModal 
-                title="Confirmar" 
-                onPress={() => {
-                  const existingItemIndex = LinhasC.findIndex(item => item.id === selectedItem.id);
-
-                  if (existingItemIndex >= 0) {
-                    LinhasC[existingItemIndex].quantity = quantidade;
-                  }
-
-                  setLinhas([...LinhasC]);
-
-                  setSelectedItem(null);
-                  setQuantidade('');
-
-                  setModalVisible(false);
-                }}
-                styles={styles}
-                gradientColors={['#ff8a2a', '#ffa500']}
+            <View style={styles.modalView}>
+              <Text style={styles.titleSelect}>Change Quantity</Text>
+              <View style={styles.borderMargin}>
+              <TextInput
+                style={[styles.input, { width: 100, textAlign: 'center' }]}
+                onChangeText={setQuantidade}
+                value={quantidade}
+                placeholder="Quantidade"
+                keyboardType="numeric"
               />
               </View>
               <View style={styles.buttonModal}>
-              <CustomButtonModal
-                styles={styles}
-                gradientColors={['#ff0000', '#ffa500']}
-                title="Cancelar" 
-                onPress={() => setModalVisible(false)}
-              />
+                <CustomButtonModal 
+                  title="Confirmar" 
+                  onPress={() => {
+                    const existingItemIndex = LinhasC.findIndex(item => item.id === selectedItem.id);
+
+                    if (existingItemIndex >= 0) {
+                      LinhasC[existingItemIndex].quantity = quantidade;
+                    }
+
+                    setLinhas([...LinhasC]);
+
+                    setSelectedItem(null);
+                    setQuantidade('');
+
+                    setModalVisible(false);
+                  }}
+                  styles={styles}
+                  gradientColors={['#ff8a2a', '#ffa500']}
+                />
+                </View>
+                <View style={styles.buttonModal}>
+                <CustomButtonModal
+                  styles={styles}
+                  gradientColors={['#ff0000', '#ffa500']}
+                  title="Cancelar" 
+                  onPress={() => setModalVisible(false)}
+                />
+              </View>
             </View>
-          </View>
         </View>
       </Modal>
       
@@ -679,7 +680,8 @@ const getStyles = (colorScheme) => StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
+    borderRadius:10
   },
   modalText: {
     color: '#ffffff', // Letras brancas

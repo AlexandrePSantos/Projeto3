@@ -367,7 +367,7 @@ export default function DetalhesArtigo({ route, navigation }) {
 
       {isEditing && (
           <>
-      <View style={{marginTop: 10, marginBottom: 20, width: 350}}>
+      <View style={{marginTop: 10, marginBottom: 0, width: 350}}>
         <CustomButton
           title="Confirmar"
           color="#d0933f"
