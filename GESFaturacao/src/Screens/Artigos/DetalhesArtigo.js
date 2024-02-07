@@ -90,10 +90,16 @@ export default function DetalhesArtigo({ route, navigation }) {
             setObservations(fetchedArtigo.data.observations);
             setLabel(fetchedArtigo.data.label);
             setImage(fetchedArtigo.data.image);
-              
+
+            console.log('Image: ', fetchedArtigo.data.image);
+            console.log('Artigo: ', fetchedArtigo.data);
             if (categoryResponse.data) {
               setDadosCategorias(categoryResponse.data);
-              const selectedCategory = categoryResponse.data.find(category => category.name.toUpperCase() === fetchedArtigo.data.category.toUpperCase());
+              const selectedCategory = categoryResponse.data.find(category => {
+                const categoryName = category.name;
+                const fetchedCategoryName = fetchedArtigo.data.category;
+                return categoryName && fetchedCategoryName && categoryName.toUpperCase() === fetchedCategoryName.toUpperCase();
+              });
               if (selectedCategory) {
                 setSelectedIdCategory(selectedCategory.id);
               } else {
@@ -123,6 +129,7 @@ export default function DetalhesArtigo({ route, navigation }) {
   }, [artigoId]);
   
   const handleConfirmarEditar = async () => {    
+    console.log('Image about to be sent: ', image);
     EditarArtigo(
       artigoId,
       code,
@@ -231,7 +238,7 @@ export default function DetalhesArtigo({ route, navigation }) {
           <View style={styles.borderMargin}>
           <Picker
             style={styles.pickerComponent}
-            selectedValue={selectedIdCategory.toString()}
+            selectedValue={selectedIdCategory ? selectedIdCategory.toString() : null}
             onValueChange={itemValue => { 
               setSelectedIdCategory(itemValue); 
               const selectedCategory = dadosCategorias.find(categoria => categoria.id.toString() === itemValue);

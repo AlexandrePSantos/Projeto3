@@ -882,6 +882,8 @@ export const AuthProvider = ({children}) => {
           'image': image,
           'initialPrice': precoIni,
         });
+
+        console.log('Image sent to the api: ' + image);
       
         let config = {
           method: 'put',
