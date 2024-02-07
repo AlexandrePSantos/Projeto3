@@ -78,7 +78,7 @@ export default function ListarOrcamentos({navigation}) {
     <View style={styles.orcamentoContainer}>
       <TouchableOpacity onPress={() => navigation.navigate('Detalhes Orçamento', {orcamentoId: orcamento.id})}>
         <View>
-            <Text style={styles.textInOrcamentoContainer}>Número: {orcamento.title}</Text>
+            <Text style={[styles.textInOrcamentoContainer , { marginTop: 5 }]}>Número: {orcamento.title}</Text>
             <Text style={styles.textInOrcamentoContainer}>Cliente: {orcamento.name}</Text>
             <Text style={styles.textInOrcamentoContainer}>NIF: {orcamento.vatNumber} </Text>
             <Text style={styles.textInOrcamentoContainer}>Data: {orcamento.dateFormatted}</Text>
@@ -231,7 +231,6 @@ const getStyles = (colorScheme) => StyleSheet.create({
     marginLeft: 10,
     color: colorScheme === 'dark' ? '#ffffff' : '#444444',
   },
-
   // Container styles
   buttonContainer: {
     flexDirection: 'row',

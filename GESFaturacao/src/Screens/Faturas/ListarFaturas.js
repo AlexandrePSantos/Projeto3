@@ -77,7 +77,7 @@ export default function ListarFaturas({ navigation }) {
     <View style={styles.faturaContainer}>
       <TouchableOpacity onPress={() => navigation.navigate('Detalhes Fatura', { faturaId: fatura.id })} >
         <View>
-          <Text style={styles.textInFaturaContainer}>Número: {fatura.title}</Text>
+          <Text style={[styles.textInFaturaContainer, { marginTop: 5 }]}>Número: {fatura.title}</Text>
           <Text style={styles.textInFaturaContainer}>Cliente: {fatura.name}</Text>
           <Text style={styles.textInFaturaContainer}>NIF: {fatura.vatNumber} </Text>
           <Text style={styles.textInFaturaContainer}>Data: {fatura.dateFormatted}</Text>

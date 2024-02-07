@@ -240,6 +240,20 @@ export default function CriarOrcamento({ route, navigation }) {
       </LinearGradient>
     </TouchableOpacity>
   );
+
+  const CustomButtonModal = ({ title, onPress, styles, gradientColors }) => (
+    <TouchableOpacity onPress={onPress}>
+      <LinearGradient
+        colors={gradientColors}
+        style={[styles.buttonModal]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
+        <Text style={styles.modalText}>{title}</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+
   
   return (
     <ScrollView>
@@ -558,8 +572,7 @@ export default function CriarOrcamento({ route, navigation }) {
             />
             </View>
             <View style={styles.buttonModal}>
-              <Button 
-                color={'gray'}
+              <CustomButtonModal
                 title="Confirmar" 
                 onPress={() => {
                   const existingItemIndex = LinhasC.findIndex(item => item.id === selectedItem.id);
@@ -575,11 +588,14 @@ export default function CriarOrcamento({ route, navigation }) {
 
                   setModalVisible(false);
                 }}
+                styles={styles}
+                gradientColors={['#ff8a2a', '#ffa500']}
               />
               </View>
               <View style={styles.buttonModal}>
-              <Button 
-                color={'gray'}
+              <CustomButtonModal
+                styles={styles}
+                gradientColors={['#ff0000', '#ffa500']}
                 title="Cancelar" 
                 onPress={() => setModalVisible(false)}
               />
@@ -641,9 +657,10 @@ const getStyles = (colorScheme) => StyleSheet.create({
     elevation: 5
   },
   modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-    color: colorScheme === 'dark' ? '#ffffff' : 'black',
+    color: '#ffffff', // Letras brancas
+    fontWeight: 'bold', // Negrito
+    textAlign: 'center', // Centralizado
+    fontSize: 15,
   },
   container: {
     flex: 1,
@@ -652,7 +669,6 @@ const getStyles = (colorScheme) => StyleSheet.create({
     justifyContent: 'flex-start',
   },
   button: {
-    
     alignItems: 'center',
     backgroundColor: '#d0933f',
     width: 350,
@@ -689,7 +705,9 @@ const getStyles = (colorScheme) => StyleSheet.create({
     backgroundColor: 'transparent',
   },
   buttonModal: {
-    marginBottom: 10,
-    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
+    alignItems: 'center',
+    width: 100,
+    padding: 10,
+    borderRadius:10,
   }
 });

@@ -54,7 +54,7 @@ export default function ListarClientes({ navigation }) {
       <TouchableOpacity onPress={() => navigation.navigate('Detalhes Clientes', { clienteId: cliente.id })} >
         <View style={styles.rowContainer}>
           <View style={styles.clienteInfo}>
-            <Text style={styles.text}>ID: {cliente.id.toString()}</Text>
+            <Text style={[styles.text, { marginTop: 5 }]}>ID: {cliente.id.toString()}</Text>
             <Text style={styles.text}>Nome: {cliente.name}</Text>
             <Text style={styles.text}>NIF: {cliente.vatNumber}</Text>
             <Text style={styles.text}>Email: {cliente.email}</Text>

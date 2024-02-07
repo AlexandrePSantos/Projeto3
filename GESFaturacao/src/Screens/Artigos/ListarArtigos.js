@@ -52,7 +52,7 @@ export default function ListarArtigos({ navigation }) {
       <TouchableOpacity onPress={() => navigation.navigate('Detalhes Artigo', { artigoId: artigo.id })} >
         <View style={styles.rowContainer}>
           <View style={styles.artigoInfo}>
-            <Text style={styles.text}>ID: {artigo.id.toString()}</Text>
+            <Text style={[styles.text, { marginTop: 5 }]}>ID: {artigo.id.toString()}</Text>
             <Text style={styles.text}>Preço: {parseFloat(artigo.price).toFixed(2)}</Text>
             <Text style={styles.text}>Preço+Tax: {parseFloat(artigo.pricePvp).toFixed(2)}€</Text>
             <Text style={styles.text}>Descrição: {artigo.description.toString()}</Text>
