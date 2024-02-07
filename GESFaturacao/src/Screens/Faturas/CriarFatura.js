@@ -573,7 +573,7 @@ export default function CriarFatura({ navigation }) {
         </View>
       </Modal>
         
-      <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+      <View style={{marginTop: 10, marginBottom: 20, width: 350}}>
           <CustomButton
             title="Criar Fatura"
             onPress={() => handleCreateFatura()}

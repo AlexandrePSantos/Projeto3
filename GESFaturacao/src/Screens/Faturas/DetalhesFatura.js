@@ -17,6 +17,7 @@ import { Picker } from '@react-native-picker/picker';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 import { AuthContext } from '../../Context/AuthContext';
+import LinearGradient from 'react-native-linear-gradient';
 
 function Item({ item, onPress, onDelete, isEditing }) {
   return (
@@ -236,6 +237,7 @@ export default function DetalhesFatura({ route, navigation }) {
     setLinhas(newLinhasC);
   }
 
+
   // Loading indicator
   if (loading) {
     return (
@@ -245,19 +247,42 @@ export default function DetalhesFatura({ route, navigation }) {
     );
   }
 
+  const CustomButton = ({ title, onPress, styles, gradientColors }) => (
+    <TouchableOpacity onPress={onPress}>
+      <LinearGradient
+        colors={gradientColors}
+        style={[styles.button]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
+        <Text style={styles.buttonText}>{title}</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+
   return (
     <ScrollView>
-    <View style={styles.container}>
-    {finalizarDoc === '0' && (
-      <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-        <Button
-          title={isEditing ? "Cancelar" : "Editar"}
-          color="#d0933f"
-          onPress={() => setIsEditing(!isEditing)}
-        />
-      </View>
-      )}
-      <View pointerEvents={isEditing ? 'auto' : 'none'} style={{marginTop: 10}}>
+      <View style={styles.container}>
+      {finalizarDoc === '0' && (
+        <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+          {isEditing ? (
+            <CustomButton
+              title="Cancelar"
+              onPress={() => setIsEditing(false)}
+              styles={styles}
+              gradientColors={['#ff0000', '#ffa500']}
+            />
+          ) : (
+            <CustomButton
+              title="Editar"
+              onPress={() => setIsEditing(true)}
+              styles={styles}
+              gradientColors={['#ff8a2a', '#ffa500']}
+            />
+          )}
+        </View>
+    )}
+    <View pointerEvents={isEditing ? 'auto' : 'none'} style={{marginTop: 10}}>
 
         {/* Cliente - DONE */}
         <Text style={styles.titleSelect}>Client</Text>
@@ -484,9 +509,9 @@ export default function DetalhesFatura({ route, navigation }) {
             keyboardType="numeric"
           />
           </View>
-          <Button 
+          <CustomButton
             title="Adicionar" 
-            color="#d0933f" 
+             
             onPress={() => {
               if (!artigo) {
                 Alert.alert('Erro', 'Selecione um artigo');
@@ -520,6 +545,8 @@ export default function DetalhesFatura({ route, navigation }) {
                 setQuantidade('');
               }
             }}
+            styles={styles}
+            gradientColors={['#ff8a2a', '#ffa500']}
           />
           </>
           )}
@@ -595,11 +622,13 @@ export default function DetalhesFatura({ route, navigation }) {
       
       {isEditing && (
           <>
-      <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-        <Button
+      <View style={{marginTop: 10, marginBottom: 20, width: 350}}>
+        <CustomButton
           title="Confirmar"
           color="#d0933f"
           onPress={() => handleConfirmarEditar()}
+          styles={styles}
+          gradientColors={['#ff8a2a', '#ffa500']}
         />
       </View>
       </>
@@ -651,10 +680,16 @@ const getStyles = (colorScheme) => StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
-    marginTop: 16,
-    width: 300,
+    backgroundColor: '#d0933f',
+    width: 350,
     padding: 10,
+    borderRadius:10,
+  },
+  buttonText: {
+    color: '#ffffff', // Letras brancas
+    fontWeight: 'bold', // Negrito
+    textAlign: 'center', // Centralizado
+    fontSize: 20,
   },
   titleSelect: {
     fontSize: 20,

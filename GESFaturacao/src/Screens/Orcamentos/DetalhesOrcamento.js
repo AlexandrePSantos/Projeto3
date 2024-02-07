@@ -590,7 +590,7 @@ export default function CriarOrcamento({ route, navigation }) {
 
       {isEditing && (
           <>
-      <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+      <View style={{marginTop: 10, marginBottom: 20, width: 350}}>
         <CustomButtonConfirm
           title="Confirmar"
           color="#d0933f"

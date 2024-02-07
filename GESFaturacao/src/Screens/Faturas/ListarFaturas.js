@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useColorScheme, StyleSheet, Text, Button, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import Modal from 'react-native-modal';
+import LinearGradient from 'react-native-linear-gradient';
 
 import { AuthContext } from '../../Context/AuthContext';
 
@@ -87,23 +88,34 @@ export default function ListarFaturas({ navigation }) {
         </View>
       </TouchableOpacity>
       {fatura.status !== 'Anulado' && (
-      <View style={styles.buttonContainer}>
-        <Button
-          color={'gray'}
-          title={fatura.status === 'Aberto' ? 'Enviar' : 'Finalizar'}
-          onPress={() => handlePress(fatura)}
-        />
-        {fatura.status === 'Rascunho' && (
-          <Button
-            color={'gray'}
-            title="Remover"
-            onPress={() => handleRemoverFatura(fatura)}
-          />
-        )}
-      </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={() => handlePress(fatura)}>
+            <LinearGradient
+              colors={['#ff8a2a', '#ffa500']}
+              style={styles.button}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+            >
+              <Text style={styles.buttonText}>{fatura.status === 'Aberto' ? 'Enviar' : 'Finalizar'}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          {fatura.status === 'Rascunho' && (
+            <TouchableOpacity onPress={() => handleRemoverFatura(fatura)}>
+              <LinearGradient
+                colors={['#ff0000', '#ffa500']}
+                style={styles.button}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Text style={styles.buttonText}>Remover</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
+        </View>
       )}
     </View>
   );
+  
 
   const keyExtractor = (item) => item.id.toString();
 
@@ -167,7 +179,13 @@ const getStyles = (colorScheme) => StyleSheet.create({
   // General styles
   button: {
     marginBottom: 10,
-    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 100, 
+    height: 35,
+    marginRight: 10,
+    marginLeft:10,
   },
   input: {
     height: 40,
@@ -185,7 +203,11 @@ const getStyles = (colorScheme) => StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   container: {
     flex: 1,
     backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',

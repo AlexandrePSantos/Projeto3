@@ -6,6 +6,7 @@ import {
   TextInput,
   View,
   ScrollView,
+  TouchableOpacity,
   Button,
   Alert,
   ToastAndroid,
@@ -14,6 +15,7 @@ import {
 import CheckBox from '@react-native-community/checkbox';
 import { Picker } from '@react-native-picker/picker';
 import {AuthContext} from '../../Context/AuthContext';
+import LinearGradient from 'react-native-linear-gradient';
 
 export default function CriarArtigo({navigation}) {
   const colorScheme = useColorScheme();
@@ -111,6 +113,19 @@ export default function CriarArtigo({navigation}) {
       ToastAndroid.show('Erro ao criar Artigo', ToastAndroid.SHORT);
     }); 
   }
+
+  const CustomButton = ({ title, onPress, styles, gradientColors }) => (
+    <TouchableOpacity onPress={onPress}>
+      <LinearGradient
+        colors={gradientColors}
+        style={[styles.button]} // Make sure to access the button style from styles object
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
+        <Text style={styles.buttonText}>{title}</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
 
   return (
     <ScrollView>
@@ -262,11 +277,13 @@ export default function CriarArtigo({navigation}) {
             />
           </View>
       </View>
-      <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-          <Button
+      <View style={{marginTop: 10, marginBottom: 20, width: 350}}>
+          <CustomButton
             title="Criar Artigo"
             color="#d0933f"
             onPress={() => handleCreateArtigo()}
+            styles={styles}
+            gradientColors={['#ff8a2a', '#ffa500']}
           />
         </View>
       </View>
@@ -284,9 +301,15 @@ const getStyles = (colorScheme) => StyleSheet.create({
   button: {
     alignItems: 'center',
     backgroundColor: '#d0933f',
-    marginTop: 16,
-    width: 300,
+    width: 350,
     padding: 10,
+    borderRadius:10,
+  },
+    buttonText: {
+    color: '#ffffff', // Letras brancas
+    fontWeight: 'bold', // Negrito
+    textAlign: 'center', // Centralizado
+    fontSize: 20,
   },
   titleSelect: {
     fontSize: 20,

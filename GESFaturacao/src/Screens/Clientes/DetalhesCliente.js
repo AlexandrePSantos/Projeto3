@@ -7,6 +7,7 @@ import {
   View,
   ScrollView,
   Button,
+  TouchableOpacity,
   ToastAndroid,
   useColorScheme,
   ActivityIndicator
@@ -14,6 +15,7 @@ import {
 import CheckBox from '@react-native-community/checkbox';
 import { Picker } from '@react-native-picker/picker';
 import {AuthContext} from '../../Context/AuthContext';
+import LinearGradient from 'react-native-linear-gradient';
 
 export default function DetalhesCliente({ route, navigation }) {
     const colorScheme = useColorScheme();
@@ -153,17 +155,41 @@ export default function DetalhesCliente({ route, navigation }) {
         );
     }
 
+    const CustomButton = ({ title, onPress, styles, gradientColors }) => (
+      <TouchableOpacity onPress={onPress}>
+        <LinearGradient
+          colors={gradientColors}
+          style={[styles.button]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Text style={styles.buttonText}>{title}</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+    );
     return (
         <ScrollView>
             <View style={styles.container}>
-                <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-                    <Button
-                      title={isEditing ? "Cancelar" : "Editar"}
-                      color="#d0933f"
-                      onPress={() => setIsEditing(!isEditing)}
-                    />
-                </View>
-                <View pointerEvents={isEditing ? 'auto' : 'none'} style={{marginTop: 10}}>
+          <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
+            {isEditing ? (
+              <CustomButton
+                title="Cancelar"
+                onPress={() => setIsEditing(false)}
+                styles={styles}
+                gradientColors={['#ff0000', '#ffa500']}
+              />
+            ) : (
+              <CustomButton
+                title="Editar"
+                onPress={() => setIsEditing(true)}
+                styles={styles}
+                gradientColors={['#ff8a2a', '#ffa500']}
+              />
+            )}
+          </View>
+        
+        <View pointerEvents={isEditing ? 'auto' : 'none'} style={{marginTop: 10}}>
+
 
         {/* Código - Obrigatório - TextInput */}
         <Text style={styles.titleSelect}>Código Interno</Text>
@@ -457,11 +483,12 @@ export default function DetalhesCliente({ route, navigation }) {
             </View>
                 {isEditing && (
                     <>
-                        <View style={{marginTop: 30, marginBottom: 10, width: 350}}>
-                            <Button
+                        <View style={{marginTop: 10, marginBottom: 20, width: 350}}>
+                            <CustomButton
                             title="Confirmar"
-                            color="#d0933f"
                             onPress={() => handleConfirmarEditar()}
+                            styles={styles}
+                            gradientColors={['#ff8a2a', '#ffa500']}
                             />
                         </View>
                     </>
@@ -482,9 +509,15 @@ const getStyles = (colorScheme) => StyleSheet.create({
     button: {
       alignItems: 'center',
       backgroundColor: '#d0933f',
-      marginTop: 16,
-      width: 300,
+      width: 350,
       padding: 10,
+      borderRadius:10,
+    },
+    buttonText: {
+      color: '#ffffff', // Letras brancas
+      fontWeight: 'bold', // Negrito
+      textAlign: 'center', // Centralizado
+      fontSize: 20,
     },
     titleSelect: {
       fontSize: 20,
