@@ -62,9 +62,9 @@ function Item({ item, onPress, onDelete }) {
           <Text style={styles.itemText}>
             {"ID: " + item.id + "\n" +
             "Artigo: " + item.description + "\n" +
-            "Preço Un.: " + Number(item.price) + " €\n" +
+            "Preço Un.: " + parseFloat(item.price).toFixed(2) + " €\n" +
             "QTD.: " + parseInt(item.quantity) + "\n" +
-            "Total: " + Number(item.price) * Number(item.quantity) + " €"}
+            "Total: " + (parseFloat(item.price) * parseInt(item.quantity)).toFixed(2) + " €"}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
@@ -74,6 +74,7 @@ function Item({ item, onPress, onDelete }) {
     </View>
   );
 }
+
 
 export default function CriarOrcamento({ route, navigation }) {
   const colorScheme = useColorScheme();
