@@ -18,12 +18,47 @@ import DatePicker from 'react-native-date-picker';
 import moment from 'moment/moment';
 import LinearGradient from 'react-native-linear-gradient';
 
+const styles = StyleSheet.create({
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    backgroundColor: '#f9f9f9',
+  },
+  itemDetails: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flex: 1,
+  },
+  itemText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  deleteButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#bf4346',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontSize: 20,
+    marginBottom: 10,
+  },
+});
+
 function Item({ item, onPress, onDelete }) {
   return (
-    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 8, borderBottomWidth: 1, borderColor: '#000'}}>
-      <View style={{flexDirection: 'row', justifyContent: 'space-between', flex: 1}}>
+    <View style={styles.itemContainer}>
+      <View style={styles.itemDetails}>
         <TouchableOpacity onPress={onPress}>
-          <Text>
+          <Text style={styles.itemText}>
             {"ID: " + item.id + "\n" +
             "Artigo: " + item.description + "\n" +
             "Preço Un.: " + Number(item.price) + " €\n" +
@@ -31,13 +66,14 @@ function Item({ item, onPress, onDelete }) {
             "Total: " + Number(item.price) * Number(item.quantity) + " €"}
           </Text>
         </TouchableOpacity>
-        <View style={{marginLeft: 10}}>
-          <Button title="x" color="#bf4346" onPress={onDelete} />
-        </View>
+        <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
+          <Text style={styles.deleteButtonText}>x</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
+
 const CustomButton = ({ title, onPress, styles, gradientColors }) => (
   <TouchableOpacity onPress={onPress}>
     <LinearGradient
@@ -480,7 +516,7 @@ export default function CriarOrcamento({ navigation }) {
           <Text style={styles.titleSelect}>Linha de Artigos</Text>
           <View style={styles.borderMargin}>
             {LinhasC.length === 0 ? (
-              <Text>Sem artigos selecionados</Text>
+              <Text style={styles.emptyText}>Sem artigos selecionados</Text>
             ) : (
               LinhasC.map((item, index) => (
                 <Item 
@@ -504,7 +540,7 @@ export default function CriarOrcamento({ navigation }) {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.titleSelect}>Change Quantity</Text>
+            <Text style={styles.titleSelect}>Alterar Quantidade</Text>
             <View style={styles.borderMargin}>
             <TextInput
               style={styles.input}
@@ -632,5 +668,12 @@ const getStyles = (colorScheme) => StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  emptyText: {
+    color: '#000',
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 10,
   },
 });
