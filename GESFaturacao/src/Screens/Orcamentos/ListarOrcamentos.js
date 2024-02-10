@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useColorScheme, StyleSheet, Text, Button, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import Modal from 'react-native-modal';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -10,18 +11,25 @@ export default function ListarOrcamentos({navigation}) {
   const styles = getStyles(colorScheme);
 
   const [loading, setLoading] = useState(true);
-  const { getOrcamentos, enviarEmail, finalizarOrcamento, removerOrcamento } = useContext(AuthContext);
+  const { getOrcamentos, enviarEmail, finalizarOrcamento, removerOrcamento, getSeries } = useContext(AuthContext);
   const [orcamentos, setOrcamentos] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedOrcamento, setSelectedOrcamento] = useState(null);
   const [email, setEmail] = useState('');
 
+  // Filtro por status
+  const [selectedStatus, setSelectedStatus] = useState(null);
+
+  const [allOrcamentos, setAllOrcamentos] = useState([]);
+
+  // Função para carregar os dados dos orçamentos
   const carregarOrcamentos = async () => {
     try {
       const response = await getOrcamentos();
       if (response.data) {
         const sortedOrcamentos = response.data.sort((a, b) => b.id - a.id);
         setOrcamentos(sortedOrcamentos);
+        setAllOrcamentos(sortedOrcamentos);
         setLoading(false);
       }
     } catch (error) {
@@ -36,7 +44,7 @@ export default function ListarOrcamentos({navigation}) {
   const handleFinalizarOrcamento = async (orcamento) => {
     try {
       await finalizarOrcamento(orcamento.id);
-      console.log('Orçamento finalizada com sucesso', orcamento.id);
+      console.log('Orçamento finalizado com sucesso', orcamento.id);
       await carregarOrcamentos();
     } catch (error) {
       console.error('Erro ao finalizar Orçamento:', error);
@@ -46,7 +54,7 @@ export default function ListarOrcamentos({navigation}) {
   const handleRemoverOrcamento = async (orcamento) => {
     try {
       await removerOrcamento(orcamento.id);
-      console.log('Orçamento removida com sucesso', orcamento.id);
+      console.log('Orçamento removido com sucesso', orcamento.id);
       await carregarOrcamentos();
     } catch (error) {
       console.error('Erro ao remover Orçamento:', error);
@@ -64,7 +72,6 @@ export default function ListarOrcamentos({navigation}) {
     }
   };
 
-  
   const handlePress = (orcamento) => {
     if (orcamento.status === 'Aberto') {
       setSelectedOrcamento(orcamento);
@@ -74,48 +81,53 @@ export default function ListarOrcamentos({navigation}) {
     }
   };
 
-  const renderItem =({item: orcamento}) => (
-    <View style={styles.orcamentoContainer}>
-      <TouchableOpacity onPress={() => navigation.navigate('Detalhes Orçamento', {orcamentoId: orcamento.id})}>
-        <View>
-            <Text style={[styles.textInOrcamentoContainer , { marginTop: 5 }]}>Número: {orcamento.title}</Text>
+  const renderItem = ({ item: orcamento }) => {
+    if (selectedStatus && orcamento.status !== selectedStatus) {
+      return null;
+    }
+
+    return (
+      <View style={styles.orcamentoContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate('Detalhes Orçamento', { orcamentoId: orcamento.id })}>
+          <View>
+            <Text style={[styles.textInOrcamentoContainer, { marginTop: 5 }]}>Número: {orcamento.title}</Text>
             <Text style={styles.textInOrcamentoContainer}>Cliente: {orcamento.name}</Text>
             <Text style={styles.textInOrcamentoContainer}>NIF: {orcamento.vatNumber} </Text>
             <Text style={styles.textInOrcamentoContainer}>Data: {orcamento.dateFormatted}</Text>
             <Text style={styles.textInOrcamentoContainer}>Data Venc.: {orcamento.expirationFormatted}</Text>
             <Text style={styles.textInOrcamentoContainer}>Total: {parseFloat(orcamento.total).toFixed(2)}€</Text>
             <Text style={styles.textInOrcamentoContainer}>Estado: {orcamento.status}</Text>
-        </View>
-      </TouchableOpacity>
-      {orcamento.status !== 'ANULADO' && (
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={() => handlePress(orcamento)}>
-            <LinearGradient
-              colors={['#ff8a2a', '#ffa500']}
-              style={styles.button}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <Text style={styles.buttonText}>{orcamento.status === 'Aberto' ? 'Enviar' : 'Finalizar'}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-          {orcamento.status === 'Rascunho' && (
-            <TouchableOpacity onPress={() => handleRemoverOrcamento(orcamento)}>
+          </View>
+        </TouchableOpacity>
+        {orcamento.status !== 'ANULADO' && (
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity onPress={() => handlePress(orcamento)}>
               <LinearGradient
-                colors={['#ff0000', '#ffa500']}
+                colors={['#ff8a2a', '#ffa500']}
                 style={styles.button}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                <Text style={styles.buttonText}>Remover</Text>
+                <Text style={styles.buttonText}>{orcamento.status === 'Aberto' ? 'Enviar' : 'Finalizar'}</Text>
               </LinearGradient>
             </TouchableOpacity>
-          )}
-        </View>
-
-      )}
-    </View>
-  );
+            {orcamento.status === 'Rascunho' && (
+              <TouchableOpacity onPress={() => handleRemoverOrcamento(orcamento)}>
+                <LinearGradient
+                  colors={['#ff0000', '#ffa500']}
+                  style={styles.button}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Text style={styles.buttonText}>Remover</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+      </View>
+    );
+  };
 
   const keyExtractor = (item) => item.id.toString();
 
@@ -130,7 +142,16 @@ export default function ListarOrcamentos({navigation}) {
 
   return (
     <View>
-      <Text style={styles.titleSelect}></Text>
+      <Picker
+        style={styles.pickerComponent}
+        selectedValue={selectedStatus}
+        onValueChange={(itemValue) => setSelectedStatus(itemValue)}
+      >
+        <Picker.Item label="Filtre por Estado" value={null} />
+        <Picker.Item label="Rascunho" value="Rascunho" />
+        <Picker.Item label="Aberto" value="Aberto" />
+      </Picker>
+
       <FlatList
         data={orcamentos}
         renderItem={renderItem}
@@ -171,7 +192,6 @@ export default function ListarOrcamentos({navigation}) {
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }
@@ -183,7 +203,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 100, // Aqui estava o erro
+    width: 100,
     height: 35,
     marginRight: 10,
     marginLeft:10,
@@ -216,12 +236,6 @@ const getStyles = (colorScheme) => StyleSheet.create({
     backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
   },
   // Text styles
-  titleSelect: {
-    fontSize: 20,
-    margin: 10,
-    fontWeight: "bold",
-    color: colorScheme === 'dark' ? '#ffffff' : '#5F5D5C',
-  },
   modalText: {
     marginBottom: 15,
     textAlign: "center",
@@ -268,5 +282,16 @@ const getStyles = (colorScheme) => StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5
+  },
+  pickerComponent: {
+    height: 50,
+    width: '100%',
+    color: colorScheme === 'dark' ? '#ffffff' : '#444444',
+    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: colorScheme === 'dark' ? '#ffffff' : '#444444',
+    borderRadius: 7,
   },
 });
