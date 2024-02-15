@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useColorScheme, StyleSheet, Text, Button, View, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import Modal from 'react-native-modal';
 import LinearGradient from 'react-native-linear-gradient';
-
+import { Picker } from '@react-native-picker/picker';
 import { AuthContext } from '../../Context/AuthContext';
 
 export default function ListarFaturas({ navigation }) {
@@ -16,12 +16,18 @@ export default function ListarFaturas({ navigation }) {
   const [selectedFatura, setSelectedFatura] = useState(null);
   const [email, setEmail] = useState('');
 
+  //filtro
+  const [selectedStatus, setSelectedStatus] = useState(null);
+
+  const [allFaturas, setAllFaturas] = useState([]);
+
   const carregarFaturas = async () => {
     try {
       const response = await getFaturas();
       if (response.data) {
         const sortedFaturas = response.data.sort((a, b) => b.id - a.id);
         setFaturas(sortedFaturas);
+        setAllFaturas(sortedFaturas);
         setLoading(false);
       }
     } catch (error) {
@@ -73,48 +79,53 @@ export default function ListarFaturas({ navigation }) {
     }
   };
 
-  const renderItem = ({ item: fatura }) => (
-    <View style={styles.faturaContainer}>
-      <TouchableOpacity onPress={() => navigation.navigate('Detalhes Fatura', { faturaId: fatura.id })} >
-        <View>
-          <Text style={[styles.textInFaturaContainer, { marginTop: 5 }]}>Número: {fatura.title}</Text>
-          <Text style={styles.textInFaturaContainer}>Cliente: {fatura.name}</Text>
-          <Text style={styles.textInFaturaContainer}>NIF: {fatura.vatNumber} </Text>
-          <Text style={styles.textInFaturaContainer}>Data: {fatura.dateFormatted}</Text>
-          <Text style={styles.textInFaturaContainer}>Data Venc.: {fatura.expirationFormatted}</Text>
-          <Text style={styles.textInFaturaContainer}>Total: {parseFloat(fatura.total).toFixed(2)} €</Text>
-          <Text style={styles.textInFaturaContainer}>Saldo: {parseFloat(fatura.saldo).toFixed(2)} €</Text>
-          <Text style={styles.textInFaturaContainer}>Estado: {fatura.status}</Text>
-        </View>
-      </TouchableOpacity>
-      {fatura.status !== 'Anulado' && (
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={() => handlePress(fatura)}>
-            <LinearGradient
-              colors={['#ff8a2a', '#ffa500']}
-              style={styles.button}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <Text style={styles.buttonText}>{fatura.status === 'Aberto' ? 'Enviar' : 'Finalizar'}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-          {fatura.status === 'Rascunho' && (
-            <TouchableOpacity onPress={() => handleRemoverFatura(fatura)}>
+  const renderItem = ({ item: fatura }) => {
+    if (selectedStatus && fatura.status !== selectedStatus) {
+      return null;
+    }
+    return(
+      <View style={styles.faturaContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate('Detalhes Fatura', { faturaId: fatura.id })} >
+          <View>
+            <Text style={[styles.textInFaturaContainer, { marginTop: 5 }]}>Número: {fatura.title}</Text>
+            <Text style={styles.textInFaturaContainer}>Cliente: {fatura.name}</Text>
+            <Text style={styles.textInFaturaContainer}>NIF: {fatura.vatNumber} </Text>
+            <Text style={styles.textInFaturaContainer}>Data: {fatura.dateFormatted}</Text>
+            <Text style={styles.textInFaturaContainer}>Data Venc.: {fatura.expirationFormatted}</Text>
+            <Text style={styles.textInFaturaContainer}>Total: {parseFloat(fatura.total).toFixed(2)} €</Text>
+            <Text style={styles.textInFaturaContainer}>Saldo: {parseFloat(fatura.saldo).toFixed(2)} €</Text>
+            <Text style={styles.textInFaturaContainer}>Estado: {fatura.status}</Text>
+          </View>
+        </TouchableOpacity>
+        {fatura.status !== 'Anulado' && (
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity onPress={() => handlePress(fatura)}>
               <LinearGradient
-                colors={['#ff0000', '#ffa500']}
+                colors={['#ff8a2a', '#ffa500']}
                 style={styles.button}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                <Text style={styles.buttonText}>Remover</Text>
+                <Text style={styles.buttonText}>{fatura.status === 'Aberto' ? 'Enviar' : 'Finalizar'}</Text>
               </LinearGradient>
             </TouchableOpacity>
-          )}
-        </View>
-      )}
-    </View>
-  );
+            {fatura.status === 'Rascunho' && (
+              <TouchableOpacity onPress={() => handleRemoverFatura(fatura)}>
+                <LinearGradient
+                  colors={['#ff0000', '#ffa500']}
+                  style={styles.button}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Text style={styles.buttonText}>Remover</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+      </View>
+    );
+  };
   
 
   const keyExtractor = (item) => item.id.toString();
@@ -129,7 +140,15 @@ export default function ListarFaturas({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titleSelect}></Text>
+      <Picker
+        style={styles.pickerComponent}
+        selectedValue={selectedStatus}
+        onValueChange={(itemValue) => setSelectedStatus(itemValue)}
+      >
+        <Picker.Item label="Filtre por Estado" value={null} />
+        <Picker.Item label="Rascunho" value="Rascunho" />
+        <Picker.Item label="Aberto" value="Aberto" />
+      </Picker>
       <FlatList
         data={faturas}
         renderItem={renderItem}
