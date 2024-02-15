@@ -137,6 +137,18 @@ export default function ListarFaturas({ navigation }) {
       </View>
     );
   }
+  const CustomButtonModal = ({ title, onPress, styles, gradientColors }) => (
+    <TouchableOpacity onPress={onPress}>
+      <LinearGradient
+        colors={gradientColors}
+        style={[styles.buttonModal]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
+        <Text style={styles.modalText}>{title}</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
@@ -161,29 +173,33 @@ export default function ListarFaturas({ navigation }) {
       >
         <View style={styles.overlay}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Insira email:</Text>
+            <Text style={styles.titleSelect}>Insira email:</Text>
+            <View style={styles.borderMargin}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { width: 200, textAlign: 'center' }]}
               onChangeText={setEmail}
               value={email}
-              placeholder="Email"
+              placeholder="Insira o email"
               keyboardType="email-address"
             />
-            <View style={styles.button}>
-              <Button
-                color={'gray'}
+            </View>
+            <View style={styles.buttonModal}>
+              <CustomButtonModal
                 title="Enviar"
                 onPress={handleEnviarEmail}
+                styles={styles}
+                gradientColors={['#ff8a2a', '#ffa500']}
               />
             </View>
-            <View style={styles.button}>
-              <Button
-                color={'gray'}
+            <View style={styles.buttonModal}>
+              <CustomButtonModal
                 title="Cancelar"
                 onPress={() => {
                   setEmail('');
                   setModalVisible(false);
                 }}
+                styles={styles}
+                gradientColors={['#ff0000', '#ffa500']}
               />
             </View>
           </View>
@@ -206,21 +222,10 @@ const getStyles = (colorScheme) => StyleSheet.create({
     marginRight: 10,
     marginLeft:10,
   },
-  input: {
-    height: 40,
-    marginTop: 10,
-    marginBottom: 15,
-    width: 250,
-    backgroundColor: colorScheme === 'dark' ? '#333333' : '#fff',
-    borderWidth: 1,
-    borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
-    borderRadius: 7,
-  },
   overlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   buttonText: {
     color: '#fff',
@@ -237,11 +242,6 @@ const getStyles = (colorScheme) => StyleSheet.create({
     margin: 10,
     fontWeight: "bold",
     color: colorScheme === 'dark' ? '#ffffff' : '#5F5D5C',
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-    color: colorScheme === 'dark' ? '#ffffff' : 'black',
   },
   textInFaturaContainer: {
     marginLeft: 10,
@@ -284,6 +284,25 @@ const getStyles = (colorScheme) => StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
+    borderRadius:10,
+  },
+  borderMargin: {
+    borderWidth: 1,
+    borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
+    marginBottom: 15,
+    borderRadius: 7,
+  },
+  buttonModal: {
+    alignItems: 'center',
+    width: 100,
+    padding: 10,
+    borderRadius:10,
+  },
+  modalText: {
+    color: '#ffffff', // Letras brancas
+    fontWeight: 'bold', // Negrito
+    textAlign: 'center', // Centralizado
+    fontSize: 15,
   },
 });

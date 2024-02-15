@@ -238,23 +238,14 @@ const getStyles = (colorScheme) => StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-
   overlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-
   },
-
   container: {
     flex: 1,
     backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
-  },
-  // Text styles
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-    color: colorScheme === 'dark' ? '#ffffff' : 'black',
   },
   textInOrcamentoContainer: {
     marginLeft: 10,
