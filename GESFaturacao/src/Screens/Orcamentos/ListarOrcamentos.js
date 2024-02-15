@@ -86,6 +86,8 @@ export default function ListarOrcamentos({navigation}) {
       return null;
     }
 
+  
+
     return (
       <View style={styles.orcamentoContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('Detalhes Orçamento', { orcamentoId: orcamento.id })}>
@@ -140,6 +142,18 @@ export default function ListarOrcamentos({navigation}) {
     );
   }
 
+  const CustomButtonModal = ({ title, onPress, styles, gradientColors }) => (
+    <TouchableOpacity onPress={onPress}>
+      <LinearGradient
+        colors={gradientColors}
+        style={[styles.buttonModal]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
+        <Text style={styles.modalText}>{title}</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
   return (
     <View>
       <Picker
@@ -164,30 +178,35 @@ export default function ListarOrcamentos({navigation}) {
       >
         <View style={styles.overlay}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Enter email: </Text>
+            <Text style={styles.titleSelect}>Enter email: </Text>
+            <View style={styles.borderMargin}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { width: 200, textAlign: 'center' }]}
               onChangeText={setEmail}
               value={email}
               placeholder="Insira o email"
               keyboardType="email-address"
             />
-            <View style={styles.button}>
-              <Button
-                color={'gray'}
+            </View>
+            <View style={styles.buttonModal}>
+              <CustomButtonModal
                 title="Enviar"
                 onPress={handleEnviarEmail}
+                styles={styles}
+                gradientColors={['#ff8a2a', '#ffa500']}
               />
             </View>
-            <View style={styles.button}>
-              <Button
-                color={'gray'}
+            <View style={styles.buttonModal}>
+              <CustomButtonModal
                 title="Cancelar"
                 onPress={() => {
                   setEmail('');
                   setModalVisible(false);
                 }}
+                styles={styles}
+                gradientColors={['#ff0000', '#ffa500']}
               />
+              
             </View>
           </View>
         </View>
@@ -208,27 +227,23 @@ const getStyles = (colorScheme) => StyleSheet.create({
     marginRight: 10,
     marginLeft:10,
   },
+  borderMargin: {
+    borderWidth: 1,
+    borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
+    marginBottom: 15,
+    borderRadius: 7,
+  },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  input: {
-    height: 40,
-    marginTop: 10,
-    marginBottom: 15,
-    width: 250,
-    backgroundColor: colorScheme === 'dark' ? '#333333' : '#fff',
-    borderWidth: 1,
-    borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
-    borderRadius: 7,
-    paddingHorizontal: 10,
-  },
+
   overlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+
   },
 
   container: {
@@ -281,7 +296,8 @@ const getStyles = (colorScheme) => StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
+    borderRadius:10,
   },
   pickerComponent: {
     height: 50,
@@ -293,5 +309,23 @@ const getStyles = (colorScheme) => StyleSheet.create({
     borderWidth: 1,
     borderColor: colorScheme === 'dark' ? '#ffffff' : '#444444',
     borderRadius: 7,
+  },
+  buttonModal: {
+    alignItems: 'center',
+    width: 100,
+    padding: 10,
+    borderRadius:10,
+  },
+  modalText: {
+    color: '#ffffff', // Letras brancas
+    fontWeight: 'bold', // Negrito
+    textAlign: 'center', // Centralizado
+    fontSize: 15,
+  },
+  titleSelect: {
+    fontSize: 20,
+    margin: 10,
+    fontWeight: 'bold',
+    color: colorScheme === 'dark' ? '#ffffff' : '#5F5D5C',
   },
 });

@@ -404,6 +404,7 @@ export default function DetalhesArtigo({ route, navigation }) {
       width: 350,
       padding: 10,
       borderRadius:10,
+      margin:10,
     },
     buttonText: {
       color: '#ffffff', // Letras brancas
