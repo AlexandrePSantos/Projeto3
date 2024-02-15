@@ -570,7 +570,7 @@ export default function CriarFatura({ navigation }) {
         </View>
       </View>
 
-        <Modal
+      <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
@@ -650,7 +650,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
     padding: 10,
     borderRadius:10,
   },
-    buttonText: {
+  buttonText: {
     color: '#ffffff', // Letras brancas
     fontWeight: 'bold', // Negrito
     textAlign: 'center', // Centralizado
@@ -686,6 +686,7 @@ const getStyles = (colorScheme) => StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
     width: 300,
@@ -711,12 +712,6 @@ const getStyles = (colorScheme) => StyleSheet.create({
     fontWeight: 'bold', // Negrito
     textAlign: 'center', // Centralizado
     fontSize: 15,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Add this line
   },
   emptyText: {
     color: '#000',
