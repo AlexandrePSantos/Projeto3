@@ -678,18 +678,13 @@ const getStyles = (colorScheme) => StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalText: {
     color: '#ffffff', // Letras brancas
     fontWeight: 'bold', // Negrito
     textAlign: 'center', // Centralizado
     fontSize: 15,
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   emptyText: {
     color: '#000',
