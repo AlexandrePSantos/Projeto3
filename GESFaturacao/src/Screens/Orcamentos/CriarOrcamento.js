@@ -232,6 +232,18 @@ export default function CriarOrcamento({ navigation }) {
     setLinhas(newLinhasC);
   }
 
+  const CustomButtonModal = ({ title, onPress, styles, gradientColors }) => (
+    <TouchableOpacity onPress={onPress}>
+      <LinearGradient
+        colors={gradientColors}
+        style={[styles.buttonModal]} // Make sure to access the button style from styles object
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+      >
+        <Text style={styles.modalText}>{title}</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
   return (
     <ScrollView>
       <View style={styles.container}>
@@ -538,12 +550,12 @@ export default function CriarOrcamento({ navigation }) {
           setModalVisible(!modalVisible);
         }}
       >
-        <View style={styles.centeredView}>
+        <View style={styles.overlay}>
           <View style={styles.modalView}>
             <Text style={styles.titleSelect}>Alterar Quantidade</Text>
             <View style={styles.borderMargin}>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { width: 100, textAlign: 'center' }]}
               onChangeText={setQuantidade}
               value={quantidade}
               placeholder="Quantidade"
@@ -551,8 +563,7 @@ export default function CriarOrcamento({ navigation }) {
             />
             </View>
             <View style={styles.buttonModal}>
-              <Button 
-                color={'gray'}
+              <CustomButtonModal
                 title="Confirmar" 
                 onPress={() => {
                   const existingItemIndex = LinhasC.findIndex(item => item.id === selectedItem.id);
@@ -568,11 +579,14 @@ export default function CriarOrcamento({ navigation }) {
 
                   setModalVisible(false);
                 }}
+                styles={styles}
+                gradientColors={['#ff8a2a', '#ffa500']}
               />
               </View>
               <View style={styles.buttonModal}>
-              <Button 
-                color={'gray'}
+              <CustomButtonModal
+                styles={styles}
+                gradientColors={['#ff0000', '#ffa500']}
                 title="Cancelar" 
                 onPress={() => setModalVisible(false)}
               />
@@ -625,7 +639,6 @@ const getStyles = (colorScheme) => StyleSheet.create({
     width: 350,
   },
   borderMargin: {
-    backgroundColor: colorScheme === 'dark' ? '#333333' : '#ffffff',
     borderWidth: 1,
     borderColor: colorScheme === 'dark' ? '#ffffff' : 'grey',
     marginBottom: 15,
@@ -637,8 +650,10 @@ const getStyles = (colorScheme) => StyleSheet.create({
     justifyContent: 'center',
   },
   buttonModal: {
-    marginBottom: 10,
-    backgroundColor: colorScheme === 'dark' ? '#ffffff' : '#d0933f',
+    alignItems: 'center',
+    width: 100,
+    padding: 10,
+    borderRadius:10,
   },
   modalView: {
     width: 300,
@@ -656,12 +671,19 @@ const getStyles = (colorScheme) => StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
+    borderRadius:10,
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-    color: colorScheme === 'dark' ? '#ffffff' : 'black',
+    color: '#ffffff', // Letras brancas
+    fontWeight: 'bold', // Negrito
+    textAlign: 'center', // Centralizado
+    fontSize: 15,
   },
   centeredView: {
     flex: 1,

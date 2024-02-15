@@ -583,7 +583,7 @@ export default function CriarFatura({ navigation }) {
             <Text style={styles.titleSelect}>Alterar quantidade: </Text>
             <View style={styles.borderMargin}>
             <TextInput
-              style={[styles.input, { width: 200, textAlign: 'center' }]}
+              style={[styles.input, { width: 100, textAlign: 'center' }]}
               onChangeText={setQuantidade}
               value={quantidade}
               placeholder="Quantidade"
